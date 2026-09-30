@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <title>Project Atlas</title>
-<meta name="description" content="Hybrid-Prototyp v0.3 – animiertes Pixel-Dorf mit Glas-Panels, Detailansicht und Notion-Bearbeitung für Flos Projekte und KI-Team.">
+<meta name="description" content="Hybrid-Prototyp v0.4 – animiertes Pixel-Dorf mit Innenräumen, Wetter und Notion-Bearbeitung für Flos Projekte und KI-Team.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Figtree:wght@400;500;600;700&family=Pixelify+Sans:wght@500;600;700&display=swap" rel="stylesheet">
@@ -99,6 +99,11 @@ a{color:inherit}
 .seg button{border:0;background:none;padding:5px 10px;border-radius:7px;font-family:var(--f-ui);font-weight:600;font-size:12px;color:var(--fg-2);cursor:pointer;white-space:nowrap}
 .seg button[aria-pressed="true"]{background:var(--glass-3);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line-2)}
 .ctl{display:flex;flex-direction:column;gap:4px}
+.wxb{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 11px;border-radius:10px;background:rgba(9,16,22,.55);border:1px solid var(--line);font-family:var(--f-ui);font-weight:600;font-size:12px;color:var(--fg);cursor:pointer;white-space:nowrap}
+.wxb:hover{border-color:var(--line-2)}
+.wxb small{color:var(--fg-3);font-size:10.5px}
+.wx-ic svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wx-ic{color:var(--star)}
 .ctl > span{display:none}
 
 /* ---------- Welt ---------- */
@@ -251,21 +256,23 @@ a{color:inherit}
 .app{transition:filter .35s ease, transform .35s ease}
 body.detail-open .app{filter:blur(9px) saturate(.7) brightness(.62);transform:scale(.985);pointer-events:none;user-select:none}
 body.detail-open{overflow:hidden}
-.detail{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:24px;background:rgba(4,9,12,.38);opacity:0;transition:opacity .28s ease}
+.detail{position:fixed;inset:0;z-index:20;background:#070c10;opacity:0;transition:opacity .35s ease}
 .detail.show{opacity:1}
 .detail[hidden]{display:none}
-.detail-box{position:relative;width:min(1320px,100%);height:min(860px,calc(100vh - 48px));display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);overflow:hidden;padding:0;transform:translateY(10px) scale(.985);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
-.detail.show .detail-box{transform:none}
-.scene{position:relative;min-height:0;background:#0b1512;border-right:1px solid var(--line)}
+/* Innenraum füllt den Bildschirm, die Infos schweben als Glas-Panel rechts darüber */
+.detail-box{position:absolute;inset:0}
+.scene{position:absolute;inset:0;background:#070c10}
 .scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.scene-cap{position:absolute;left:14px;bottom:14px;right:14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;pointer-events:none}
+.scene-cap{position:absolute;left:20px;bottom:18px;right:470px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;pointer-events:none}
 .scene-cap b{font-family:var(--f-pixel);font-weight:700;font-size:20px;text-shadow:0 2px 10px rgba(0,0,0,.8)}
 .scene-cap span{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-2);padding:3px 8px;border-radius:7px;background:rgba(8,16,20,.72);border:1px solid var(--line)}
-.info{min-height:0;overflow:auto;padding:22px 22px 26px;display:flex;flex-direction:column;gap:18px;scrollbar-width:thin;scrollbar-color:rgba(150,214,220,.25) transparent}
+.info{position:absolute;top:16px;right:16px;bottom:16px;width:min(430px,42vw);overflow:auto;padding:22px 22px 26px;display:flex;flex-direction:column;gap:18px;scrollbar-width:thin;scrollbar-color:rgba(150,214,220,.25) transparent;background:rgba(12,21,28,.8);border:1px solid var(--line-2);border-radius:var(--r);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);box-shadow:0 18px 50px rgba(0,0,0,.5);transform:translateX(24px);opacity:0;transition:transform .45s cubic-bezier(.2,.8,.2,1) .15s,opacity .35s ease .15s}
+.detail.show .info{transform:none;opacity:1}
+.info .eyebrow{padding-right:48px}
 .info h2{margin:2px 0 0;font-family:var(--f-pixel);font-weight:700;font-size:30px;line-height:1.05;text-wrap:balance;padding-right:44px}
 .info h3{margin:0 0 8px;font-family:var(--f-ui);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-2);display:flex;align-items:center;gap:8px}
 .info h3 small{font-size:11px;letter-spacing:0;text-transform:none;color:var(--fg-3);font-weight:600}
-.d-close{position:absolute;top:14px;right:14px;z-index:2;width:38px;height:38px;border-radius:10px;border:1px solid var(--line-2);background:rgba(8,16,20,.85);color:var(--fg);font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.d-close{position:absolute;top:28px;right:28px;z-index:2;width:38px;height:38px;border-radius:10px;border:1px solid var(--line-2);background:rgba(8,16,20,.85);color:var(--fg);font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center}
 .d-close:hover{border-color:var(--core);color:var(--core)}
 .d-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .sync{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3)}
@@ -324,10 +331,10 @@ body.detail-open{overflow:hidden}
 .side-open{margin-top:14px}
 @media (hover:none){.del{opacity:1}}
 @media (max-width:900px){
-  .detail{padding:0}
-  .detail-box{width:100%;height:100%;border-radius:0;grid-template-columns:1fr;grid-template-rows:minmax(220px,40vh) minmax(0,1fr)}
-  .scene{border-right:0;border-bottom:1px solid var(--line)}
-  .info{padding:18px 16px 28px}
+  .scene{bottom:auto;height:44vh}
+  .scene-cap{right:16px;left:16px;bottom:30px}
+  .info{top:calc(44vh - 18px);left:0;right:0;bottom:0;width:auto;border-radius:18px 18px 0 0;padding:18px 16px 28px;transform:translateY(30px)}
+  .d-close{top:14px;right:14px}
   .info h2{font-size:25px}
   .trow{grid-template-columns:22px minmax(0,1fr) auto 28px}
   .trow .pill.st{display:none}
@@ -363,7 +370,7 @@ body.detail-open{overflow:hidden}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion: reduce){
-  .lbl,.toast,.app,.detail,.detail-box{transition:none}
+  .lbl,.toast,.app,.detail,.detail-box,.info{transition:none}
 }
 </style>
 
@@ -397,7 +404,7 @@ body.detail-open{overflow:hidden}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v0.3 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
+      <small>Hybrid-Prototyp v0.4 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
     </div>
   </aside>
 
@@ -425,6 +432,9 @@ body.detail-open{overflow:hidden}
           <button type="button" data-tod="day" aria-pressed="false">Tag</button>
           <button type="button" data-tod="night" aria-pressed="false">Nacht</button>
         </div>
+      </div>
+      <div class="ctl"><span>Wetter</span>
+        <button type="button" class="wxb" id="wxBtn" title="Wetter wechselt von selbst – klicken legt es fest"><span class="wx-ic" id="wxIc" aria-hidden="true"></span><b id="wxName">Klar</b><small id="wxMode">Auto</small></button>
       </div>
       <div class="clock" aria-live="off">
         <b id="tCy">--:--</b>
@@ -469,7 +479,7 @@ body.detail-open{overflow:hidden}
   </aside>
 </div>
 <div class="detail" id="detail" hidden>
-  <div class="detail-box glass" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+  <div class="detail-box" role="dialog" aria-modal="true" aria-labelledby="dTitle">
     <div class="scene" id="scene"><canvas id="sceneCv" aria-hidden="true"></canvas><div class="scene-cap" id="sceneCap"></div></div>
     <div class="info" id="info"></div>
     <button type="button" class="d-close" id="dClose" aria-label="Detailansicht schließen" title="Schließen (Esc)">×</button>
@@ -819,6 +829,55 @@ function lighting(){
 }
 
 /* =========================================================
+   Wetter: wechselt von selbst alle paar Minuten, per Klick festlegbar
+   ========================================================= */
+const WEATHER_TYPES = ['klar','wolkig','wind','regen','gewitter','nebel'];
+const WEATHER_LABEL = { klar:'Klar', wolkig:'Wolkig', wind:'Windig', regen:'Regen', gewitter:'Gewitter', nebel:'Nebel' };
+const WEATHER_WEIGHT = { klar:34, wolkig:22, wind:12, regen:16, gewitter:7, nebel:9 };
+const WEATHER_ICON = {
+  klar:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/></svg>',
+  wolkig:'<svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 18z"/></svg>',
+  wind:'<svg viewBox="0 0 24 24"><path d="M3 9h12a3 3 0 1 0-3-3M3 15h16a3 3 0 1 1-3 3M3 12h8"/></svg>',
+  regen:'<svg viewBox="0 0 24 24"><path d="M7 14h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 14zM8 17l-1 3M12 17l-1 3M16 17l-1 3"/></svg>',
+  gewitter:'<svg viewBox="0 0 24 24"><path d="M7 13h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 13zM13 13l-3 5h4l-2 4"/></svg>',
+  nebel:'<svg viewBox="0 0 24 24"><path d="M4 9h16M2 13h14M6 17h16M8 5h10"/></svg>',
+};
+const wx = { cur:'klar', manual:null, timer:60 + rnd()*60, amt:{ klar:1, wolkig:0, wind:0, regen:0, gewitter:0, nebel:0 }, flash:0, boltT:5 };
+let rain = [];
+const fogBlobs = Array.from({length:7}, (_,i) => ({ x:rnd()*1.2 - .1, y:.1 + i*.13 + rnd()*.05, r:.22 + rnd()*.18, sp:.004 + rnd()*.006 }));
+function nextWeather(){ const opts = WEATHER_TYPES.filter(k => k !== wx.cur); let r = rnd()*opts.reduce((n,k) => n + WEATHER_WEIGHT[k], 0); for (const k of opts){ r -= WEATHER_WEIGHT[k]; if (r <= 0) return k; } return 'klar'; }
+function paintWeather(){ $('#wxName').textContent = WEATHER_LABEL[wx.cur]; $('#wxMode').textContent = wx.manual ? 'fest' : 'Auto'; $('#wxIc').innerHTML = WEATHER_ICON[wx.cur]; $('#wxBtn').setAttribute('aria-label', `Wetter: ${WEATHER_LABEL[wx.cur]}, ${wx.manual ? 'festgelegt' : 'wechselt automatisch'}. Klicken zum Ändern.`); }
+function simulateWeather(dt){
+  if (!wx.manual){ wx.timer -= dt; if (wx.timer <= 0){ wx.cur = nextWeather(); wx.timer = 120 + rnd()*120; paintWeather(); } }
+  const rate = reduceMotion ? 1 : dt/7;
+  for (const k of WEATHER_TYPES) wx.amt[k] += clamp((k === wx.cur ? 1 : 0) - wx.amt[k], -rate, rate);
+  const wet = Math.min(1, wx.amt.regen + wx.amt.gewitter), want = reduceMotion ? 0 : Math.round(280*wet);
+  while (rain.length < want) rain.push({ x:rnd(), y:rnd(), l:.6 + rnd()*.6, v:.9 + rnd()*.5 });
+  if (rain.length > want) rain.length = want;
+  for (const d of rain){ d.y += dt*d.v*1.15; d.x += dt*.16; if (d.y > 1.05){ d.y = -.05; d.x = rnd(); } if (d.x > 1.05) d.x -= 1.1; }
+  if (wx.amt.gewitter > .6 && !reduceMotion){ wx.boltT -= dt; if (wx.boltT <= 0){ wx.flash = 1; wx.boltT = 6 + rnd()*10; } }
+  wx.flash = Math.max(0, wx.flash - dt*2.8);
+  for (const b of fogBlobs){ b.x += b.sp*dt; if (b.x - b.r > 1.1) b.x = -b.r; }
+}
+function drawWeather(t){
+  const a = wx.amt, wet = Math.min(1, a.regen + a.gewitter);
+  const gray = .16*a.wolkig + .22*a.regen + .34*a.gewitter + .05*a.nebel;
+  if (gray > .005){ ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(70,82,100,${gray})`; ctx.fillRect(0, 0, cw, ch); ctx.globalCompositeOperation = 'source-over'; }
+  if (a.nebel > .01){
+    ctx.fillStyle = `rgba(205,214,222,${.22*a.nebel})`; ctx.fillRect(0, 0, cw, ch);
+    for (const b of fogBlobs){ const x = b.x*cw, y = b.y*ch, r = b.r*Math.max(cw, ch), g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, `rgba(222,229,235,${.42*a.nebel})`); g.addColorStop(1, 'rgba(222,229,235,0)'); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r*2, r*2); }
+  }
+  if (rain.length){
+    ctx.strokeStyle = `rgba(205,222,242,${.35 + .35*wet})`; ctx.lineWidth = Math.max(1, dpr*.9); ctx.beginPath();
+    for (const d of rain){ const x = d.x*cw, y = d.y*ch, L2 = d.l*16*dpr; ctx.moveTo(x, y); ctx.lineTo(x - L2*.18, y - L2); }
+    ctx.stroke();
+    ctx.strokeStyle = `rgba(215,230,245,${.35*wet})`; ctx.lineWidth = Math.max(1, dpr*.8);
+    for (let i=0;i<Math.round(26*wet);i++){ const x = rnd()*cw, y = rnd()*ch; ctx.beginPath(); ctx.ellipse(x, y, (2 + rnd()*3)*dpr, (1 + rnd())*dpr, 0, 0, Math.PI*2); ctx.stroke(); }
+  }
+  if (wx.flash > 0){ ctx.fillStyle = `rgba(235,240,255,${wx.flash*wx.flash*.6})`; ctx.fillRect(0, 0, cw, ch); }
+}
+
+/* =========================================================
    Bilder laden, Leucht-Ebene vorbereiten
    ========================================================= */
 const baseImg = new Image(), lightImg = new Image();
@@ -940,7 +999,7 @@ function render(t){
   ctx.fillStyle = '#0b1512'; ctx.fillRect(0,0,cw,ch);
   if (ready && bgCanvas) ctx.drawImage(bgCanvas, 0, 0);
   if (!ready){ ctx.fillStyle = '#a8b7bc'; ctx.font = `600 ${14*dpr}px "Chakra Petch", system-ui`; ctx.textAlign = 'center'; ctx.fillText('Karte wird geladen …', cw/2, ch/2); ctx.textAlign = 'start'; return; }
-  const s = view.s, L = lighting(), lit = Math.max(L.dark, L.warm*.6), day = 1 - L.dark;
+  const s = view.s, L = lighting(), wet = Math.min(1, wx.amt.regen + wx.amt.gewitter), lit = Math.max(L.dark, L.warm*.6, .45*wet + .2*wx.amt.nebel), day = 1 - L.dark;
   ctx.imageSmoothingEnabled = s < 1.4; ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(baseImg, view.ox, view.oy, IW*s, IH*s);
   ctx.save(); ctx.beginPath(); ctx.rect(view.ox, view.oy, IW*s, IH*s); ctx.clip();
@@ -953,7 +1012,7 @@ function render(t){
     for (const r of lakeRipples){ const v = (Math.sin(t*.9 + r.ph)+1)/2; ctx.strokeStyle = `rgba(215,238,255,${v*.35})`; ctx.lineWidth = Math.max(1, s); ctx.beginPath(); ctx.moveTo(WX(r.x - 7 - v*4), WY(r.y)); ctx.lineTo(WX(r.x + 7 + v*4), WY(r.y)); ctx.stroke(); }
   }
   // Wolkenschatten (Tag)
-  if (day > .3){ ctx.globalCompositeOperation = 'multiply'; for (const c of clouds){ const g = ctx.createRadialGradient(WX(c.x), WY(c.y), 0, WX(c.x), WY(c.y), c.r*s); g.addColorStop(0, `rgba(40,55,70,${.16*day})`); g.addColorStop(1, 'rgba(40,55,70,0)'); ctx.fillStyle = g; ctx.fillRect(WX(c.x)-c.r*s, WY(c.y)-c.r*s, c.r*2*s, c.r*2*s); } ctx.globalCompositeOperation = 'source-over'; }
+  if (day > .3){ ctx.globalCompositeOperation = 'multiply'; for (const c of clouds){ const g = ctx.createRadialGradient(WX(c.x), WY(c.y), 0, WX(c.x), WY(c.y), c.r*s); g.addColorStop(0, `rgba(40,55,70,${Math.min(.5, .16*day*(1 + 1.8*(wx.amt.wolkig + wet)))})`); g.addColorStop(1, 'rgba(40,55,70,0)'); ctx.fillStyle = g; ctx.fillRect(WX(c.x)-c.r*s, WY(c.y)-c.r*s, c.r*2*s, c.r*2*s); } ctx.globalCompositeOperation = 'source-over'; }
   // Rauch
   for (const q of smoke){ const a = clamp(q.life,0,1)*.4; ctx.fillStyle = `rgba(225,228,232,${a})`; const sz = Math.max(2, q.size*s); ctx.fillRect(WX(q.x)-sz/2, WY(q.y)-sz/2, sz, sz); }
   // Dorfbewohner & Tiere (werden nachts mit abgedunkelt)
@@ -1017,13 +1076,14 @@ function render(t){
 
   // Tag: Schmetterlinge und Vögel · Wind: Blätter
   ctx.globalCompositeOperation = 'source-over';
-  if (!reduceMotion && day > .4){
+  if (!reduceMotion && day > .4 && wet < .3){
     for (const b of butterflies){ const x = b.cx + Math.sin(t*.7 + b.ph)*b.r, y = b.cy + Math.sin(t*1.3 + b.ph*2)*b.r*.5 - 10, flap = Math.abs(Math.sin(t*14 + b.ph)); ctx.fillStyle = b.col; ctx.fillRect(WX(x) - 2.5*s*flap, WY(y), 2.5*s*flap, 2.5*s); ctx.fillRect(WX(x), WY(y), 2.5*s*flap, 2.5*s); }
     ctx.strokeStyle = 'rgba(30,34,40,.8)'; ctx.lineWidth = Math.max(1, 1.3*s);
     for (const b of birds){ const flap = Math.sin(t*10 + b.ph)*3; const x = WX(b.x), y = WY(b.y); ctx.beginPath(); ctx.moveTo(x - 6*s, y - flap*s); ctx.lineTo(x, y); ctx.lineTo(x + 6*s, y - flap*s); ctx.stroke(); }
   }
   for (const l of leaves){ ctx.save(); ctx.translate(WX(l.x), WY(l.y)); ctx.rotate(l.rot); ctx.fillStyle = l.col; ctx.fillRect(-2*s, -1*s, 4*s, 2.2*s); ctx.restore(); }
   ctx.restore(); // Clip
+  drawWeather(t);
 
   // KI-Agenten + Namensschilder
   const order = [...AGENTS].sort((a,b) => st[a.id].y - st[b.id].y), heads = {};
@@ -1046,6 +1106,7 @@ function render(t){
 function simulate(dt, t){
   for (const a of AGENTS){ const s = st[a.id]; if (s.route.length && walk(s, dt, 55)) arrive(a.id); }
   if (mode==='demo') demoTick(dt);
+  simulateWeather(dt);
   if (reduceMotion) return;
   for (const v of VILLAGERS){
     if (v.route.length){ walk(v, dt, 32); continue; }
@@ -1066,14 +1127,14 @@ function simulate(dt, t){
   birdT -= dt; if (birdT <= 0){ birdT = 18 + rnd()*20; const y0 = 80 + rnd()*500, n = 3 + Math.floor(rnd()*3); for (let i=0;i<n;i++) birds.push({ x:-30 - i*22, y:y0 + (i%2)*14 + i*4, vx:70 + rnd()*10, ph:rnd()*6 }); }
   for (const b of birds){ b.x += b.vx*dt; b.y += Math.sin(t + b.ph)*.2; } birds = birds.filter(b => b.x < IW + 40);
   for (const c of clouds){ c.x += (7 + gust*18)*dt; if (c.x - c.r > IW) { c.x = -c.r; c.y = 100 + rnd()*(IH-200); } }
-  gustT -= dt; if (gustT <= 0){ gustT = 25 + rnd()*25; gust = 6; const y0 = rnd()*IH*.8; for (let i=0;i<34;i++) leaves.push({ x:-20 - rnd()*300, y:y0 + rnd()*260, vx:110 + rnd()*70, vy:(rnd()-.5)*20, rot:rnd()*6, vr:(rnd()-.5)*8, ph:rnd()*6, col:pick(['#6cae4f','#8cc25a','#d99a3a','#c8672f']) }); }
+  gustT -= dt*(1 + 3*wx.amt.wind + wx.amt.gewitter); if (gustT <= 0){ gustT = 25 + rnd()*25; gust = 6; const y0 = rnd()*IH*.8; for (let i=0;i<34;i++) leaves.push({ x:-20 - rnd()*300, y:y0 + rnd()*260, vx:110 + rnd()*70, vy:(rnd()-.5)*20, rot:rnd()*6, vr:(rnd()-.5)*8, ph:rnd()*6, col:pick(['#6cae4f','#8cc25a','#d99a3a','#c8672f']) }); }
   if (gust > 0) gust = Math.max(0, gust - dt);
   for (const l of leaves){ l.x += l.vx*dt; l.y += (l.vy + Math.sin(t*3 + l.ph)*18)*dt; l.rot += l.vr*dt; } leaves = leaves.filter(l => l.x < IW + 30);
   for (const f of flow){ f.life += dt; f.y += 26*dt; f.x += Math.sin(f.y*.02)*6*dt; if (f.life > f.max || !isWater(f.x, f.y)) spawnFlow(f); }
   for (const f of foam){ f.t += dt*(f.zone===2 ? .9 : .55); if (f.t > 1) { f.t = 0; f.zone = Math.floor(rnd()*3); } }
   smokeT += dt; if (smokeT > .3){ smokeT = 0; for (const [x,y] of SMOKE_SRC) smoke.push({ x:x + (rnd()-.5)*3, y, vx:(rnd()-.2)*6 + gust*4, vy:-10 - rnd()*6, life:1, size:3 + rnd()*3 }); }
   for (let i=smoke.length-1;i>=0;i--){ const q = smoke[i]; q.x += q.vx*dt; q.y += q.vy*dt; q.size += dt*2.5; q.life -= dt*.3; if (q.life <= 0) smoke.splice(i,1); }
-  if (tween){ tween.t = Math.min(1, tween.t + dt*2.2); const e = 1 - Math.pow(1 - tween.t, 3); centerOn(tween.fx + (tween.tx-tween.fx)*e, tween.fy + (tween.ty-tween.fy)*e, tween.fs + (tween.ts-tween.fs)*e); if (tween.t >= 1) tween = null; }
+  if (tween){ tween.t = Math.min(1, tween.t + dt*(tween.sp || 2.2)); const e = tween.done ? tween.t*tween.t*(3 - 2*tween.t) : 1 - Math.pow(1 - tween.t, 3); centerOn(tween.fx + (tween.tx-tween.fx)*e, tween.fy + (tween.ty-tween.fy)*e, tween.fs + (tween.ts-tween.fs)*e); if (tween.t >= 1){ const fin = tween.done; tween = null; if (fin) fin(); } }
 }
 let smokeT = 0;
 
@@ -1363,34 +1424,65 @@ function addMilestone(pr, title, date){
 /* =========================================================
    Detailansicht: animiertes Gebäude links, alle Infos rechts
    ========================================================= */
+// Innenräume (gemalt von ChatGPT): Arbeitsplätze, Laufwege und Lichter in Bildkoordinaten
+const INTERIOR = {
+  sb:{ src:'assets/innen/sb.webp', door:[747,935], px:13,
+    spots:[ { x:527, y:627, kind:'desk', face:1 }, { x:953, y:627, kind:'desk', face:-1 }, { x:1287, y:722, kind:'desk', face:1 }, { x:1120, y:470, kind:'ladder', face:-1 }, { x:205, y:630, kind:'read', face:1 } ],
+    walk:[[747,790],[420,745],[1090,790],[1150,660],[380,615]],
+    lights:[[273,493,2.4],[513,800,1.1],[993,800,1.1],[1353,553,.8],[760,480,.8],[527,293,.8],[940,293,.8],[1104,147,.8],[1300,73,.8],[1293,287,.8],[173,353,.7],[127,600,.7],[460,380,.8],[1467,353,.7]],
+    fire:[[273,500]], sparkle:[[713,280],[653,173],[753,220],[829,180],[691,213],[687,330],[640,300]], pet:[330,660] },
+  etsy:{ src:'assets/innen/etsy.webp', door:[760,900], px:13,
+    spots:[ { x:330, y:595, kind:'desk', face:-1 }, { x:585, y:525, kind:'desk', face:-1 }, { x:1173, y:565, kind:'desk', face:1 }, { x:813, y:630, kind:'desk', face:1 }, { x:1265, y:800, kind:'desk', face:1 } ],
+    walk:[[700,600],[800,720],[620,760],[900,560],[560,640]],
+    lights:[[1020,407,2.2],[467,240,.9],[840,167,.9],[1087,253,.9],[400,680,.9],[1027,587,.9],[91,349,.9],[213,333,1.2],[1220,333,1.2],[1027,273,.7]],
+    fire:[[1020,410]], sparkle:[], pet:[1010,470] },
+};
 const ART_FX = {
   sb:{ lights:[[0.404,0.445],[0.718,0.536],[0.411,0.649],[0.168,0.552],[0.58,0.586],[0.896,0.591],[0.285,0.877],[0.922,0.388],[0.071,0.727],[0.917,0.822],[0.666,0.953],[0.103,0.876],[0.721,0.223],[0.109,0.328],[0.27,0.687],[0.844,0.372],[0.276,0.953],[0.924,0.297],[0.207,0.936],[0.635,0.316],[0.896,0.922],[0.083,0.391]], sparkle:[[0.431,0.051]], smoke:[] },
   etsy:{ lights:[[0.147,0.51],[0.2,0.44],[0.21,0.565],[0.26,0.565],[0.32,0.57],[0.39,0.56],[0.303,0.77],[0.61,0.63],[0.77,0.585],[0.817,0.565],[0.818,0.478],[0.875,0.555]], sparkle:[], smoke:[[0.521,0.088]] },
 };
-const artImgs = {};
+const artImgs = {}, innerImgs = {};
 for (const p of PROJECTS) if (p.art){ const im = new Image(); im.src = p.art; artImgs[p.id] = im; }
+for (const k in INTERIOR){ const im = new Image(); im.src = INTERIOR[k].src; innerImgs[k] = im; }
 const sceneEl = $('#scene'), sceneCv = $('#sceneCv'), sctx = sceneCv.getContext('2d');
-let detailId = null, lastFocus = null, scene = null, sceneBg = null, sceneSmoke = [], shownTasks = [], shownMs = [];
+let detailId = null, lastFocus = null, scene = null, sceneBg = null, sceneSmoke = [], shownTasks = [], shownMs = [], enterT = 1, inAgents = {}, savedView = null;
 const motes = Array.from({length:22}, () => ({ u:rnd(), v:.15 + rnd()*.8, ph:rnd()*6.28, sp:.3 + rnd()*.5 }));
 const TRASH_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>';
+const imgOk = im => im && im.complete && im.naturalWidth > 0;
 
 function buildScene(id){
-  const pr = P[id], W = sceneCv.width, H = sceneCv.height, im = artImgs[id];
-  if (im && im.complete && im.naturalWidth){
-    const fx = ART_FX[id] || { lights:[], sparkle:[], smoke:[] }, iw = im.naturalWidth, ih = im.naturalHeight;
-    return { img:im, art:true, sx:0, sy:0, sw:iw, sh:ih, smooth:true,
-      lights:fx.lights.map(([x,y]) => [x*iw, y*ih, 1]), smoke:fx.smoke.map(([x,y]) => [x*iw, y*ih]), sparkle:fx.sparkle.map(([x,y]) => [x*iw, y*ih]), cyan:[], water:[], blink:[] };
+  const W = sceneCv.width, H = sceneCv.height, inn = INTERIOR[id];
+  if (inn && imgOk(innerImgs[id])){
+    const im = innerImgs[id];
+    return { img:im, art:true, interior:true, sx:0, sy:0, sw:im.naturalWidth, sh:im.naturalHeight, smooth:true, agentPx:inn.px,
+      lights:inn.lights, fire:inn.fire, sparkle:inn.sparkle, smoke:[], cyan:[], water:[], blink:[], spots:inn.spots, walk:inn.walk, door:inn.door, pet:inn.pet };
   }
-  // Kein eigenes Bild: Ausschnitt der Dorf-Karte im Seitenverhältnis der Bühne
+  const im = artImgs[id];
+  if (imgOk(im)){
+    const fx = ART_FX[id] || { lights:[], sparkle:[], smoke:[] }, iw = im.naturalWidth, ih = im.naturalHeight;
+    return { img:im, art:true, sx:0, sy:0, sw:iw, sh:ih, smooth:true, agentPx:iw*.009,
+      lights:fx.lights.map(([x,y]) => [x*iw, y*ih, 1]), smoke:fx.smoke.map(([x,y]) => [x*iw, y*ih]), sparkle:fx.sparkle.map(([x,y]) => [x*iw, y*ih]), cyan:[], water:[], blink:[], fire:[],
+      door:[iw*.5, ih*.95], spots:[{ x:iw*.38, y:ih*.9, kind:'desk', face:1 }, { x:iw*.62, y:ih*.9, kind:'desk', face:-1 }, { x:iw*.5, y:ih*.97, kind:'desk', face:1 }], walk:[[iw*.3, ih*.95],[iw*.7, ih*.95]] };
+  }
+  // Kein eigenes Bild: Ausschnitt der Dorf-Karte, die KIs arbeiten vor dem Eingang
+  const aw = sceneArea()[2], ar = aw/H;
   const b = id==='atlas' ? [640,330,915,560] : BLD[id].box, cx = (b[0]+b[2])/2, cy = (b[1]+b[3])/2;
-  let sw = (b[2]-b[0])*1.45, sh = (b[3]-b[1])*1.45; const ar = W/H;
+  let sw = (b[2]-b[0])*1.45, sh = (b[3]-b[1])*1.45;
   if (sw/sh < ar) sw = sh*ar; else sh = sw/ar;
   sw = Math.min(sw, IW); sh = Math.min(sh, IH);
   const sx = clamp(cx - sw/2, 0, IW - sw), sy = clamp(cy - sh/2, 0, IH - sh), inR = (x,y) => x >= sx && x <= sx+sw && y >= sy && y <= sy+sh;
-  return { img:baseImg, art:false, sx, sy, sw, sh, smooth:false,
+  const f = id==='atlas' ? [CRYSTAL.x, CRYSTAL.y + 60] : BLD[id].front;
+  return { img:baseImg, art:false, sx, sy, sw, sh, smooth:false, agentPx:SP,
     lights:MD.warm.filter(([x,y,c]) => c >= 8 && inR(x,y)).map(([x,y,c]) => [x, y, Math.min(1.6, .6 + Math.sqrt(c)*.12)]),
-    cyan:MD.cyan.filter(([x,y]) => inR(x,y)), smoke:SMOKE_SRC.filter(([x,y]) => inR(x,y)), sparkle:[],
-    water:MD.water.filter(([x,y]) => inR(x,y)), blink:inR(1333,24) ? [[1333,24]] : [], crystal:inR(CRYSTAL.x, CRYSTAL.y) };
+    cyan:MD.cyan.filter(([x,y]) => inR(x,y)), smoke:SMOKE_SRC.filter(([x,y]) => inR(x,y)), sparkle:[], fire:[],
+    water:MD.water.filter(([x,y]) => inR(x,y)), blink:inR(1333,24) ? [[1333,24]] : [], crystal:inR(CRYSTAL.x, CRYSTAL.y),
+    door:[f[0], f[1] + 30], spots:[{ x:f[0]-26, y:f[1]+12, kind:'desk', face:1 }, { x:f[0]+26, y:f[1]+12, kind:'desk', face:-1 }, { x:f[0], y:f[1]+24, kind:'desk', face:1 }, { x:f[0]-50, y:f[1]+26, kind:'desk', face:1 }], walk:[[f[0]-40, f[1]+36],[f[0]+40, f[1]+36]] };
+}
+// Bühne: links vom Glas-Panel (Desktop) bzw. ganze Fläche (Handy)
+function sceneArea(){
+  const W = sceneCv.width, H = sceneCv.height, info = $('#info');
+  if (window.innerWidth > 900 && info){ const d = W / Math.max(1, sceneEl.clientWidth); const pw = (info.getBoundingClientRect().width + 32)*d; return [0, 0, Math.max(W*.4, W - pw), H]; }
+  return [0, 0, W, H];
 }
 function sizeScene(){
   const r = sceneEl.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
@@ -1401,75 +1493,163 @@ function buildSceneBg(){
   sceneBg = null; if (!scene || !scene.art) return;
   const W = sceneCv.width, H = sceneCv.height, c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d'), k = Math.max(W/scene.sw, H/scene.sh)*1.15;
-  g.filter = 'blur(22px) saturate(1.15)'; g.drawImage(scene.img, (W - scene.sw*k)/2, (H - scene.sh*k)/2, scene.sw*k, scene.sh*k);
-  g.filter = 'none'; g.fillStyle = 'rgba(9,16,22,.45)'; g.fillRect(0, 0, W, H); sceneBg = c;
+  g.filter = 'blur(26px) saturate(1.1)'; g.drawImage(scene.img, (W - scene.sw*k)/2, (H - scene.sh*k)/2, scene.sw*k, scene.sh*k);
+  g.filter = 'none'; g.fillStyle = 'rgba(7,12,16,.55)'; g.fillRect(0, 0, W, H); sceneBg = c;
 }
 new ResizeObserver(() => { if (detailId) sizeScene(); }).observe(sceneEl);
 
 function sGlow(x,y,r,col,a){ if (r <= 0 || a <= 0) return; const g = sctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0, rgba(col,a)); g.addColorStop(1, rgba(col,0)); sctx.fillStyle = g; sctx.fillRect(x-r,y-r,r*2,r*2); }
+
+// KIs im Innenraum: kommen zur Tür herein, arbeiten, holen zwischendurch etwas, gehen wieder
+function freeSpot(){ const used = new Set(Object.values(inAgents).map(a => a.spot)); const n = scene.spots.length; for (let k=0;k<n;k++){ const i = (Object.keys(inAgents).length + k) % n; if (!used.has(i)) return i; } return 0; }
+function syncInterior(dt){
+  const sp = scene; if (!sp || !sp.spots) return;
+  const here = AGENTS.filter(a => st[a.id].target === detailId && (st[a.id].status === 'work' || st[a.id].status === 'walk'));
+  for (const a of here) if (!inAgents[a.id]){
+    const i = freeSpot(), s0 = sp.spots[i], first = !enterDone;
+    inAgents[a.id] = { id:a.id, spot:i, x:first ? s0.x : sp.door[0], y:first ? s0.y : sp.door[1], route:first ? [] : [{ x:s0.x, y:s0.y }], face:s0.face, t:rnd()*3, next:6 + rnd()*6, carry:false, bub:rnd()*5, leaving:false };
+  }
+  for (const k in inAgents){ const ia = inAgents[k];
+    if (!here.find(a => a.id === k) && !ia.leaving){ ia.leaving = true; ia.route = [{ x:sp.door[0], y:sp.door[1] }]; }
+  }
+  const speed = sp.sw*.085;
+  for (const k in inAgents){ const ia = inAgents[k], s0 = sp.spots[ia.spot];
+    ia.bub += dt;
+    if (ia.route.length){ if (walk(ia, dt, speed)){ if (ia.leaving){ delete inAgents[k]; continue; } ia.face = s0.face; if (ia.carryDone) ia.carry = false; } continue; }
+    ia.t += dt;
+    if (ia.t > ia.next && s0.kind !== 'ladder' && s0.kind !== 'read' && !reduceMotion){
+      ia.t = 0; ia.next = 7 + rnd()*8;
+      if (rnd() < .45){ const w = pick(sp.walk); ia.route = [{ x:w[0], y:w[1] }, { x:s0.x, y:s0.y }]; ia.carry = true; ia.carryDone = true; }
+    }
+  }
+}
+function drawSprite(rows, colors, x, y, px, face){
+  const w = rows[0].length;
+  for (let r=0;r<rows.length;r++) for (let c=0;c<w;c++){ const k = rows[r][c]; if (k==='.') continue; sctx.fillStyle = colors[k] || colors.B; const cc = face < 0 ? w-1-c : c; sctx.fillRect(Math.round(x + cc*px), Math.round(y + r*px), Math.ceil(px), Math.ceil(px)); }
+}
+function sceneTag(x, y, text, color, dim){
+  const d = Math.min(window.devicePixelRatio || 1, 2), fs = Math.round(11.5*d);
+  sctx.font = `600 ${fs}px "Chakra Petch", system-ui, sans-serif`;
+  const pad = 6*d, tw = sctx.measureText(text).width + pad*2, th = fs + 8*d, bx = x - tw/2, by = y - th;
+  sctx.globalAlpha = dim; sctx.fillStyle = 'rgba(8,16,20,.88)'; sctx.strokeStyle = rgba(color, .85); sctx.lineWidth = d;
+  sctx.beginPath(); sctx.roundRect(bx, by, tw, th, 6*d); sctx.fill(); sctx.stroke();
+  sctx.fillStyle = '#e6eef0'; sctx.textBaseline = 'middle'; sctx.fillText(text, bx + pad, by + th/2 + .5*d); sctx.globalAlpha = 1;
+}
+function drawInterior(t, X, Y, s){
+  const sp = scene;
+  // schlafende Katze am Kamin, wenn niemand da ist
+  if (sp.pet && !Object.keys(inAgents).length){ const px = sp.agentPx*.55*s, p = PETS[0]; drawSprite(PET_ROWS.coonS, p.col, X(sp.pet[0]) - 5*px, Y(sp.pet[1]) - 8*px, px, 1);
+    if (!reduceMotion){ const k = (t*.5) % 1; sctx.globalAlpha = 1 - k; sctx.fillStyle = '#e6eef0'; sctx.font = `700 ${Math.round(9*px/2 + 8)}px "Chakra Petch", system-ui`; sctx.fillText('z', X(sp.pet[0]) + 4*px + k*18*s, Y(sp.pet[1]) - 10*px - k*40*s); sctx.globalAlpha = 1; } }
+  const list = Object.values(inAgents).sort((a,b) => a.y - b.y);
+  for (const ia of list){
+    const a = A[ia.id], s0 = sp.spots[ia.spot], px = sp.agentPx*s, moving = ia.route.length > 0, working = !moving && st[ia.id].status === 'work';
+    let y = ia.y; if (!moving && s0.kind === 'ladder') y -= (Math.sin(t*.5 + ia.spot) * .5 + .5) * sp.agentPx*9;
+    const lift = moving ? (Math.floor(t*8)%2)*px*.5 : working && s0.kind==='desk' ? (Math.sin(t*7 + ia.spot) > .3 ? px*.3 : 0) : 0;
+    const x0 = X(ia.x) - 3*px, y0 = Y(y) - 9*px - lift;
+    sctx.fillStyle = 'rgba(0,0,0,.3)'; sctx.beginPath(); sctx.ellipse(X(ia.x), Y(ia.y) + px*.2, 3.4*px, 1.1*px, 0, 0, Math.PI*2); sctx.fill();
+    const col = { A: working ? a.color : '#dfe8ea', S:shade(a.color,.55), B:a.color, V:'#132028', E:'#e8fbff', C:shade(a.color,.78), W:'#fff4df', L:shade(a.color,.45) };
+    drawSprite(spriteRows(ia.id), col, x0, y0, px, ia.face || 1);
+    if (ia.carry && moving){ sctx.fillStyle = '#c9884a'; sctx.fillRect(x0 + (ia.face > 0 ? 4.5 : -1.5)*px, y0 + 5*px, 2.2*px, 1.8*px); sctx.fillStyle = '#8a5a2e'; sctx.fillRect(x0 + (ia.face > 0 ? 4.5 : -1.5)*px, y0 + 5*px, 2.2*px, .5*px); }
+    if (s0.kind === 'read' && !moving){ sctx.fillStyle = '#f3ead7'; sctx.fillRect(x0 + (ia.face > 0 ? 4 : -1)*px, y0 + 5.2*px, 2.4*px, 1.4*px); sctx.fillStyle = a.color; sctx.fillRect(x0 + (ia.face > 0 ? 5.1 : .1)*px, y0 + 5.2*px, .25*px, 1.4*px); }
+    if (working && !reduceMotion){ sctx.globalCompositeOperation = 'lighter'; for (let k=0;k<3;k++){ const ph = (t*1.3 + k/3 + ia.spot*.17) % 1; sGlow(X(ia.x) + Math.sin(k*2.1 + t*2)*px*2.5, y0 - ph*px*5, px*.8, a.color, (1-ph)*.85); } sctx.globalCompositeOperation = 'source-over'; }
+    sceneTag(X(ia.x), y0 - px*.6, a.name, a.color, 1);
+    const cyc = ia.bub % 9; if (working && cyc < 4 && st[ia.id].task){ const txt = st[ia.id].task.length > 34 ? st[ia.id].task.slice(0, 33) + '…' : st[ia.id].task; sceneTag(X(ia.x), y0 - px*.6 - 30*Math.min(window.devicePixelRatio || 1, 2), '„' + txt + '“', '#e6eef0', Math.min(1, cyc*2, (4 - cyc)*2)); }
+  }
+}
 function renderScene(t){
   const W = sceneCv.width, H = sceneCv.height;
   sctx.setTransform(1,0,0,1,0,0); sctx.globalCompositeOperation = 'source-over'; sctx.globalAlpha = 1;
-  sctx.fillStyle = '#0b1512'; sctx.fillRect(0, 0, W, H);
-  if (!scene){ if (ready) { scene = buildScene(detailId); buildSceneBg(); } else return; }
-  const sp = scene, kb = reduceMotion ? 1 : 1 + .018*(1 + Math.sin(t*.13));
-  const fitS = sp.art ? Math.min(W/sp.sw, (H*.92)/sp.sh) : Math.max(W/sp.sw, H/sp.sh), s = fitS*kb;
-  const panX = reduceMotion ? 0 : Math.sin(t*.07)*sp.sw*.008, panY = reduceMotion ? 0 : Math.cos(t*.09)*sp.sh*.006;
-  const ox = W/2 - (sp.sx + sp.sw/2 + panX)*s, oy = H/2 - (sp.sy + sp.sh/2 + panY)*s, X = x => ox + x*s, Y = y => oy + y*s;
+  sctx.fillStyle = '#070c10'; sctx.fillRect(0, 0, W, H);
+  if (!scene){ if (ready){ scene = buildScene(detailId); buildSceneBg(); } else return; }
+  const sp = scene, [ax, ay, aw, ah] = sceneArea();
+  const ent = reduceMotion ? 1 : 1 - Math.pow(1 - enterT, 3), kb = (reduceMotion ? 1 : 1 + .012*(1 + Math.sin(t*.13))) * (1 + (1 - ent)*.45);
+  const fitS = sp.art ? Math.min(aw/sp.sw, (ah*.94)/sp.sh) : Math.max(aw/sp.sw, ah/sp.sh), s = fitS*kb;
+  const panX = reduceMotion ? 0 : Math.sin(t*.07)*sp.sw*.006, panY = reduceMotion ? 0 : Math.cos(t*.09)*sp.sh*.004;
+  const ox = ax + aw/2 - (sp.sx + sp.sw/2 + panX)*s, oy = ay + ah/2 - (sp.sy + sp.sh/2 + panY)*s, X = x => ox + x*s, Y = y => oy + y*s;
   if (sceneBg) sctx.drawImage(sceneBg, 0, 0);
   sctx.imageSmoothingEnabled = sp.smooth; sctx.imageSmoothingQuality = 'high';
-  if (sp.art){ sctx.save(); sctx.shadowColor = 'rgba(0,0,0,.55)'; sctx.shadowBlur = 40; sctx.drawImage(sp.img, X(0), Y(0), sp.sw*s, sp.sh*s); sctx.restore(); }
+  if (sp.art){ sctx.save(); sctx.shadowColor = 'rgba(0,0,0,.6)'; sctx.shadowBlur = 50; sctx.drawImage(sp.img, X(0), Y(0), sp.sw*s, sp.sh*s); sctx.restore(); }
   else { const m = 60, x0 = Math.max(0, sp.sx-m), y0 = Math.max(0, sp.sy-m), x1 = Math.min(IW, sp.sx+sp.sw+m), y1 = Math.min(IH, sp.sy+sp.sh+m); sctx.drawImage(sp.img, x0, y0, x1-x0, y1-y0, X(x0), Y(y0), (x1-x0)*s, (y1-y0)*s); }
   const L = lighting(), lit = Math.max(L.dark, L.warm*.6), rect = sp.art ? [X(0), Y(0), sp.sw*s, sp.sh*s] : [0, 0, W, H];
-  // Wasser glitzert
   if (!reduceMotion) for (const q of sp.water){ const v = Math.sin(t*1.7 + q[0]*.13 + q[1]*.07); if (v > .86){ sctx.fillStyle = `rgba(235,250,255,${(v-.86)*5})`; sctx.fillRect(X(q[0]), Y(q[1]), Math.max(1, 2*s), Math.max(1, 2*s)); } }
-  // Tageszeit wie in der Welt (gemalte Bilder sind schon abendlich, daher sanfter)
-  const dk = sp.art ? L.dark*.5 : L.dark*.84;
+  // Tageszeit (Innenräume bleiben warm beleuchtet)
+  const dk = sp.interior ? L.dark*.25 : sp.art ? L.dark*.5 : L.dark*.84;
   if (L.warm > 0 && !sp.art){ sctx.globalCompositeOperation = 'multiply'; sctx.fillStyle = `rgba(255,172,122,${L.warm*.5})`; sctx.fillRect(...rect); }
   if (dk > 0){ sctx.globalCompositeOperation = 'multiply'; sctx.fillStyle = `rgba(38,52,108,${dk})`; sctx.fillRect(...rect); }
   sctx.globalCompositeOperation = 'source-over';
   if (!sp.art && lit > 0){ const m = 60, x0 = Math.max(0, sp.sx-m), y0 = Math.max(0, sp.sy-m), x1 = Math.min(IW, sp.sx+sp.sw+m), y1 = Math.min(IH, sp.sy+sp.sh+m); sctx.globalAlpha = Math.min(1, lit*1.05); sctx.drawImage(lightImg, x0, y0, x1-x0, y1-y0, X(x0), Y(y0), (x1-x0)*s, (y1-y0)*s); sctx.globalAlpha = 1; }
-  // Fenster und Laternen flackern
   sctx.globalCompositeOperation = 'lighter';
-  const base = sp.art ? .22 + .5*L.dark : .12 + .7*lit, rr = sp.art ? sp.sw*.028 : 13;
+  const base = sp.interior ? .32 + .25*L.dark : sp.art ? .22 + .5*L.dark : .12 + .7*lit, rr = sp.art ? sp.sw*.028 : 13;
   sp.lights.forEach(([x,y,w], i) => { const fl = reduceMotion ? 1 : .78 + .22*Math.sin(t*(2.1 + (i%4)*.7) + i*1.7) + (Math.sin(t*11 + i) > .97 ? -.25 : 0); sGlow(X(x), Y(y), rr*w*s*(.9 + .1*fl), '#ffc46e', base*fl); });
+  for (const [x,y] of sp.fire){ const f = reduceMotion ? 1 : .7 + .3*Math.sin(t*9) * Math.sin(t*5.3 + 1); sGlow(X(x), Y(y), sp.sw*.07*s, '#ff8a3a', .35*f); sGlow(X(x), Y(y) - sp.sw*.01*s, sp.sw*.025*s, '#ffd27a', .5*f); }
   for (const [x,y] of sp.cyan) sGlow(X(x), Y(y), 30*s, '#6ee7d8', .3 + .3*lit);
   if (sp.crystal){ const pulse = .5 + .5*Math.sin(t*1.6); sGlow(X(CRYSTAL.x), Y(CRYSTAL.y), (80 + pulse*14)*s, '#6ee7d8', .22 + lit*.25);
     if (!reduceMotion) for (let k=0;k<6;k++){ const ang = t*.9 + k*1.047; sGlow(X(CRYSTAL.x + Math.cos(ang)*34), Y(CRYSTAL.y - 6 + Math.sin(ang)*12 - ((t*12 + k*9) % 40)*.4), 5*s, k%2 ? '#f4c86a' : '#bff7f0', .8); } }
   for (const [x,y] of sp.blink) if (Math.sin(t*3) > 0) sGlow(X(x), Y(y), 16*s, '#ff5a4a', .55 + .4*lit);
-  for (const [x,y] of sp.sparkle){ const k = reduceMotion ? 1 : .6 + .4*Math.sin(t*2.6), r = sp.sw*.03*s*k; sGlow(X(x), Y(y), r*1.6, '#ffd978', .5*k);
-    sctx.fillStyle = `rgba(255,244,200,${.75*k})`; sctx.fillRect(X(x) - r, Y(y) - Math.max(1, s*1.5), r*2, Math.max(2, s*3)); sctx.fillRect(X(x) - Math.max(1, s*1.5), Y(y) - r, Math.max(2, s*3), r*2); }
-  // Glühwürmchen (Nacht) bzw. Staub im Licht (Tag)
-  if (!reduceMotion) for (const m of motes){ const x = sp.sx + (m.u + Math.sin(t*m.sp + m.ph)*.02)*sp.sw, y = sp.sy + (m.v + Math.cos(t*m.sp*.8 + m.ph)*.02)*sp.sh, a = (Math.sin(t*2 + m.ph)*.5 + .5);
+  sp.sparkle.forEach(([x,y], i) => { const k = reduceMotion ? 1 : Math.max(0, Math.sin(t*2.2 + i*1.9)), r = sp.sw*(sp.interior ? .012 : .03)*s*(.4 + .6*k); sGlow(X(x), Y(y), r*1.8, '#ffd978', .5*k);
+    sctx.fillStyle = `rgba(255,244,200,${.8*k})`; sctx.fillRect(X(x) - r, Y(y) - Math.max(1, s*1.2), r*2, Math.max(2, s*2.4)); sctx.fillRect(X(x) - Math.max(1, s*1.2), Y(y) - r, Math.max(2, s*2.4), r*2); });
+  if (!reduceMotion && !sp.interior) for (const m of motes){ const x = sp.sx + (m.u + Math.sin(t*m.sp + m.ph)*.02)*sp.sw, y = sp.sy + (m.v + Math.cos(t*m.sp*.8 + m.ph)*.02)*sp.sh, a = (Math.sin(t*2 + m.ph)*.5 + .5);
     if (L.dark > .3) sGlow(X(x), Y(y), sp.sw*.008*s + 4, '#d9f77a', .55*a*L.dark); else sGlow(X(x), Y(y), 3 + sp.sw*.003*s, '#fff1c9', .25*a); }
+  if (!reduceMotion && sp.interior) for (const m of motes){ const x = sp.sw*(.2 + m.u*.6) + Math.sin(t*m.sp + m.ph)*sp.sw*.01, y = sp.sh*(.25 + ((m.v + t*.012*m.sp) % .6)), a = (Math.sin(t*1.5 + m.ph)*.5 + .5); sGlow(X(x), Y(y), 3 + sp.sw*.002*s, '#fff1c9', .22*a); }
   sctx.globalCompositeOperation = 'source-over';
-  // Rauch
   for (const q of sceneSmoke){ const a = clamp(q.life,0,1)*.38; sctx.fillStyle = `rgba(228,231,235,${a})`; const sz = Math.max(2, q.size*s); sctx.fillRect(X(q.x) - sz/2, Y(q.y) - sz/2, sz, sz); }
+  drawInterior(t, X, Y, s);
   // Vignette + Verlauf für die Beschriftung
-  const vg = sctx.createRadialGradient(W/2, H/2, Math.min(W,H)*.35, W/2, H/2, Math.max(W,H)*.75); vg.addColorStop(0, 'rgba(5,10,12,0)'); vg.addColorStop(1, 'rgba(5,10,12,.55)'); sctx.fillStyle = vg; sctx.fillRect(0, 0, W, H);
-  const bg = sctx.createLinearGradient(0, H*.72, 0, H); bg.addColorStop(0, 'rgba(5,10,12,0)'); bg.addColorStop(1, 'rgba(5,10,12,.6)'); sctx.fillStyle = bg; sctx.fillRect(0, H*.72, W, H*.28);
+  const vg = sctx.createRadialGradient(ax + aw/2, H/2, Math.min(aw,H)*.35, ax + aw/2, H/2, Math.max(aw,H)*.78); vg.addColorStop(0, 'rgba(5,10,12,0)'); vg.addColorStop(1, 'rgba(5,10,12,.55)'); sctx.fillStyle = vg; sctx.fillRect(0, 0, W, H);
+  const bg = sctx.createLinearGradient(0, H*.78, 0, H); bg.addColorStop(0, 'rgba(5,10,12,0)'); bg.addColorStop(1, 'rgba(5,10,12,.6)'); sctx.fillStyle = bg; sctx.fillRect(0, H*.78, W, H*.22);
+  // Überblendung beim Hineinzoomen
+  if (ent < 1){ sctx.fillStyle = `rgba(7,12,16,${1 - ent})`; sctx.fillRect(0, 0, W, H); }
 }
-let sceneSmokeT = 0;
+let sceneSmokeT = 0, enterDone = false;
 function simulateScene(dt){
-  if (!scene || reduceMotion) return;
+  if (!scene) return;
+  if (enterT < 1){ enterT = Math.min(1, enterT + dt*1.4); if (enterT >= 1) enterDone = true; }
+  syncInterior(dt);
+  if (reduceMotion) return;
   sceneSmokeT += dt;
   if (sceneSmokeT > .22){ sceneSmokeT = 0; const u = scene.sw; for (const [x,y] of scene.smoke) sceneSmoke.push({ x:x + (rnd()-.5)*u*.006, y, vx:(rnd()-.2)*u*.006, vy:-u*(scene.art ? .03 : .012) - rnd()*u*.008, life:1, size:u*(scene.art ? .012 : .01) + rnd()*u*.006 }); }
   for (let i=sceneSmoke.length-1;i>=0;i--){ const q = sceneSmoke[i]; q.x += q.vx*dt; q.y += q.vy*dt; q.size += dt*scene.sw*.006; q.life -= dt*.28; if (q.life <= 0) sceneSmoke.splice(i, 1); }
+}
+// Demo: beim Betreten schauen ein, zwei KIs vorbei und arbeiten an echten offenen Aufgaben
+function demoVisit(id){
+  if (mode !== 'demo') return;
+  const pr = P[id], open = pr.tasks.filter(t => !isDone(t)).sort(byOrder), here = headingTo(id);
+  const want = Math.max(0, Math.min(2, (open.length || 1)) - here.length);
+  const pool = AGENTS.filter(a => !here.includes(a.id) && st[a.id].status !== 'walk');
+  for (let k=0; k<want && pool.length; k++){
+    const a = pool.splice(Math.floor(rnd()*pool.length), 1)[0];
+    const task = open[k] ? open[k].title : (DEMO[a.id].find(d => d[0] === id) || [id, 'Projekt vorbereiten'])[1];
+    assign(a.id, id, 'work', task);
+  }
+  demoTimer = Math.max(demoTimer, 25); // nicht gleich wieder weglaufen
 }
 
 function openDetail(id){
   if (!P[id] || P[id].plot){ select(id); return; }
   select(id);
   if (detailId === id) return;
+  if (!detailId && !reduceMotion && ready){
+    // Kamera fährt ins Gebäude, dann Überblendung in den Innenraum
+    savedView = { s:view.s, cx:(cw/2 - view.ox)/view.s, cy:(ch/2 - view.oy)/view.s };
+    let x, y; if (id==='atlas'){ x = CRYSTAL.x; y = CRYSTAL.y + 30; } else { const b = BLD[id].box; x = (b[0]+b[2])/2; y = (b[1]+b[3])/2; }
+    tween = { fx:savedView.cx, fy:savedView.cy, fs:view.s, tx:x, ty:y, ts:maxS(), t:0, sp:1.6, done:() => showDetail(id) };
+    zoomingTo = id; return;
+  }
+  showDetail(id);
+}
+let zoomingTo = null;
+function showDetail(id){
+  zoomingTo = null;
   const wasOpen = !!detailId;
   detailId = id; if (!wasOpen) lastFocus = document.activeElement;
   const d = $('#detail'), app = $('.app');
   d.hidden = false; document.body.classList.add('detail-open'); app.setAttribute('aria-hidden', 'true'); app.inert = true;
   requestAnimationFrame(() => d.classList.add('show'));
-  sceneSmoke = []; scene = null; sizeScene();
-  const pr = P[id];
-  $('#sceneCap').innerHTML = `<b>${esc(pr.building)}</b><span>${pr.art ? 'Illustration: ChatGPT' : 'Ausschnitt der Dorf-Karte · eigene Illustration folgt'}</span>`;
-  renderDetail(); $('#dClose').focus();
+  sceneSmoke = []; scene = null; inAgents = {}; enterT = wasOpen || reduceMotion ? 1 : 0; enterDone = enterT >= 1;
+  demoVisit(id);
+  const pr = P[id], inn = INTERIOR[id];
+  $('#sceneCap').innerHTML = `<b>${esc(pr.building)}</b><span>${inn ? 'Innenansicht · gemalt von ChatGPT' : pr.art ? 'Außenansicht · Innenraum folgt' : 'Ausschnitt der Dorf-Karte · Innenraum folgt'}</span>`;
+  renderDetail(); sizeScene(); $('#dClose').focus();
   if (live.mcp && (!live.at || Date.now() - live.at > 20000)) refreshLive();
 }
 function closeDetail(){
@@ -1478,6 +1658,7 @@ function closeDetail(){
   const d = $('#detail'), app = $('.app');
   d.classList.remove('show'); document.body.classList.remove('detail-open'); app.removeAttribute('aria-hidden'); app.inert = false;
   setTimeout(() => { if (!detailId) d.hidden = true; }, reduceMotion ? 0 : 300);
+  if (savedView && !reduceMotion){ tween = { fx:(cw/2 - view.ox)/view.s, fy:(ch/2 - view.oy)/view.s, fs:view.s, tx:savedView.cx, ty:savedView.cy, ts:savedView.s, t:0, sp:1.8 }; savedView = null; }
   if (lastFocus && lastFocus.isConnected && lastFocus.focus) lastFocus.focus();
   changed();
 }
@@ -1613,6 +1794,8 @@ buildLabels();
 new ResizeObserver(resize).observe(stage);
 resize();
 updateClock(); setInterval(updateClock, 15000);
+paintWeather();
+$('#wxBtn').addEventListener('click', () => { const order = [null, ...WEATHER_TYPES], i = order.indexOf(wx.manual); wx.manual = order[(i + 1) % order.length]; if (wx.manual) wx.cur = wx.manual; else wx.timer = 90; paintWeather(); });
 setMode('demo');
 renderProject(); flush();
 Promise.all([loadImg(baseImg, 'assets/dorf.webp'), loadImg(lightImg, 'assets/lichter.png')])
