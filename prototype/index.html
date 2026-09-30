@@ -299,6 +299,68 @@ a{color:inherit}
 .agent .s.off{color:var(--fg-3)}
 @media (max-width:560px){ .rv-k{grid-template-columns:repeat(2,minmax(0,1fr))} .rv-head h2{font-size:21px} }
 
+/* ---------- Menü-Ansichten ---------- */
+.sheet-box{width:min(1040px,100%)}
+.sheet-box h2{margin:2px 0 0;font-family:var(--f-pixel);font-weight:700;font-size:28px;line-height:1.1;padding-right:44px}
+.sheet-box h3{margin:0 0 8px;font-family:var(--f-ui);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-2);display:flex;align-items:center;gap:8px}
+.sheet-box h3 small{font-size:11px;letter-spacing:0;text-transform:none;color:var(--fg-3)}
+.sh-note{margin:6px 0 0}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.pcard{display:flex;flex-direction:column;padding:0;overflow:hidden;text-align:left;cursor:pointer;border-radius:var(--r);border:1px solid var(--line);background:rgba(9,16,22,.5);color:var(--fg);transition:border-color .15s,transform .15s}
+.pcard:hover{border-color:var(--line-2);transform:translateY(-2px)}
+.pcard img{width:100%;height:auto;aspect-ratio:32/19;object-fit:cover;display:block;border-bottom:1px solid var(--line)}
+.pc-b{display:flex;flex-direction:column;gap:7px;padding:12px}
+.pc-b b{font-family:var(--f-pixel);font-size:18px;line-height:1.1}
+.pc-meta{color:var(--fg-3);font-size:12px}
+.here-dots{display:flex;align-items:center;gap:4px}
+.here-dots i{width:8px;height:8px;border-radius:2px}
+.here-dots small{margin-left:4px;color:var(--fg-2);font-size:11.5px}
+.tf{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tf .inp{flex:1 1 220px}
+.tf-today{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:12.5px;font-weight:600;color:var(--fg-2)}
+.add.tf-add{grid-template-columns:minmax(0,1fr) auto auto auto;margin-top:0}
+.tgroup{margin-top:4px}
+.tgroup + .tgroup{margin-top:14px}
+.linkish{border:0;background:none;padding:0;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
+.linkish:hover{color:var(--core);text-decoration:underline}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:12px}
+.kcard{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:var(--r);border:1px solid var(--line);background:rgba(9,16,22,.5)}
+.kc-top{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center}
+.kc-top svg{width:30px;height:40px;image-rendering:pixelated}
+.kc-top b{font-family:var(--f-ui);font-size:16px;display:block}
+.kc-top small{color:var(--fg-3);font-size:12px}
+.kst{display:inline-flex;align-items:center;gap:5px;font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3);white-space:nowrap}
+.kst i{width:7px;height:7px;border-radius:50%;background:var(--idle)}
+.kst.work{color:var(--ok)} .kst.work i{background:var(--ok);box-shadow:0 0 7px var(--ok)}
+.kst.ready{color:var(--core)} .kst.ready i{background:var(--core)}
+.kst.walk{color:var(--warn)} .kst.walk i{background:var(--warn)}
+.kc-task{margin:0;font-size:13.5px}
+.muted{color:var(--fg-3)}
+.kc-set{display:flex;align-items:center;gap:8px;font-family:var(--f-ui);font-size:12px;font-weight:600;color:var(--fg-3)}
+.kc-set .sel{flex:1}
+.kc-list{display:flex;flex-direction:column;gap:3px;font-size:12.5px}
+.kc-list small{color:var(--fg-3)}
+.kc-list em{font-style:normal;color:var(--fg-3);font-size:11.5px}
+.kcard .btn{align-self:flex-start;margin-top:auto}
+.alist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.alist li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(9,16,22,.45)}
+.alist b{font-family:var(--f-ui);font-size:14px;display:block}
+.alist small{color:var(--fg-3);font-size:12px}
+.adot{width:10px;height:10px;border-radius:50%;background:var(--idle)}
+.adot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.adot.idea{background:none;border:1.5px dashed var(--fg-3)}
+.astate{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3)}
+.setg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.setg .seg{align-self:flex-start}
+.seg button:disabled{opacity:.45;cursor:not-allowed}
+@media (max-width:640px){
+  .review{padding:0}
+  .review-box{width:100%;max-height:100vh;height:100%;border-radius:0;padding:20px 16px 28px}
+  .add.tf-add{grid-template-columns:minmax(0,1fr) auto}
+  .add.tf-add input[name="t"]{grid-column:1 / -1}
+  .kgrid{grid-template-columns:1fr}
+}
+
 /* ---------- Detailansicht ---------- */
 .app{transition:filter .35s ease, transform .35s ease}
 body.detail-open .app{filter:blur(9px) saturate(.7) brightness(.62);transform:scale(.985);pointer-events:none;user-select:none}
@@ -454,7 +516,7 @@ body.detail-open{overflow:hidden}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v0.6 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
+      <small>Hybrid-Prototyp v0.7 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
     </div>
   </aside>
 
@@ -550,6 +612,12 @@ body.detail-open{overflow:hidden}
     <div class="scene" id="scene"><canvas id="sceneCv" aria-hidden="true"></canvas><div class="scene-cap" id="sceneCap"></div></div>
     <div class="info" id="info"></div>
     <button type="button" class="d-close" id="dClose" aria-label="Detailansicht schließen" title="Schließen (Esc)">×</button>
+  </div>
+</div>
+<div class="review" id="sheet" hidden>
+  <div class="review-box sheet-box glass" role="dialog" aria-modal="true" aria-labelledby="shTitle">
+    <button type="button" class="d-close" id="shClose" aria-label="Ansicht schließen" title="Schließen (Esc)">×</button>
+    <div id="shBody"></div>
   </div>
 </div>
 <div class="review" id="review" hidden>
@@ -1243,7 +1311,8 @@ function buildLabels(){
       `<span class="lbl-ai"></span>`;
     el.setAttribute('aria-label', pr.plot ? 'Freier Bauplatz für ein neues Projekt' : `${pr.name}, ${pr.status}${pg!==null ? ', ' + pg + ' Prozent' : ''}`);
     el.addEventListener('click', () => pr.plot ? select(pr.id) : openDetail(pr.id));
-    el.addEventListener('mouseenter', () => { hovered = pr.id; });
+    el.addEventListener('mouseenter', () => { hovered = pr.id; if (!pr.plot) ensureImg(pr.id); });
+    el.addEventListener('focus', () => { if (!pr.plot) ensureImg(pr.id); });
     el.addEventListener('mouseleave', () => { if (hovered===pr.id) hovered = null; });
     labelsEl.appendChild(el);
   }
@@ -1342,6 +1411,7 @@ cv.addEventListener('pointermove', e => {
   if (drag && pointers.size === 1){ const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.hypot(dx,dy) > 5) drag.moved = true;
     if (drag.moved){ view.ox = drag.ox + dx*dpr; view.oy = drag.oy + dy*dpr; clampView(); placeLabels(); tween = null; cv.classList.add('dragging'); tip.hidden = true; return; } }
   const q = toImage(e); hoverAgent = hitAgent(q); const pet = hoverAgent ? null : hitPet(q); hovered = (hoverAgent || pet) ? null : hitBuilding(q);
+  if (hovered && !P[hovered].plot) ensureImg(hovered);
   cv.classList.toggle('hot', !!(hoverAgent || hovered));
   if (pet && !hoverAgent){ tip.innerHTML = `<b>${esc(pet.label)}</b><small>${pet.route.length ? 'unterwegs im Dorf' : pet.sit ? 'macht es sich gemütlich' : 'schaut sich um'}</small>`; tip.style.left = q.cx + 'px'; tip.style.top = q.cy + 'px'; tip.hidden = false; return; }
   if (hoverAgent){ const a = A[hoverAgent], s = st[hoverAgent], where = s.target==='home' ? 'am KI-Kern' : P[s.target]?.name || '';
@@ -1372,6 +1442,7 @@ const toast = $('#toast'); let toastT;
 document.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', () => {
   if (b.dataset.nav === 'home') return;
   if (b.dataset.nav === 'Rückblick'){ openReview(); return; }
+  if (SHEETS[b.dataset.nav]){ openSheet(b.dataset.nav); return; }
   toast.textContent = `„${b.dataset.nav}“ kommt mit dem MVP (Phase 1). Im Prototyp ist nur die Übersicht aktiv.`;
   toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 2600);
 }));
@@ -1463,11 +1534,12 @@ function applyLive(projRows, taskRows, msRows){
     p.milestones.push({ id:idOf(r.url), title:r.Titel || '(ohne Titel)', status:r.Status || 'Nicht begonnen', date:r['date:Zieldatum:start'] || '' }); }
   buildLabels(); placeLabels(); changed();
   if (detailId) renderDetail(true);
+  refreshSheet();
 }
 // Schreiben: nacheinander, optimistisch, bei Fehler zurückrollen
 let writeChain = Promise.resolve();
 function write(label, fn, undo){
-  live.busy++; setSync('busy', label + ' …'); changed(); renderDetailLists();
+  live.busy++; setSync('busy', label + ' …'); changed(); renderDetailLists(); refreshSheet();
   const run = writeChain.then(fn).then(() => {}, e => {
     undo && undo();
     const unsure = e && (e.code==='server_unavailable' || e.code==='upstream_error');
@@ -1475,7 +1547,7 @@ function write(label, fn, undo){
     if (DENIED.includes(e && e.code)) live.denied = true;
   }).finally(() => {
     live.busy--; if (!live.busy){ setSync('live'); clearTimeout(reT); reT = setTimeout(refreshLive, 1800); }
-    changed(); renderDetailLists();
+    changed(); renderDetailLists(); refreshSheet();
   });
   writeChain = run; return run;
 }
@@ -1559,9 +1631,13 @@ const ART_FX = {
   sb:{ lights:[[0.404,0.445],[0.718,0.536],[0.411,0.649],[0.168,0.552],[0.58,0.586],[0.896,0.591],[0.285,0.877],[0.922,0.388],[0.071,0.727],[0.917,0.822],[0.666,0.953],[0.103,0.876],[0.721,0.223],[0.109,0.328],[0.27,0.687],[0.844,0.372],[0.276,0.953],[0.924,0.297],[0.207,0.936],[0.635,0.316],[0.896,0.922],[0.083,0.391]], sparkle:[[0.431,0.051]], smoke:[] },
   etsy:{ lights:[[0.147,0.51],[0.2,0.44],[0.21,0.565],[0.26,0.565],[0.32,0.57],[0.39,0.56],[0.303,0.77],[0.61,0.63],[0.77,0.585],[0.817,0.565],[0.818,0.478],[0.875,0.555]], sparkle:[], smoke:[[0.521,0.088]] },
 };
+// Innenräume erst bei Bedarf laden (beim Überfahren eines Gebäudes oder beim Hineinzoomen), spart auf dem Handy mehrere MB
 const artImgs = {}, innerImgs = {};
-for (const p of PROJECTS) if (p.art){ const im = new Image(); im.src = p.art; artImgs[p.id] = im; }
-for (const k in INTERIOR){ const im = new Image(); im.src = INTERIOR[k].src; innerImgs[k] = im; }
+function ensureImg(id){
+  const inn = INTERIOR[id], pr = P[id];
+  const load = (src, into) => { if (into[id]) return; const im = new Image(); im.decoding = 'async'; im.onload = () => { if (detailId === id){ scene = null; inAgents = {}; } }; im.src = src; into[id] = im; };
+  if (inn) load(inn.src, innerImgs); else if (pr && pr.art) load(pr.art, artImgs);
+}
 const sceneEl = $('#scene'), sceneCv = $('#sceneCv'), sctx = sceneCv.getContext('2d');
 let detailId = null, lastFocus = null, scene = null, sceneBg = null, sceneSmoke = [], shownTasks = [], shownMs = [], enterT = 1, inAgents = {}, savedView = null;
 const motes = Array.from({length:22}, () => ({ u:rnd(), v:.15 + rnd()*.8, ph:rnd()*6.28, sp:.3 + rnd()*.5 }));
@@ -1754,6 +1830,7 @@ function demoVisit(id){
 
 function openDetail(id){
   if (!P[id] || P[id].plot){ select(id); return; }
+  ensureImg(id);
   select(id);
   if (detailId === id) return;
   if (!detailId && !reduceMotion && ready){
@@ -1870,7 +1947,7 @@ function startRename(li, item, kind){
   span.replaceWith(input); input.focus(); input.select();
   let done = false;
   const finish = save => { if (done) return; done = true; const v = input.value.trim(); input.remove();
-    if (save && v && v !== item.title) setField(item, 'title', v, 'Umbenennen', { Titel:v }); else renderDetailLists(); };
+    if (save && v && v !== item.title) setField(item, 'title', v, 'Umbenennen', { Titel:v }); else { renderDetailLists(); refreshSheet(); } };
   input.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); finish(true); } else if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); finish(false); } });
   input.addEventListener('blur', () => finish(true));
 }
@@ -1908,7 +1985,7 @@ $('#info').addEventListener('change', e => {
 $('#dClose').addEventListener('click', closeDetail);
 $('#detail').addEventListener('mousedown', e => { if (e.target.id === 'detail') closeDetail(); });
 document.addEventListener('keydown', e => {
-  if (!detailId || !$('#review').hidden) return;
+  if (!detailId || !$('#review').hidden || sheetKind) return;
   if (e.key === 'Escape'){ e.preventDefault(); closeDetail(); return; }
   if (e.key === 'Tab'){ const f = [...$('#detail').querySelectorAll('button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]')].filter(x => x.offsetParent !== null);
     if (!f.length) return; const i = f.indexOf(document.activeElement);
@@ -2202,6 +2279,193 @@ paintSound();
 const prevMs = {};
 
 /* =========================================================
+   Menü-Ansichten: Projekte, Aufgaben, KI-Agenten, Automationen, Notion-Sync, Einstellungen
+   ========================================================= */
+let sheetKind = null, sheetLast = null, sheetItems = [];
+const SHEETS = { 'Projekte':renderSheetProjects, 'Aufgaben':renderSheetTasks, 'KI-Agenten':renderSheetAgents, 'Automationen':renderSheetAuto, 'Notion-Sync':renderSheetSync, 'Einstellungen':renderSheetSettings };
+const taskFilter = Object.assign({ q:'', st:'offen', proj:'', prio:'', today:false }, (() => { try { return JSON.parse(store.get('atlas-tf') || '{}'); } catch { return {}; } })());
+const KI_PAGE = Object.fromEntries(Object.entries(KI_OF).map(([pid, id]) => [id, pid]));
+const DASH_PAGE = '3dcf5a8714b381ea9fb4cb0810a51f7e', HUB_PAGE = '3ebf5a8714b381a68331f37170907e4c';
+function navCurrent(k){ document.querySelectorAll('[data-nav]').forEach(b => b.dataset.nav === k ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')); }
+function openSheet(kind){ if (!SHEETS[kind]) return; const was = sheetKind; sheetKind = kind; if (!was) sheetLast = document.activeElement; renderSheet(); $('#sheet').hidden = false; $('#shBody').scrollTop = 0; $('#shClose').focus(); navCurrent(kind); }
+function closeSheet(){ if (!sheetKind) return; sheetKind = null; $('#sheet').hidden = true; navCurrent('home'); if (sheetLast && sheetLast.isConnected && sheetLast.focus) sheetLast.focus(); }
+function renderSheet(){ if (sheetKind) SHEETS[sheetKind](); }
+function refreshSheet(){
+  if (!sheetKind || document.querySelector('#sheet .ttl-in')) return;
+  if (sheetKind === 'Aufgaben') return renderTaskList();
+  const a = document.activeElement; if ($('#sheet').contains(a) && a !== $('#shClose') && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)) return;
+  renderSheet();
+}
+$('#shClose').addEventListener('click', closeSheet);
+$('#sheet').addEventListener('mousedown', e => { if (e.target.id === 'sheet') closeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheetKind && !document.querySelector('#sheet .ttl-in')){ e.preventDefault(); closeSheet(); } });
+const head = (eyebrow, title, note) => `<div class="eyebrow">${esc(eyebrow)}</div><h2 id="shTitle">${esc(title)}</h2>${note ? `<p class="note sh-note">${note}</p>` : ''}`;
+
+// ---------- Projekte ----------
+const thumbs = {};
+function thumbOf(id){
+  if (thumbs[id]) return thumbs[id]; if (!ready) return '';
+  const b = id === 'atlas' ? [640,330,915,560] : BLD[id].box, w = 320, h = 190, c = document.createElement('canvas'); c.width = w; c.height = h;
+  let sw = (b[2]-b[0])*1.3, sh = sw*h/w; if (sh < (b[3]-b[1])*1.3){ sh = (b[3]-b[1])*1.3; sw = sh*w/h; }
+  const sx = clamp((b[0]+b[2])/2 - sw/2, 0, IW - sw), sy = clamp((b[1]+b[3])/2 - sh/2, 0, IH - sh), g = c.getContext('2d');
+  g.imageSmoothingQuality = 'high'; g.drawImage(baseImg, sx, sy, sw, sh, 0, 0, w, h);
+  return thumbs[id] = c.toDataURL('image/jpeg', .84);
+}
+function renderSheetProjects(){
+  let h = head('Übersicht', 'Projekte', 'Ein Klick zoomt ins Gebäude, dort kannst du alles bearbeiten.') + `<div class="pgrid">`;
+  for (const pr of PROJECTS){
+    const pg = progressOf(pr), open = pr.tasks.filter(t => !isDone(t)), here = headingTo(pr.id), msOpen = pr.milestones.filter(m => !isDone(m)).length;
+    h += `<button type="button" class="pcard" data-proj="${pr.id}"><img src="${thumbOf(pr.id)}" alt="" width="320" height="190"><span class="pc-b">` +
+      `<span class="eyebrow">${esc(pr.building)}</span><b>${esc(pr.name)}</b><span class="chips"><span class="chip ${statusClass(pr.status)}">${esc(pr.status)}</span>${pr.group === 'sb' ? '<span class="chip grp-sb">SternenBücher</span>' : ''}</span>` +
+      (pg !== null ? `<span class="meter" style="margin-top:0"><span class="bar ${pr.group==='sb'?'sb':''}"><i style="width:${pg}%"></i></span><small>${pg} % Fortschritt</small></span>` : '') +
+      `<small class="pc-meta">${open.length} offen · ${open.filter(t => t.prio === 'Hoch').length} hoch · ${msOpen} ${msOpen === 1 ? 'Meilenstein' : 'Meilensteine'} offen</small>` +
+      (here.length ? `<span class="here-dots">${here.map(a => `<i style="background:${A[a].color}" title="${esc(A[a].name)}"></i>`).join('')}<small>${here.map(a => esc(A[a].name)).join(', ')}</small></span>` : '') + `</span></button>`;
+  }
+  $('#shBody').innerHTML = h + `</div>`;
+}
+
+// ---------- Aufgaben ----------
+function saveFilter(){ store.set('atlas-tf', JSON.stringify(taskFilter)); }
+function renderSheetTasks(){
+  const ed = canEdit(), f = taskFilter;
+  $('#shBody').innerHTML = head('Alle Projekte', 'Aufgaben') +
+    `<div class="tf" role="search"><input class="inp" id="tfQ" type="search" placeholder="Aufgabe suchen …" value="${esc(f.q)}" aria-label="Aufgaben durchsuchen">` +
+    `<div class="seg" role="group" aria-label="Status">${[['offen','Offen'],['run','In Arbeit'],['done','Erledigt'],['alle','Alle']].map(([k,l]) => `<button type="button" data-tf-st="${k}" aria-pressed="${f.st === k}">${l}</button>`).join('')}</div>` +
+    `<select class="sel" id="tfProj" aria-label="Projekt"><option value="">Alle Projekte</option>${PROJECTS.map(p => `<option value="${p.id}"${f.proj === p.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</select>` +
+    `<select class="sel" id="tfPrio" aria-label="Priorität"><option value="">Jede Priorität</option>${['Hoch','Mittel','Niedrig'].map(x => `<option${f.prio === x ? ' selected' : ''}>${x}</option>`).join('')}</select>` +
+    `<label class="tf-today"><input type="checkbox" id="tfToday"${f.today ? ' checked' : ''}> nur Heute</label></div>` +
+    (ed ? `<form class="add tf-add" id="tfAdd"><input class="inp" name="t" placeholder="Neue Aufgabe …" maxlength="200" required aria-label="Neue Aufgabe"><select class="sel" name="p" aria-label="Projekt">${PROJECTS.map(p => `<option value="${p.id}"${(f.proj || 'atlas') === p.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</select><select class="sel" name="r" aria-label="Priorität"><option>Hoch</option><option selected>Mittel</option><option>Niedrig</option></select><button class="btn pri" type="submit">Hinzufügen</button></form>`
+        : `<div class="ro">Nur Ansicht: Bearbeiten klappt, wenn du das Dashboard in Claude öffnest und Notion erlaubst.</div>`) +
+    `<p class="note" id="tfCount" aria-live="polite"></p><div id="tfList"></div>`;
+  renderTaskList();
+}
+function renderTaskList(){
+  const el = $('#tfList'); if (!el || document.querySelector('#sheet .ttl-in')) return;
+  const f = taskFilter, q = f.q.trim().toLowerCase();
+  const rows = PROJECTS.flatMap(p => p.tasks.map(t => [t, p])).filter(([t, p]) => (!f.proj || p.id === f.proj) && (!f.prio || t.prio === f.prio) && (!f.today || t.today) && (!q || t.title.toLowerCase().includes(q)) && (f.st === 'alle' || (f.st === 'offen' ? !isDone(t) : stKey(t.status) === f.st)));
+  sheetItems = rows;
+  const groups = PROJECTS.map(p => [p, rows.filter(r => r[1] === p).sort((a,b) => byOrder(a[0], b[0]))]).filter(g => g[1].length);
+  $('#tfCount').textContent = `${rows.length} ${rows.length === 1 ? 'Aufgabe' : 'Aufgaben'}${f.st === 'offen' ? ' offen' : ''}`;
+  el.innerHTML = groups.length ? groups.map(([p, list]) => `<section class="tgroup"><h3><button type="button" class="linkish" data-open-proj="${p.id}" title="Ins Gebäude zoomen">${esc(p.name)}</button><small>${list.length}</small></h3><ul class="tlist">${list.map(([t]) => itemRow(t, rows.findIndex(r => r[0] === t), 'task')).join('')}</ul></section>`).join('')
+    : `<div class="empty">Keine Aufgaben für diese Filter.</div>`;
+}
+
+// ---------- KI-Agenten ----------
+function renderSheetAgents(){
+  const ed = canEdit() && liveKI, kiLive = !!(live.ok && liveKI);
+  let h = head('Team', 'KI-Agenten', kiLive ? 'Status live aus der Notion-Datenbank „KI-Agenten“. Änderungen hier landen direkt dort.' : mode === 'demo' ? 'Demo-Modus: Die Figuren im Dorf bewegen sich simuliert.' : 'Offline-Stand vom 30.09.2026.') + `<div class="kgrid">`;
+  for (const a of AGENTS){
+    const k = kiLive ? liveKI[a.id] : null, s = st[a.id];
+    const status = k ? k.status : STATUS_TXT[s.status], task = k ? k.task : s.task;
+    const projs = k ? k.projects.map(n => PROJECTS.find(p => p.notion === n)).filter(Boolean) : (P[s.target] && !P[s.target].plot ? [P[s.target]] : []);
+    const mine = PROJECTS.flatMap(p => p.tasks.map(t => [t, p])).filter(([t]) => t.who === a.id && !isDone(t)).sort((x,y) => byOrder(x[0], y[0]));
+    const cls = /Arbeitet/.test(status) ? 'work' : /Bereit/.test(status) ? 'ready' : /Unterwegs/.test(status) ? 'walk' : 'off';
+    h += `<article class="kcard"><div class="kc-top">${pixelAvatar(a.id)}<div><b style="color:${a.color}">${esc(a.name)}</b><small>${esc(a.vendor)} · ${esc(a.role)}</small></div><span class="kst ${cls}"><i></i>${esc(status)}</span></div>` +
+      `<p class="kc-task">${task ? esc(task) : '<span class="muted">Keine aktuelle Tätigkeit eingetragen.</span>'}${projs.length ? ` <span class="muted">· ${projs.map(p => esc(p.name)).join(', ')}</span>` : ''}</p>` +
+      (ed ? `<label class="kc-set">Status <select class="sel" data-ki="${a.id}">${['Arbeitet','Bereit','Offline'].map(o => `<option${o === (k && k.status) ? ' selected' : ''}>${o}</option>`).join('')}</select></label>` : '') +
+      `<div class="kc-list"><small>${mine.length ? `Zuständig für ${mine.length} offene ${mine.length === 1 ? 'Aufgabe' : 'Aufgaben'}` : 'Keine offenen Aufgaben zugewiesen'}</small>${mine.slice(0,3).map(([t,p]) => `<span>${esc(t.title)} <em>${esc(p.name)}</em></span>`).join('')}</div>` +
+      `<button type="button" class="btn" data-show-agent="${a.id}">Auf der Karte zeigen</button></article>`;
+  }
+  $('#shBody').innerHTML = h + `</div>`;
+}
+function setKiStatus(id, v){
+  const k = liveKI && liveKI[id]; if (!k || !KI_PAGE[id]) return;
+  const prev = k.status; k.status = v; if (mode === 'real') applyReal();
+  write('KI-Status', () => updProps(KI_PAGE[id], { Status:v }), () => { k.status = prev; if (mode === 'real') applyReal(); });
+}
+
+// ---------- Automationen ----------
+function renderSheetAuto(){
+  const s = sunToday(), city = (CITIES[wxCity] || ['Limassol'])[0];
+  const on = [
+    ['Notion-Abgleich', live.ok ? `alle 2 Minuten · zuletzt ${hhmm(live.at)}` : live.mcp ? 'wartet auf die Notion-Freigabe' : 'aus: nur wenn das Dashboard in Claude geöffnet ist', live.ok],
+    ['Live-Wetter', wxLive.data ? `alle 20 Minuten · ${esc(city)} · zuletzt ${hhmm(new Date(wxLive.data.at))}` : !wxLive.mcp ? 'aus: nur wenn das Dashboard in Claude geöffnet ist' : wxLive.on ? (wxLive.err || 'wartet auf AccuWeather') : 'aus: Zufall nach Zypern-Klima gewählt', !!wxLive.data && wxLive.on],
+    ['Echter KI-Status', live.ok && liveKI ? 'kommt live aus „KI-Agenten“; Claude Code trägt ihn laut Projektregeln bei Arbeitsbeginn und -ende ein' : 'aus: braucht die Notion-Verbindung', !!(live.ok && liveKI)],
+    ['Tag und Nacht', `echte Sonnenzeiten für ${esc(city)}, heute ${hm(s.rise)} bis ${hm(s.set)} Uhr`, todMode === 'auto'],
+    ['Zufallswetter', wxLive.on && wxLive.data ? 'ruht, solange Live-Wetter läuft' : 'wechselt alle 2 bis 4 Minuten nach Zypern-Klima', !(wxLive.on && wxLive.data) && !wx.manual],
+    ['Hinweis Wochenrückblick', 'Punkt am Menüeintrag „Rückblick“ ab Freitag, bis du ihn öffnest', true],
+    ['Belohnungen', 'Funken beim Abhaken, Feuerwerk bei Meilensteinen und geschafftem Tagesziel', true],
+  ];
+  const ideas = [
+    ['Wochenrückblick als Notion-Seite', 'jeden Freitag automatisch; braucht eine geplante Claude-Sitzung pro Woche'],
+    ['KI-Status vollautomatisch', 'direkt aus Claude Code per Hook; braucht einen eigenen Notion-API-Schlüssel'],
+  ];
+  $('#shBody').innerHTML = head('Hintergrund', 'Automationen', 'Was im Dashboard von selbst läuft.') +
+    `<ul class="alist">${on.map(([n, d, a]) => `<li><span class="adot ${a ? 'on' : ''}" aria-hidden="true"></span><div><b>${n}</b><small>${d}</small></div><span class="astate">${a ? 'aktiv' : 'aus'}</span></li>`).join('')}</ul>` +
+    `<h3>Ideen, noch nicht eingerichtet</h3><ul class="alist">${ideas.map(([n, d]) => `<li><span class="adot idea" aria-hidden="true"></span><div><b>${n}</b><small>${d}</small></div><span class="astate">auf Wunsch</span></li>`).join('')}</ul>`;
+}
+
+// ---------- Notion-Sync ----------
+function renderSheetSync(){
+  const all = PROJECTS.flatMap(p => p.tasks), ms = PROJECTS.flatMap(p => p.milestones);
+  $('#shBody').innerHTML = head('Datenquelle', 'Notion-Sync', 'Notion bleibt die einzige Datenquelle. Das Dashboard liest „Flo Dashboard“ (Projekte, Aufgaben, Meilensteine) und „KI-Agenten“ und schreibt deine Änderungen direkt zurück.') +
+    `<div class="d-row"><span class="sync" data-sync></span></div>` +
+    `<div class="kpis rv-k"><div class="kpi"><b>${PROJECTS.length}</b><span>Projekte im Dorf</span></div><div class="kpi"><b>${all.length}</b><span>Aufgaben</span></div><div class="kpi"><b>${ms.length}</b><span>Meilensteine</span></div><div class="kpi"><b>${liveKI ? Object.keys(liveKI).length : 0}</b><span>KI-Agenten live</span></div></div>` +
+    `<div class="btns"><button type="button" class="btn pri" id="syncNow"${live.mcp ? '' : ' disabled'}>Jetzt abgleichen</button></div>` +
+    (live.mcp ? '' : `<div class="ro">Außerhalb von Claude zeigt das Dashboard den Offline-Stand vom 30.09.2026 und kann nichts speichern.</div>`) +
+    `<h3>In Notion öffnen</h3><div class="btns"><a class="btn" href="${NOTION + DASH_PAGE}" target="_blank" rel="noopener">Flo Dashboard ↗</a><a class="btn" href="${NOTION + HUB_PAGE}" target="_blank" rel="noopener">Hub-Seite ↗</a><a class="btn" href="${NOTION + TRASH_PAGE}" target="_blank" rel="noopener">Papierkorb ↗</a></div>` +
+    `<p class="note">„Entfernen“ im Dashboard verschiebt Einträge in den Papierkorb. Endgültig löschen geht nur in Notion.</p>`;
+  paintSync();
+}
+
+// ---------- Einstellungen ----------
+function renderSheetSettings(){
+  const pm = store.get('atlas-mode') || '';
+  $('#shBody').innerHTML = head('Nur auf diesem Gerät gespeichert', 'Einstellungen') +
+    `<div class="setg">` +
+    `<label class="fld"><span>Ort für Wetter und Sonnenzeiten</span><select class="sel" id="stCity">${Object.entries(CITIES).map(([k, c]) => `<option value="${k}"${k === wxCity ? ' selected' : ''}>${c[0]}</option>`).join('')}</select></label>` +
+    `<div class="fld"><span>Wetter</span><div class="seg" role="group" aria-label="Wetterquelle"><button type="button" data-st-wx="live" aria-pressed="${!wx.manual && wxLive.on}"${wxLive.mcp ? '' : ' disabled'}>Live</button><button type="button" data-st-wx="auto" aria-pressed="${!wx.manual && !wxLive.on}">Zufall</button></div></div>` +
+    `<div class="fld"><span>Tageszeit der Welt</span><div class="seg" role="group" aria-label="Tageszeit">${[['auto','Auto'],['day','Tag'],['night','Nacht']].map(([k,l]) => `<button type="button" data-st-tod="${k}" aria-pressed="${todMode === k}">${l}</button>`).join('')}</div></div>` +
+    `<div class="fld"><span>Geräusche</span><div class="seg" role="group" aria-label="Geräusche"><button type="button" data-st-snd="1" aria-pressed="${snd.on}">An</button><button type="button" data-st-snd="0" aria-pressed="${!snd.on}">Aus</button></div></div>` +
+    `<label class="fld"><span>KI-Figuren beim Öffnen</span><select class="sel" id="stMode"><option value=""${pm ? '' : ' selected'}>Automatisch</option><option value="real"${pm === 'real' ? ' selected' : ''}>Echter Stand</option><option value="demo"${pm === 'demo' ? ' selected' : ''}>Demo</option></select></label>` +
+    `</div><p class="note">Weniger Bewegung richtet sich nach der Einstellung deines Geräts (Bewegung reduzieren).</p>` +
+    `<div class="btns"><button type="button" class="btn" id="stReset">Einstellungen zurücksetzen</button></div>`;
+}
+$('#shBody').addEventListener('change', e => {
+  const el = e.target;
+  if (el.id === 'tfProj'){ taskFilter.proj = el.value; saveFilter(); renderTaskList(); if ($('#tfAdd')) $('#tfAdd').elements.p.value = el.value || 'atlas'; }
+  else if (el.id === 'tfPrio'){ taskFilter.prio = el.value; saveFilter(); renderTaskList(); }
+  else if (el.id === 'tfToday'){ taskFilter.today = el.checked; saveFilter(); renderTaskList(); }
+  else if (el.id === 'stCity'){ $('#wxCity').value = el.value; $('#wxCity').dispatchEvent(new Event('change')); }
+  else if (el.id === 'stMode'){ store.set('atlas-mode', el.value); if (el.value){ modePicked = true; setMode(el.value); } toastMsg('Gespeichert.'); }
+  else if (el.dataset.ki && canEdit()) setKiStatus(el.dataset.ki, el.value);
+});
+$('#shBody').addEventListener('input', e => { if (e.target.id === 'tfQ'){ taskFilter.q = e.target.value; saveFilter(); renderTaskList(); } });
+$('#shBody').addEventListener('submit', e => {
+  e.preventDefault(); if (e.target.id !== 'tfAdd' || !canEdit()) return;
+  const f = e.target, title = f.elements.t.value.trim(); if (!title) return;
+  addTask(P[f.elements.p.value] || P.atlas, title, f.elements.r.value); f.elements.t.value = ''; f.elements.t.focus(); renderTaskList();
+});
+$('#shBody').addEventListener('click', e => {
+  const t = e.target;
+  const pc = t.closest('[data-proj]'); if (pc){ const id = pc.dataset.proj; closeSheet(); openDetail(id); return; }
+  const op = t.closest('[data-open-proj]'); if (op){ const id = op.dataset.openProj; closeSheet(); openDetail(id); return; }
+  const sa = t.closest('[data-show-agent]'); if (sa){ const tg = st[sa.dataset.showAgent].target; closeSheet(); select(tg === 'home' ? 'atlas' : tg, true); return; }
+  const ts = t.closest('[data-tf-st]'); if (ts){ taskFilter.st = ts.dataset.tfSt; saveFilter(); document.querySelectorAll('[data-tf-st]').forEach(b => b.setAttribute('aria-pressed', b === ts)); renderTaskList(); return; }
+  const sw = t.closest('[data-st-wx]'); if (sw && !sw.disabled){ $(`#wxMenu [data-wx="${sw.dataset.stWx}"]`).click(); renderSheet(); return; }
+  const sd = t.closest('[data-st-tod]'); if (sd){ document.querySelector(`[data-tod="${sd.dataset.stTod}"]`).click(); renderSheet(); return; }
+  const ss = t.closest('[data-st-snd]'); if (ss){ if ((ss.dataset.stSnd === '1') !== snd.on) $('#sndBtn').click(); renderSheet(); return; }
+  if (t.id === 'syncNow'){ refreshLive(); return; }
+  if (t.id === 'stReset'){ for (const k of ['atlas-city','atlas-wxsrc','atlas-sound','atlas-tf','atlas-mode','atlas-rv-seen']) { try { localStorage.removeItem(k); } catch {} } toastMsg('Zurückgesetzt. Gilt ab dem nächsten Öffnen.'); return; }
+  // Aufgabenzeilen: gleiche Aktionen wie in der Detailansicht
+  const b = t.closest('[data-act]'); if (!b || b.disabled || !canEdit()) return;
+  const li = b.closest('.trow'); if (!li) return;
+  const pair = sheetItems[+li.dataset.i]; if (!pair) return;
+  const [item, pr] = pair; if (!item.id) return;
+  const act = b.dataset.act;
+  if (act === 'toggle') setStatus(item, isDone(item) ? 'Nicht begonnen' : 'Erledigt', isDone(item) ? 'Wieder öffnen' : 'Abhaken', b);
+  else if (act === 'cycle'){ const v = { 'Nicht begonnen':'In Bearbeitung', 'In Bearbeitung':'Erledigt', 'Erledigt':'Nicht begonnen' }[item.status] || 'Nicht begonnen'; setStatus(item, v, 'Status', b); }
+  else if (act === 'prio'){ const v = { Hoch:'Mittel', Mittel:'Niedrig', Niedrig:'Hoch' }[item.prio] || 'Mittel'; setField(item, 'prio', v, 'Priorität', { 'Priorität':v }); }
+  else if (act === 'today') setToday(item, !item.today);
+  else if (act === 'rename') startRename(li, item, 'task');
+  else if (act === 'del'){
+    if (!b.classList.contains('arm')){ b.classList.add('arm'); b.textContent = 'Entfernen?'; setTimeout(() => { if (b.isConnected){ b.classList.remove('arm'); b.innerHTML = TRASH_SVG; } }, 3500); return; }
+    removeItem(pr.tasks, item, 'Entfernen');
+  }
+});
+$('#shBody').addEventListener('keydown', e => { const t = e.target.closest && e.target.closest('.ttl[tabindex]'); if (t && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); t.click(); } });
+
+/* =========================================================
    Start
    ========================================================= */
 buildLabels();
@@ -2211,6 +2475,7 @@ updateClock(); setInterval(updateClock, 15000);
 paintWeather();
 paintRvDot();
 setMode('demo');
+{ const pm = store.get('atlas-mode'); if (pm === 'real' || pm === 'demo'){ modePicked = true; if (pm !== mode) setMode(pm); } }
 renderProject(); flush();
 Promise.all([loadImg(baseImg, 'assets/dorf.webp'), loadImg(lightImg, 'assets/lichter.png')])
   .then(() => { buildGlow(); ready = true; fit(); buildBackdrop(); })
