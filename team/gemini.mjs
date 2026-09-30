@@ -1,0 +1,88 @@
+#!/usr/bin/env node
+// Gemini als Team-Mitglied: Claude Code (Dirigent) delegiert Recherche, Texte und Bilder.
+//
+//   ./team/gemini.sh models                      verfügbare Modelle anzeigen
+//   ./team/gemini.sh text  "Prompt"              Text-Antwort (Flash, Free Tier)
+//   ./team/gemini.sh image "Prompt" out.png      Bild erzeugen und speichern
+//
+// Schlüssel: Umgebungsvariable GEMINI_API_KEY (nie in Code oder Chat).
+// Modelle optional überschreiben: GEMINI_TEXT_MODEL, GEMINI_IMAGE_MODEL.
+
+import { writeFile } from 'node:fs/promises';
+
+const API = 'https://generativelanguage.googleapis.com/v1beta';
+const KEY = process.env.GEMINI_API_KEY;
+
+function fail(msg) {
+  console.error(`Gemini: ${msg}`);
+  process.exit(1);
+}
+
+async function call(path, body) {
+  if (!KEY) fail('GEMINI_API_KEY fehlt. Bitte in den Umgebungs-Einstellungen hinterlegen.');
+  const res = await fetch(`${API}/${path}`, {
+    method: body ? 'POST' : 'GET',
+    headers: { 'x-goog-api-key': KEY, 'content-type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const reason = data.error?.message || res.statusText;
+    if (res.status === 429) fail(`Limit erreicht (429): ${reason}`);
+    fail(`Fehler ${res.status}: ${reason}`);
+  }
+  return data;
+}
+
+async function listModels() {
+  const out = [];
+  let pageToken = '';
+  do {
+    const data = await call(`models?pageSize=200${pageToken ? `&pageToken=${pageToken}` : ''}`);
+    out.push(...(data.models || []));
+    pageToken = data.nextPageToken || '';
+  } while (pageToken);
+  return out.filter(m => (m.supportedGenerationMethods || []).includes('generateContent'));
+}
+
+// Neuestes passendes Modell wählen, falls keins vorgegeben ist.
+async function pickModel(kind) {
+  const override = kind === 'image' ? process.env.GEMINI_IMAGE_MODEL : process.env.GEMINI_TEXT_MODEL;
+  if (override) return override;
+  const names = (await listModels()).map(m => m.name.replace('models/', ''));
+  const candidates = names.filter(n =>
+    n.includes('flash') && !n.includes('lite') && !n.includes('tts') && !n.includes('live') &&
+    (kind === 'image' ? n.includes('image') : !n.includes('image'))
+  );
+  if (!candidates.length) fail(`Kein passendes ${kind}-Modell gefunden. Mit "models" prüfen.`);
+  const version = n => (n.match(/(\d+(?:\.\d+)?)/) || [0, 0])[1] * 1;
+  candidates.sort((a, b) => version(b) - version(a) || a.includes('preview') - b.includes('preview'));
+  return candidates[0];
+}
+
+const [cmd, prompt, outFile] = process.argv.slice(2);
+
+if (cmd === 'models') {
+  for (const m of await listModels()) console.log(m.name.replace('models/', ''));
+} else if (cmd === 'text' && prompt) {
+  const model = await pickModel('text');
+  const data = await call(`models/${model}:generateContent`, { contents: [{ parts: [{ text: prompt }] }] });
+  const text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
+  console.error(`[${model}]`);
+  console.log(text.trim());
+} else if (cmd === 'image' && prompt && outFile) {
+  const model = await pickModel('image');
+  const data = await call(`models/${model}:generateContent`, {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { responseModalities: ['TEXT', 'IMAGE'] },
+  });
+  const parts = data.candidates?.[0]?.content?.parts || [];
+  const img = parts.find(p => p.inlineData?.data);
+  if (!img) fail(`Kein Bild erhalten. Antwort: ${parts.map(p => p.text || '').join(' ').slice(0, 300)}`);
+  await writeFile(outFile, Buffer.from(img.inlineData.data, 'base64'));
+  console.error(`[${model}]`);
+  console.log(`Bild gespeichert: ${outFile}`);
+} else {
+  console.log('Nutzung: gemini.sh models | text "Prompt" | image "Prompt" datei.png');
+  process.exit(cmd ? 1 : 0);
+}
