@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <title>Project Atlas</title>
-<meta name="description" content="Hybrid-Prototyp v0.2 – animiertes Pixel-Dorf mit Glas-Panels für Flos Projekte und KI-Team.">
+<meta name="description" content="Hybrid-Prototyp v0.3 – animiertes Pixel-Dorf mit Glas-Panels, Detailansicht und Notion-Bearbeitung für Flos Projekte und KI-Team.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Figtree:wght@400;500;600;700&family=Pixelify+Sans:wght@500;600;700&display=swap" rel="stylesheet">
@@ -85,6 +85,7 @@ a{color:inherit}
 .hello{display:flex;flex-direction:column;min-width:0}
 .hello h2{margin:0;font-family:var(--f-ui);font-weight:700;font-size:21px;line-height:1.15;text-wrap:balance}
 .hello p{margin:0;color:var(--fg-2);font-size:13px}
+.hello .sync{margin-top:3px}
 .search{flex:1 1 200px;max-width:320px;display:flex;align-items:center;gap:8px;padding:0 12px;height:40px;border-radius:10px;background:rgba(9,16,22,.55);border:1px solid var(--line)}
 .search svg{width:16px;height:16px;stroke:var(--fg-3);fill:none;stroke-width:2;flex:none}
 .search input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--fg);font:inherit;font-size:14px}
@@ -110,18 +111,24 @@ a{color:inherit}
 .zoom button:hover{border-color:var(--core);color:var(--core)}
 .zoom svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 #labels{position:absolute;inset:0;pointer-events:none}
-.lbl{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px 5px;border-radius:8px;border:1px solid rgba(110,231,216,.45);background:rgba(8,16,20,.82);cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.45);transition:transform .18s ease, opacity .2s ease, border-color .2s}
-.lbl:hover{transform:translate(-50%,-100%) translateY(-2px);border-color:var(--core)}
-.lbl.below{transform:translate(-50%,0)}
+.lbl{--lb:rgba(110,231,216,.45);--lbg:#0c1a1e;position:absolute;transform:translate(-50%,calc(-100% - 8px));pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px 5px;border-radius:8px;border:1px solid rgba(110,231,216,.45);background:rgba(8,16,20,.82);cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.45);transition:transform .18s ease, opacity .2s ease, border-color .2s}
+.lbl:hover{transform:translate(-50%,calc(-100% - 10px));border-color:var(--core);--lb:var(--core)}
+/* Zeiger vom Schild zum Gebäude, damit klar ist, wozu es gehört */
+.lbl::before,.lbl::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--lb);pointer-events:none}
+.lbl::after{margin-top:-2px;border-width:6px;border-top-color:var(--lbg)}
+.lbl.below::before,.lbl.below::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--lb)}
+.lbl.below::after{margin:0 0 -2px;border-bottom-color:var(--lbg)}
+.lbl.mid::before,.lbl.mid::after{display:none}
+.lbl.below{transform:translate(-50%,8px)}
 .lbl.mid{transform:translate(-50%,-50%)}
 .lbl.mid:hover{transform:translate(-50%,-50%) translateY(-2px)}
-.lbl.plot{border-style:dashed;border-color:rgba(214,230,220,.4);background:rgba(8,16,20,.62);padding:3px 8px}
+.lbl.plot{--lb:rgba(214,230,220,.4);border-style:dashed;border-color:rgba(214,230,220,.4);background:rgba(8,16,20,.62);padding:3px 8px}
 .lbl.plot .lbl-name{font-size:11px;color:var(--fg-2)}
 .lbl.plot.sel{box-shadow:0 0 0 2px rgba(214,230,220,.4)}
-.lbl.below:hover{transform:translate(-50%,0) translateY(2px)}
-.lbl.sb{border-color:rgba(244,200,106,.55)}
-.lbl.sb:hover{border-color:var(--star)}
-.lbl.core{border-color:rgba(110,231,216,.7);background:rgba(8,22,26,.86)}
+.lbl.below:hover{transform:translate(-50%,10px)}
+.lbl.sb{--lb:rgba(244,200,106,.55);border-color:rgba(244,200,106,.55)}
+.lbl.sb:hover{border-color:var(--star);--lb:var(--star)}
+.lbl.core{--lb:rgba(110,231,216,.7);border-color:rgba(110,231,216,.7);background:rgba(8,22,26,.86)}
 .lbl.sel{box-shadow:0 0 0 2px rgba(110,231,216,.45),0 6px 18px rgba(0,0,0,.5)}
 .lbl.sb.sel{box-shadow:0 0 0 2px rgba(244,200,106,.5),0 6px 18px rgba(0,0,0,.5)}
 .lbl.dim{opacity:.28}
@@ -135,10 +142,13 @@ a{color:inherit}
 .bar i{position:absolute;inset:0 auto 0 0;border-radius:3px;background:linear-gradient(90deg,#3fbfae,var(--core))}
 .sb .bar i{background:linear-gradient(90deg,#d9a441,var(--star))}
 .stage.compact .lbl-row,.stage.compact .lbl-state,.stage.compact .lbl-ai{display:none}
+.stage.dense.far .lbl-state{display:none}
+.stage.dense.far .lbl.plot:not(.sel){display:none}
 .stage.compact .lbl{padding:3px 6px}
 .stage.compact .lbl-name{font-size:11px}
 .stage.compact .lbl:not(.sel):not(.core){width:14px;height:14px;padding:0;border-radius:50%;border-width:2px;background:rgba(8,16,20,.9)}
-.stage.compact .lbl:not(.sel):not(.core)::after{content:"";position:absolute;inset:-8px}
+.stage.compact .lbl:not(.sel):not(.core)::before{display:none}
+.stage.compact .lbl:not(.sel):not(.core)::after{content:"";position:absolute;inset:-8px;border:0;margin:0;transform:none}
 .stage.compact .lbl:not(.sel):not(.core) .lbl-name{display:none}
 .stage.compact .lbl.plot:not(.sel){display:none}
 .stage.compact .badge-mode{font-size:10.5px;padding:4px 8px;top:8px;left:8px}
@@ -172,6 +182,7 @@ a{color:inherit}
 .chip.st-run{color:var(--core);border-color:rgba(110,231,216,.4)}
 .chip.st-plan{color:var(--warn);border-color:rgba(240,179,90,.4)}
 .chip.st-none{color:var(--idle)}
+.chip.st-done{color:var(--ok);border-color:rgba(98,214,156,.4)}
 .chip.grp-sb{color:var(--star);border-color:rgba(244,200,106,.4)}
 .chip.grp-sb::before,.chip.grp-other::before{border-radius:1px}
 .desc{margin:10px 0 0;color:var(--fg-2)}
@@ -205,6 +216,7 @@ a{color:inherit}
 .tasks .done .ic{background:var(--ok);border-color:var(--ok)}
 .tasks .done .ic::after{content:"";width:6px;height:3px;border:2px solid #0b1a14;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .tasks .wait .ic{border-color:var(--warn);border-style:dashed}
+.tasks .run .ic{border-color:var(--core);background:rgba(110,231,216,.25)}
 .tasks .done .tt{color:var(--fg-3);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
 .tasks .tt{font-size:13px;line-height:1.35;min-width:0}
 .tasks .tm{font-size:11px;color:var(--fg-3);white-space:nowrap;font-family:var(--f-ui);font-weight:600;padding-top:2px}
@@ -233,6 +245,93 @@ a{color:inherit}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;padding:10px 14px;border-radius:10px;background:rgba(12,22,28,.95);border:1px solid var(--line-2);font-size:13px;transition:opacity .2s, transform .2s;pointer-events:none;z-index:10;max-width:calc(100% - 32px)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+
+/* ---------- Detailansicht ---------- */
+.app{transition:filter .35s ease, transform .35s ease}
+body.detail-open .app{filter:blur(9px) saturate(.7) brightness(.62);transform:scale(.985);pointer-events:none;user-select:none}
+body.detail-open{overflow:hidden}
+.detail{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:24px;background:rgba(4,9,12,.38);opacity:0;transition:opacity .28s ease}
+.detail.show{opacity:1}
+.detail[hidden]{display:none}
+.detail-box{position:relative;width:min(1320px,100%);height:min(860px,calc(100vh - 48px));display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);overflow:hidden;padding:0;transform:translateY(10px) scale(.985);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.detail.show .detail-box{transform:none}
+.scene{position:relative;min-height:0;background:#0b1512;border-right:1px solid var(--line)}
+.scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scene-cap{position:absolute;left:14px;bottom:14px;right:14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;pointer-events:none}
+.scene-cap b{font-family:var(--f-pixel);font-weight:700;font-size:20px;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.scene-cap span{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-2);padding:3px 8px;border-radius:7px;background:rgba(8,16,20,.72);border:1px solid var(--line)}
+.info{min-height:0;overflow:auto;padding:22px 22px 26px;display:flex;flex-direction:column;gap:18px;scrollbar-width:thin;scrollbar-color:rgba(150,214,220,.25) transparent}
+.info h2{margin:2px 0 0;font-family:var(--f-pixel);font-weight:700;font-size:30px;line-height:1.05;text-wrap:balance;padding-right:44px}
+.info h3{margin:0 0 8px;font-family:var(--f-ui);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-2);display:flex;align-items:center;gap:8px}
+.info h3 small{font-size:11px;letter-spacing:0;text-transform:none;color:var(--fg-3);font-weight:600}
+.d-close{position:absolute;top:14px;right:14px;z-index:2;width:38px;height:38px;border-radius:10px;border:1px solid var(--line-2);background:rgba(8,16,20,.85);color:var(--fg);font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.d-close:hover{border-color:var(--core);color:var(--core)}
+.d-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sync{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3)}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--idle)}
+.sync.live{color:var(--ok)} .sync.live i{background:var(--ok);box-shadow:0 0 7px var(--ok)}
+.sync.busy{color:var(--warn)} .sync.busy i{background:var(--warn);animation:pulse 1s ease-in-out infinite}
+.sync.err{color:#f08a7a} .sync.err i{background:#f08a7a}
+@keyframes pulse{50%{opacity:.3}}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld > span{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3)}
+.inp,.sel,.area{font:inherit;color:var(--fg);background:rgba(9,16,22,.6);border:1px solid var(--line-2);border-radius:9px;padding:8px 10px;min-width:0}
+.inp:focus,.sel:focus,.area:focus{outline:none;border-color:var(--core)}
+.inp:disabled,.sel:disabled,.area:disabled{opacity:.6;cursor:not-allowed}
+.area{resize:vertical;min-height:64px;line-height:1.45}
+.sel{padding-right:6px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:end}
+.tlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+.trow{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto 28px;gap:8px;align-items:center;padding:6px 6px;border-radius:9px;border:1px solid transparent;transition:background .15s,opacity .2s}
+.trow:hover{background:rgba(255,255,255,.035);border-color:var(--line)}
+.trow.pending{opacity:.55}
+.trow.pending button{pointer-events:none}
+.trow.ms{grid-template-columns:22px minmax(0,1fr) auto 28px}
+.chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--fg-3);background:none;cursor:pointer;display:grid;place-items:center;padding:0}
+.chk:hover{border-color:var(--ok)}
+.trow.st-done .chk{background:var(--ok);border-color:var(--ok)}
+.trow.st-done .chk::after{content:"";width:8px;height:4px;border:2px solid #0b1a14;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.trow.st-run .chk{border-color:var(--core)}
+.trow.st-run .chk::after{content:"";width:8px;height:8px;border-radius:2px;background:var(--core);opacity:.55}
+.ttl{font-size:13.5px;line-height:1.35;min-width:0;cursor:text;border-radius:5px;padding:2px 4px;margin:-2px -4px;overflow-wrap:anywhere}
+.ttl:hover{background:rgba(255,255,255,.05)}
+.trow.st-done .ttl{color:var(--fg-3);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
+.ttl .who{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:6px;vertical-align:1px}
+.ttl-in{width:100%;font:inherit;font-size:13.5px;color:var(--fg);background:rgba(9,16,22,.8);border:1px solid var(--core);border-radius:6px;padding:3px 6px}
+.pill{border:1px solid var(--line-2);background:rgba(9,16,22,.5);color:var(--fg-2);border-radius:99px;padding:2px 9px;font-family:var(--f-ui);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
+.pill:hover{border-color:var(--fg-2);color:var(--fg)}
+.pill.p-Hoch{color:#f08a7a;border-color:rgba(240,138,122,.45)}
+.pill.p-Mittel{color:var(--warn);border-color:rgba(240,179,90,.4)}
+.pill.s-run{color:var(--core);border-color:rgba(110,231,216,.45)}
+.pill.s-done{color:var(--ok);border-color:rgba(98,214,156,.4)}
+.pill:disabled,.chk:disabled,.del:disabled{cursor:default;opacity:.7}
+.pill:disabled:hover{border-color:var(--line-2);color:var(--fg-2)}
+.del{width:28px;height:28px;border-radius:7px;border:1px solid transparent;background:none;color:var(--fg-3);cursor:pointer;display:grid;place-items:center;padding:0;opacity:0;transition:opacity .15s}
+.trow:hover .del,.del:focus-visible,.del.arm{opacity:1}
+.del svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.del:hover{color:#f08a7a;border-color:rgba(240,138,122,.4)}
+.del.arm{width:auto;padding:0 8px;color:#fff;background:#c2493a;border-color:#c2493a;font-family:var(--f-ui);font-size:11px;font-weight:700}
+.date{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3);white-space:nowrap}
+.add{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;margin-top:8px}
+.add .btn{margin:0}
+.btn.pri{background:rgba(110,231,216,.14);border-color:rgba(110,231,216,.5);color:var(--core)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btns .btn{margin-top:0}
+.ro{font-size:12px;color:var(--fg-3);padding:8px 10px;border-radius:9px;border:1px dashed var(--line-2)}
+.ro button{font:inherit;color:var(--core);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
+.side-open{margin-top:14px}
+@media (hover:none){.del{opacity:1}}
+@media (max-width:900px){
+  .detail{padding:0}
+  .detail-box{width:100%;height:100%;border-radius:0;grid-template-columns:1fr;grid-template-rows:minmax(220px,40vh) minmax(0,1fr)}
+  .scene{border-right:0;border-bottom:1px solid var(--line)}
+  .info{padding:18px 16px 28px}
+  .info h2{font-size:25px}
+  .trow{grid-template-columns:22px minmax(0,1fr) auto 28px}
+  .trow .pill.st{display:none}
+}
 
 /* ---------- Responsiv ---------- */
 @media (max-width:1280px){
@@ -264,7 +363,7 @@ a{color:inherit}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion: reduce){
-  .lbl,.toast{transition:none}
+  .lbl,.toast,.app,.detail,.detail-box{transition:none}
 }
 </style>
 
@@ -298,7 +397,7 @@ a{color:inherit}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v0.2 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: Notion-Stand 30.09.2026</small>
+      <small>Hybrid-Prototyp v0.3 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
     </div>
   </aside>
 
@@ -306,6 +405,7 @@ a{color:inherit}
     <div class="hello">
       <h2 id="greet">Hallo Flo</h2>
       <p id="subline">9 Projekte · 4 KI-Partner · 1 große Karte</p>
+      <span class="sync" data-sync></span>
     </div>
     <label class="search" for="q">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
@@ -364,9 +464,16 @@ a{color:inherit}
     <section class="card glass">
       <h3>Gesamtstand</h3>
       <div class="sum" id="sum"></div>
-      <p class="note">Quelle: Notion „Flo Dashboard“ (Projekte, Aufgaben, Meilensteine) und die Project-Atlas-Hub-Seite, abgerufen am 30.09.2026. Später liest das Dashboard live.</p>
+      <p class="note" id="srcNote"></p>
     </section>
   </aside>
+</div>
+<div class="detail" id="detail" hidden>
+  <div class="detail-box glass" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <div class="scene" id="scene"><canvas id="sceneCv" aria-hidden="true"></canvas><div class="scene-cap" id="sceneCap"></div></div>
+    <div class="info" id="info"></div>
+    <button type="button" class="d-close" id="dClose" aria-label="Detailansicht schließen" title="Schließen (Esc)">×</button>
+  </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
 
@@ -436,6 +543,18 @@ const PLOTS = [
 const P = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
 PLOTS.forEach(p => { P[p.id] = { ...p, group:'plot', building:'Bauplatz', status:'frei', plot:true }; });
 
+// Aufgaben & Meilensteine als Objekte mit den Notion-Status „Nicht begonnen · In Bearbeitung · Erledigt“.
+// Der Stand oben ist der Offline-Stand vom 30.09.2026; mit Notion-Verbindung ersetzt ihn applyLive().
+const ST_OF = { done:'Erledigt', todo:'Nicht begonnen', wait:'Nicht begonnen', run:'In Bearbeitung' };
+for (const p of PROJECTS){
+  p.tasks = (p.tasks || []).map(([title, s, prio, who]) => ({ id:null, title, status:ST_OF[s], prio:prio || 'Mittel', who:who || null }));
+  p.milestones = (p.milestones || []).map(([title, d]) => ({ id:null, title, status:'Erledigt', date:d.split('.').reverse().join('-') }));
+}
+const isDone = t => t.status === 'Erledigt';
+const stKey = s => s === 'Erledigt' ? 'done' : s === 'In Bearbeitung' ? 'run' : 'todo';
+const ORDER = { run:0, todo:1, done:2 }, PRIO = { Hoch:0, Mittel:1, Niedrig:2 };
+const byOrder = (a,b) => ORDER[stKey(a.status)] - ORDER[stKey(b.status)] || (PRIO[a.prio] ?? 1) - (PRIO[b.prio] ?? 1);
+
 // Gebäude auf der Karte (Bildkoordinaten): Klickfläche, Eingang, Beschriftung
 const BLD = {
   sbweb:  { box:[492,8,572,205],    front:[525,248],  label:[528,118,'center'] },
@@ -460,7 +579,7 @@ const ROUTES = {
   drop:   [[880,540],[980,580],[1080,600],[1150,680],[1220,760]],
   bridge: [[615,470],[530,480],[420,495],[320,500],[210,492],[120,490]],
 };
-const HOME = [[700,472],[738,502],[816,502],[854,472]];
+const HOME = [[688,468],[712,503],[842,503],[866,468]];
 const CORE_SLOT = [[735,448],[758,472],[796,472],[819,448]];
 
 const AGENTS = [
@@ -547,7 +666,39 @@ const VILLAGERS = [
   { hair:'#2b2b33', skin:'#c98e6a', shirt:'#6f7fd1', pants:'#3a3a44' },
 ].map((v,i) => ({ ...v, x:PLAZA.x - 60 + i*60, y:PLAZA.y + 40, route:[], at:null, wait:1 + i*2, face:1 }));
 const DESTS = ['sb','sbshop','mkt','seo','etsy','digi','drop','bridge','plaza','plaza'];
-const cat = { x:PLAZA.x + 90, y:PLAZA.y + 20, tx:0, ty:0, wait:2, face:-1, sit:0 };
+// Haustiere: drei Maine Coons und ein Toy Pudel (Seitenansicht, Kopf rechts)
+const PET_ROWS = {
+  coonA:['........D..D','........OOBB','D.......BEBB','DD.....BBBLN','.DB.BOOBBCL.','..BBOOOBBBL.','..BBBBBBBB..','..L.L...L.L.'],
+  coonB:['........D..D','........OOBB','D.......BEBB','DD.....BBBLN','.DB.BOOBBCL.','..BBOOOBBBL.','..BBBBBBBB..','...L.L.L.L..'],
+  coonS:['.....D..D.','.....OOBB.','.....BEBB.','....BBBLN.','...BOBCL..','D.BBOOBL..','DDBBBBBB..','.DDLBBLB..'],
+  poodA:['......QQ...','.....QQQQ..','Q....PPEPN.','QQ...QPPP..','.P.PPPPPP..','..PPPPPPP..','..P.P..P.P.','..Q.Q..Q.Q.'],
+  poodB:['......QQ...','.....QQQQ..','Q....PPEPN.','QQ...QPPP..','.P.PPPPPP..','..PPPPPPP..','...P.P.P.P.','...Q.Q.Q.Q.'],
+  poodS:['.....QQ...','....QQQQ..','....PPEPN.','Q...QPPP..','QQ.PPPPP..','.PPPPPPP..','..PPPPPP..','..QQ..QQ..'],
+};
+const PETS = [
+  { label:'Maine Coon · schwarz', kind:'coon', px:2.1, sp:15, col:{ B:'#2a2932', O:'#23222a', D:'#141319', L:'#4a4958', E:'#e8c547', N:'#4a4958', C:'#2a2932' } },
+  { label:'Maine Coon · weiß-orange (Kater)', kind:'coon', px:2.25, sp:15, col:{ B:'#e08a3c', O:'#c26f2a', D:'#a95a22', L:'#f4efe6', E:'#7cc25e', N:'#e89a9a', C:'#e08a3c' } },
+  { label:'Maine Coon · weiß-orange (Katze)', kind:'coon', px:1.9, sp:16, col:{ B:'#f3ede3', O:'#e39a52', D:'#e39a52', L:'#fbf8f2', E:'#7cc25e', N:'#e89a9a', C:'#ff6fae' } },
+  { label:'Toy Pudel', kind:'pood', px:1.9, sp:26, col:{ P:'#c8743a', Q:'#eaa866', E:'#1d1410', N:'#1d1410' } },
+].map((p,i) => ({ ...p, x:PLAZA.x - 105 + i*70, y:PLAZA.y + 52 - (i%2)*18, route:[], wait:1 + i*1.5, face:i%2 ? -1 : 1, sit:i!==3 ? 1 : 0, sitNext:false }));
+const PET_TRIPS = ['sb','sbshop','mkt','seo','etsy','digi','drop'];
+function petPlazaPoint(){
+  for (let k=0;k<12;k++){ const a = rnd()*6.283, r = .45 + rnd()*.5, x = PLAZA.x + Math.cos(a)*PLAZA.rx*.85*r, y = PLAZA.y + 24 + Math.sin(a)*PLAZA.ry*.7*r; if (Math.abs(x-PLAZA.x) > 55 || y > 500) return { x, y }; }
+  return { x:PLAZA.x + 90, y:PLAZA.y + 40 };
+}
+function petPlan(p){
+  const r = rnd();
+  if (p.kind==='pood' && r < .3){ const c = PETS[Math.floor(rnd()*3)]; p.route = [{ x:c.x - 16*(c.face||1), y:c.y + 3 }]; }
+  else if (r < .72) p.route = [petPlazaPoint()];
+  else { const rt = ROUTES[pick(PET_TRIPS)], n = 2 + Math.floor(rnd()*Math.min(3, rt.length-2)); const out = rt.slice(0, n).map(q => ({ x:q[0] + (rnd()-.5)*10, y:q[1] + (rnd()-.5)*6 })); p.route = [...out, ...out.slice(0,-1).reverse(), petPlazaPoint()]; }
+  p.wait = 2.5 + rnd()*6; p.sitNext = p.kind==='coon' ? rnd() < .7 : rnd() < .35;
+}
+// Angler am Steg (rechts unten): wartet, Biss, Fang
+// Sitzt an der vorderen Stegkante, Blick aufs Wasser, Beine hängen über die Kante
+const ANG = { x:1462, y:848, px:3, tip:[1491,878], tipUp:[1484,848], bob:[1493,915], phase:'wait', t:0, next:6 + rnd()*8 };
+const ANGLER_ROWS = ['..HHHH..','.HHHHHH.','..SSSS..','..SESE..','.JJJJJJ.','JJJJJJJA','.JJJJJJ.','.PP..PP.','.PP..PP.','.BB..BB.'];
+const ANGLER_COL = { H:'#d9b25a', S:'#f0c49b', E:'#2a1d18', J:'#3f6d8a', A:'#f0c49b', P:'#5b4a3a', B:'#2b1f18' };
+let drops = [];
 const ducks = Array.from({length:3}, (_,i) => { const p = lakePts[Math.floor(rnd()*lakePts.length)] || [1300,930]; return { x:p[0], y:p[1], a:rnd()*6.28, sp:5+rnd()*4, turn:0 }; });
 let birds = [], birdT = 6;
 const butterflies = Array.from({length:6}, (_,i) => { const c = [PLOTS[0],PLOTS[1],PLOTS[2],{x:PLAZA.x,y:PLAZA.y+60}][i%4]; return { cx:c.x, cy:c.y, ph:rnd()*6.28, r:30+rnd()*30, col:pick(['#f7c6e0','#fff3b0','#ffffff','#bfe3ff']) }; });
@@ -621,6 +772,7 @@ function buildBackdrop(){
   b.drawImage(baseImg, (cw - IW*cover)/2, (ch - IH*cover)/2, IW*cover, IH*cover);
   b.filter = 'none'; b.fillStyle = 'rgba(9,16,22,.55)'; b.fillRect(0, 0, cw, ch);
 }
+function markFar(){ stage.classList.toggle('far', view.s < fitS*1.3); }
 function zoomAt(f, px, py){
   const s0 = view.s, s = clamp(s0*f, fitS, maxS());
   const ix = (px-view.ox)/s0, iy = (py-view.oy)/s0;
@@ -641,6 +793,7 @@ function resize(){
   cw = Math.max(1, Math.round(r.width*dpr)); ch = Math.max(1, Math.round(r.height*dpr));
   cv.width = cw; cv.height = ch;
   stage.classList.toggle('compact', r.width < 640);
+  stage.classList.toggle('dense', r.width >= 640);
   if (Math.abs(r.width-lastSize[0]) > 40 || Math.abs(r.height-lastSize[1]) > 120 || !lastSize[0]) { fit(); lastSize = [r.width, r.height]; }
   else { fitS = Math.min(cw/IW, ch/IH); clampView(); placeLabels(); }
   buildBackdrop();
@@ -717,12 +870,41 @@ function drawVillager(v, t){
   ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(WX(v.x), WY(v.y)+px*.3, 3*px, 1*px, 0, 0, Math.PI*2); ctx.fill();
   blit(VILLAGER_ROWS, { H:v.hair, S:v.skin, E:'#2a1d18', T:v.shirt, P:v.pants, F:'#2b1f18' }, X, Y, px, v.face, walking ? Math.floor(t*7)%2 : null);
 }
-function drawCat(t){
-  const px = 2.2*view.s, moving = Math.hypot(cat.tx-cat.x, cat.ty-cat.y) > 1 && cat.wait <= 0;
-  const rows = cat.sit > 0 ? ['.....K.K','.....KKK','.K..KKKK','..KKKKK.','..KK.KK.'] : ['......KK','K....KKK','.KKKKKK.','.KKKKKK.','.K.K..K.'];
-  const X = WX(cat.x) - 4*px, Y = WY(cat.y) - 5*px;
-  blit(rows, { K:'#e0934a' }, X, Y, px, cat.face, moving ? Math.floor(t*6)%2 : null);
-  ctx.fillStyle = '#1d1410'; const ex = cat.face > 0 ? X + 6*px : X + 1*px; ctx.fillRect(Math.round(ex), Math.round(Y + 1*px), Math.ceil(px*.8), Math.ceil(px*.8));
+function drawPet(p, t){
+  const px = p.px*view.s, moving = p.route.length > 0, f = Math.floor(t*(p.kind==='pood' ? 9 : 6) + p.px*3) % 2;
+  const rows = p.kind==='coon' ? (moving ? (f ? PET_ROWS.coonA : PET_ROWS.coonB) : p.sit ? PET_ROWS.coonS : PET_ROWS.coonA)
+                               : (moving ? (f ? PET_ROWS.poodA : PET_ROWS.poodB) : p.sit ? PET_ROWS.poodS : PET_ROWS.poodA);
+  const w = rows[0].length, h = rows.length, bob = moving && p.kind==='pood' ? f*px*.6 : 0;
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(WX(p.x), WY(p.y)+px*.2, w*px*.42, 1.2*px, 0, 0, Math.PI*2); ctx.fill();
+  blit(rows, p.col, WX(p.x) - w/2*px, WY(p.y) - h*px - bob, px, p.face, null);
+}
+function drawAngler(t){
+  const s = view.s, A0 = ANG, px = A0.px*s;
+  const catching = A0.phase==='catch', u = catching ? Math.min(1, A0.t/1.3) : 0;
+  const lift = catching ? Math.sin(Math.min(1, u*1.6)*Math.PI/2) : A0.phase==='bite' ? .12 + .08*Math.sin(t*16) : 0;
+  const tip = [A0.tip[0] + (A0.tipUp[0]-A0.tip[0])*lift, A0.tip[1] + (A0.tipUp[1]-A0.tip[1])*lift];
+  const hand = [A0.x + 3.5*A0.px, A0.y - 1.5*A0.px];
+  // Pose, Wellen, Schwimmer
+  let by = A0.bob[1] + (reduceMotion ? 0 : Math.sin(t*2.2)*1.1);
+  if (A0.phase==='bite') by += Math.sin(t*18) > .2 ? 2.6 : 0;
+  const showBob = !catching;
+  if (!reduceMotion && showBob){ const k = (t % 2.6)/2.6; ctx.strokeStyle = `rgba(220,240,255,${.45*(1-k)})`; ctx.lineWidth = Math.max(1, .8*s); ctx.beginPath(); ctx.ellipse(WX(A0.bob[0]), WY(A0.bob[1]+1.5), (3 + k*10)*s, (1 + k*3.2)*s, 0, 0, Math.PI*2); ctx.stroke(); }
+  // Schnur
+  const end = showBob ? [A0.bob[0], by] : [A0.bob[0] + (hand[0]-A0.bob[0])*u, A0.bob[1] + (hand[1]-A0.bob[1])*u - Math.sin(u*Math.PI)*46];
+  ctx.strokeStyle = 'rgba(235,240,245,.55)'; ctx.lineWidth = Math.max(1, .6*s); ctx.beginPath(); ctx.moveTo(WX(tip[0]), WY(tip[1]));
+  ctx.quadraticCurveTo(WX((tip[0]+end[0])/2 + 2), WY(Math.max(tip[1], end[1]) - (showBob ? 4 : 0)), WX(end[0]), WY(end[1])); ctx.stroke();
+  if (showBob){ const r = Math.max(1.5, 2.2*s); ctx.fillStyle = '#f4f1ea'; ctx.beginPath(); ctx.arc(WX(A0.bob[0]), WY(by), r, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = '#e04a3a'; ctx.beginPath(); ctx.arc(WX(A0.bob[0]), WY(by), r, Math.PI, 0); ctx.fill(); }
+  else { // Fisch am Haken
+    const fx = WX(end[0]), fy = WY(end[1]), fp = Math.max(1, 1.5*s), wig = Math.sin(t*30) > 0 ? 1 : 0;
+    ctx.fillStyle = '#bcd3e6'; ctx.fillRect(fx - 3*fp, fy, 6*fp, 2*fp); ctx.fillRect(fx - 2*fp, fy - fp, 4*fp, fp);
+    ctx.fillStyle = '#8fb0c9'; ctx.fillRect(fx + (wig ? 3 : 2)*fp, fy - fp, fp, 4*fp); ctx.fillStyle = '#20303a'; ctx.fillRect(fx - 2.4*fp, fy, fp*.8, fp*.8);
+  }
+  for (const d of drops){ ctx.fillStyle = `rgba(225,242,255,${Math.max(0, d.life)})`; ctx.fillRect(WX(d.x), WY(d.y), Math.max(1, 1.6*s), Math.max(1, 1.6*s)); }
+  // Angler (sitzt an der Stegkante) + Rute
+  blit(ANGLER_ROWS, ANGLER_COL, WX(A0.x) - 4*px, WY(A0.y) - 7*px, px, 1, null);
+  ctx.strokeStyle = '#7a5a36'; ctx.lineWidth = Math.max(1, 1.3*s); ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(WX(hand[0]), WY(hand[1])); ctx.lineTo(WX(tip[0]), WY(tip[1])); ctx.stroke(); ctx.lineCap = 'butt';
+  // Eimer
+  ctx.fillStyle = '#6b7b86'; ctx.fillRect(WX(A0.x - 22), WY(A0.y - 12), 8*s, 8*s); ctx.fillStyle = '#4a5760'; ctx.fillRect(WX(A0.x - 22), WY(A0.y - 12), 8*s, 1.6*s);
 }
 function drawDuck(d, t){
   const px = 2*view.s, face = Math.cos(d.a) >= 0 ? 1 : -1, bob = Math.sin(t*2 + d.a)*px*.3;
@@ -778,7 +960,8 @@ function render(t){
   for (const d of ducks) drawDuck(d, t);
   const walkers = [...VILLAGERS].sort((a,b) => a.y - b.y);
   for (const v of walkers) drawVillager(v, t);
-  drawCat(t);
+  for (const p of [...PETS].sort((a,b) => a.y - b.y)) drawPet(p, t);
+  drawAngler(t);
 
   // Beleuchtung
   const rect = [view.ox, view.oy, IW*s, IH*s];
@@ -870,10 +1053,15 @@ function simulate(dt, t){
     let dest; do { dest = pick(DESTS); } while (dest === v.at);
     v.route = pathBetween(v.at && v.at !== 'plaza' ? v.at : null, dest); v.at = dest; v.wait = 3 + rnd()*6;
   }
-  if (cat.wait > 0){ cat.wait -= dt; if (cat.sit > 0) cat.sit -= dt; }
-  else { const dx = cat.tx-cat.x, dy = cat.ty-cat.y, d = Math.hypot(dx,dy);
-    if (d < 2){ cat.wait = 2 + rnd()*6; cat.sit = rnd() < .5 ? cat.wait : 0; const a = rnd()*6.28; cat.tx = PLAZA.x + Math.cos(a)*PLAZA.rx*.8; cat.ty = PLAZA.y + 10 + Math.sin(a)*PLAZA.ry*.7; }
-    else { const m = Math.min(d, 18*dt); cat.x += dx/d*m; cat.y += dy/d*m; if (Math.abs(dx) > .5) cat.face = dx > 0 ? 1 : -1; } }
+  for (const p of PETS){
+    if (p.route.length){ p.sit = 0; if (walk(p, dt, p.sp)) p.sit = p.sitNext ? 1 : 0; continue; }
+    p.wait -= dt; if (p.wait <= 0) petPlan(p);
+  }
+  ANG.t += dt;
+  if (ANG.phase==='wait' && ANG.t > ANG.next){ ANG.phase = 'bite'; ANG.t = 0; }
+  else if (ANG.phase==='bite' && ANG.t > 2.4){ ANG.phase = 'catch'; ANG.t = 0; for (let i=0;i<10;i++) drops.push({ x:ANG.bob[0], y:ANG.bob[1], vx:(rnd()-.5)*30, vy:-20 - rnd()*25, life:1 }); }
+  else if (ANG.phase==='catch' && ANG.t > 1.4){ ANG.phase = 'wait'; ANG.t = 0; ANG.next = 12 + rnd()*16; }
+  for (const d of drops){ d.x += d.vx*dt; d.y += d.vy*dt; d.vy += 90*dt; d.life -= dt*1.4; } drops = drops.filter(d => d.life > 0);
   for (const d of ducks){ d.a += (Math.sin(t*.3 + d.sp) * .4) * dt; const nx = d.x + Math.cos(d.a)*d.sp*dt, ny = d.y + Math.sin(d.a)*d.sp*.5*dt; if (isWater(nx+Math.cos(d.a)*14, ny) && isWater(nx, ny+6)){ d.x = nx; d.y = ny; } else d.a += Math.PI*(.6 + rnd()*.4); }
   birdT -= dt; if (birdT <= 0){ birdT = 18 + rnd()*20; const y0 = 80 + rnd()*500, n = 3 + Math.floor(rnd()*3); for (let i=0;i<n;i++) birds.push({ x:-30 - i*22, y:y0 + (i%2)*14 + i*4, vx:70 + rnd()*10, ph:rnd()*6 }); }
   for (const b of birds){ b.x += b.vx*dt; b.y += Math.sin(t + b.ph)*.2; } birds = birds.filter(b => b.x < IW + 40);
@@ -894,13 +1082,13 @@ let smokeT = 0;
    ========================================================= */
 const labelsEl = $('#labels');
 function progressOf(pr){
-  if (pr.progressFrom === 'tasks'){ const d = pr.tasks.filter(t => t[1]==='done').length; return Math.round(d/pr.tasks.length*100); }
+  if (pr.progressFrom === 'tasks') return pr.tasks.length ? Math.round(pr.tasks.filter(isDone).length/pr.tasks.length*100) : 0;
   return typeof pr.progress === 'number' ? pr.progress : null;
 }
-const statusClass = s => s==='In Bearbeitung' ? 'st-run' : s==='Planung' ? 'st-plan' : 'st-none';
+const statusClass = s => s==='In Bearbeitung' ? 'st-run' : s==='Erledigt' ? 'st-done' : s==='Planung' ? 'st-plan' : 'st-none';
 function match(id){ if (!filter) return true; const pr = P[id]; return (pr.name + ' ' + pr.building).toLowerCase().includes(filter); }
 function anchorOf(id){
-  if (id==='atlas') return [PLAZA.x, PLAZA.y + PLAZA.ry + 6, 'below'];
+  if (id==='atlas') return [CRYSTAL.x, 482, 'below']; // auf dem Platz, Zeiger nach oben zum Kristall
   if (P[id].plot) return [P[id].x, P[id].y - 34, 'above'];
   return BLD[id].label;
 }
@@ -917,13 +1105,14 @@ function buildLabels(){
       (pr.plot ? '' : pg !== null ? `<span class="lbl-row"><span class="bar"><i style="width:${pg}%"></i></span>${pg}%</span>` : `<span class="lbl-state">${esc(pr.status)}</span>`) +
       `<span class="lbl-ai"></span>`;
     el.setAttribute('aria-label', pr.plot ? 'Freier Bauplatz für ein neues Projekt' : `${pr.name}, ${pr.status}${pg!==null ? ', ' + pg + ' Prozent' : ''}`);
-    el.addEventListener('click', () => select(pr.id));
+    el.addEventListener('click', () => pr.plot ? select(pr.id) : openDetail(pr.id));
     el.addEventListener('mouseenter', () => { hovered = pr.id; });
     el.addEventListener('mouseleave', () => { if (hovered===pr.id) hovered = null; });
     labelsEl.appendChild(el);
   }
 }
 function placeLabels(){
+  markFar();
   for (const el of labelsEl.children){
     const [x,y] = anchorOf(el.dataset.id), X = WX(x)/dpr, Y = WY(y)/dpr;
     el.style.left = X + 'px'; el.style.top = Y + 'px';
@@ -956,7 +1145,7 @@ function renderAgents(){
     : 'Echter Stand vom 30.09.2026: ChatGPT malt im Auftrag von Claude Code die Gebäude-Illustrationen. Gemini ist angebunden, hat gerade keinen Auftrag. Live-Meldungen kommen mit Phase 2.';
 }
 function renderSummary(){
-  const all = PROJECTS.flatMap(p => p.tasks || []), done = all.filter(t => t[1]==='done').length;
+  const all = PROJECTS.flatMap(p => p.tasks), done = all.filter(isDone).length;
   const running = PROJECTS.filter(p => p.status!=='Nicht begonnen').length, act = AGENTS.filter(a => st[a.id].status==='work').length;
   $('#sum').innerHTML = [[PROJECTS.length,'Projekte gesamt'],[running,'laufen (inkl. Atlas)'],[`${done}/${all.length}`,'Aufgaben erledigt'],[PLOTS.length,'freie Bauplätze']]
     .map(([v,l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
@@ -971,47 +1160,33 @@ function renderProject(){
       <a class="btn" href="${NOTION}3ec50ed7a8c4402ca44637ea943ac758" target="_blank" rel="noopener">Projekte in Notion öffnen <span aria-hidden="true">↗</span></a>`;
     return;
   }
-  const pg = progressOf(pr);
+  const pg = progressOf(pr), open = pr.tasks.filter(t => !isDone(t)), done = pr.tasks.length - open.length;
   const grp = pr.id==='atlas' ? '<span class="chip grp-other">Dashboard · Kern</span>' : pr.group==='sb' ? '<span class="chip grp-sb">SternenBücher-Bereich</span>' : '<span class="chip grp-other">Weiteres Projekt</span>';
   let h = pr.art ? `<figure class="art"><img src="${pr.art}" alt="${esc(pr.building)} – Illustration von ChatGPT" width="768" height="512"></figure>` : '';
   h += `<div class="eyebrow">Ausgewählt · ${esc(pr.building)}</div><h2>${esc(pr.name)}</h2><div class="chips"><span class="chip ${statusClass(pr.status)}">${esc(pr.status)}</span>${grp}</div>`;
   if (pr.desc) h += `<p class="desc">${esc(pr.desc)}</p>`;
   if (pg !== null) h += `<div class="meter"><div class="meter-top"><span>Fortschritt</span><b>${pg} %</b></div><div class="bar ${pr.group==='sb'?'sb':''}"><i style="width:${pg}%"></i></div><small>${pr.progressFrom==='tasks' ? 'berechnet aus erledigten Aufgaben' : 'laut Notion-Feld „Fortschritt Prozent“'}</small></div>`;
-  if (pr.tasks){
-    const d = pr.tasks.filter(t => t[1]==='done').length;
-    h += `<div class="kpis"><div class="kpi"><b>${d}/${pr.tasks.length}</b><span>Aufgaben erledigt</span></div>` +
-      (pr.milestones ? `<div class="kpi"><b>${pr.milestones.length}/${pr.milestones.length}</b><span>Meilensteine</span></div>` : `<div class="kpi"><b>${pr.tasks.filter(t=>t[1]==='wait').length}</b><span>warten auf Flo</span></div>`) +
-      `<div class="kpi"><b>${pr.tasks.filter(t=>t[2]==='Hoch' && t[1]!=='done').length}</b><span>offen, Prio hoch</span></div></div>`;
-  }
-  if (pr.zodiac){
-    const lv = ['offen','in Arbeit','fertig'];
-    h += `<h3 style="margin-top:18px">Sternzeichen-Produktion</h3><div class="zodiac">` + pr.zodiac.map(([n,g,z]) => { const s = z || [0,0,0,0];
-      return `<div class="zs ${s.some(v => v>0)?'on':''}" title="${esc(n)}: Story ${lv[s[0]]}, Charakter ${lv[s[1]]}, Illustration ${lv[s[2]]}, Layout ${lv[s[3]]}"><span class="g">${g}︎</span><span class="d">${s.map(v => `<i class="${v===2?'done':v===1?'wip':''}"></i>`).join('')}</span></div>`; }).join('') +
-      `</div><div class="legend"><span>Punkte: Story · Charakter · Illustration · Layout</span><span><i style="background:var(--ok)"></i>fertig</span><span><i style="background:var(--star)"></i>in Arbeit</span></div>`;
-  }
-  if (pr.tasks){
-    const order = { wait:0, todo:1, done:2 }, prio = { Hoch:0, Mittel:1, Niedrig:2 };
-    h += `<h3>Aufgaben</h3><ul class="tasks">` + [...pr.tasks].sort((a,b) => order[a[1]]-order[b[1]] || prio[a[2]]-prio[b[2]]).map(([t,s,pp,who]) => {
-      const meta = s==='wait' ? `<span class="tm wt">wartet auf Flo</span>` : s==='done' ? `<span class="tm">erledigt</span>` : `<span class="tm ${pp==='Hoch'?'hi':''}">${esc(pp)}</span>`;
-      const dot = who ? `<span class="who" style="background:${A[who].color}" title="${esc(A[who].name)}"></span>` : '';
-      return `<li class="${s}"><span class="ic"></span><span class="tt">${dot}${esc(t)}</span>${meta}</li>`; }).join('') + `</ul>`;
-  } else h += `<h3>Aufgaben</h3><div class="empty">Noch keine Aufgaben in Notion. Sobald du dort welche anlegst, erscheinen sie hier und das Gebäude bekommt einen Fortschrittsbalken.</div>`;
-  if (pr.milestones) h += `<h3>Meilensteine</h3><ul class="tasks">` + pr.milestones.map(([t,d]) => `<li class="done"><span class="ic"></span><span class="tt">${esc(t)}</span><span class="tm">${esc(d)}</span></li>`).join('') + `</ul>`;
+  h += `<div class="kpis"><div class="kpi"><b>${done}/${pr.tasks.length}</b><span>Aufgaben erledigt</span></div><div class="kpi"><b>${pr.tasks.filter(t => t.status==='In Bearbeitung').length}</b><span>in Bearbeitung</span></div><div class="kpi"><b>${open.filter(t => t.prio==='Hoch').length}</b><span>offen, Prio hoch</span></div></div>`;
+  const next = [...open].sort(byOrder).slice(0, 4);
+  h += `<h3>Nächste Aufgaben</h3>` + (next.length
+    ? `<ul class="tasks">` + next.map(t => `<li class="${stKey(t.status)}"><span class="ic"></span><span class="tt">${t.who && A[t.who] ? `<span class="who" style="background:${A[t.who].color}" title="${esc(A[t.who].name)}"></span>` : ''}${esc(t.title)}</span><span class="tm ${t.prio==='Hoch'?'hi':''}">${t.status==='In Bearbeitung' ? 'in Arbeit' : esc(t.prio)}</span></li>`).join('') + `</ul>` + (open.length > 4 ? `<p class="note">+ ${open.length - 4} weitere in der Detailansicht</p>` : '')
+    : `<div class="empty">${pr.tasks.length ? 'Alles erledigt.' : 'Noch keine Aufgaben. In der Detailansicht kannst du direkt welche anlegen.'}</div>`);
   const here = headingTo(pr.id);
   h += `<h3>KIs an diesem Projekt</h3>` + (here.length ? `<div class="here">${here.map(id => `<span><i style="background:${A[id].color}"></i>${esc(A[id].name)} · ${esc(st[id].status==='walk' ? 'unterwegs' : st[id].task)}</span>`).join('')}</div>` : `<div class="empty">Gerade arbeitet keine KI hier.</div>`);
-  h += `<a class="btn" href="${NOTION + pr.notion}" target="_blank" rel="noopener">In Notion öffnen <span aria-hidden="true">↗</span></a>`;
+  h += `<div class="btns side-open"><button type="button" class="btn pri" data-open="${pr.id}">Details &amp; bearbeiten</button><a class="btn" href="${NOTION + pr.notion}" target="_blank" rel="noopener">In Notion öffnen <span aria-hidden="true">↗</span></a></div>`;
   $('#projCard').innerHTML = h;
 }
 function select(id, focus){ selected = id; renderProject(); refreshLabels(); if (focus) focusOn(id); }
 let dirty = true;
 function changed(){ dirty = true; }
-function flush(){ if (!dirty) return; dirty = false; renderAgents(); renderSummary(); refreshLabels(); renderProject(); }
+function flush(){ if (!dirty) return; dirty = false; renderAgents(); renderSummary(); refreshLabels(); renderProject(); if (detailId) renderDetailHere(); }
 
 /* =========================================================
    Interaktion
    ========================================================= */
 const tip = $('#tip');
 function toImage(e){ const r = cv.getBoundingClientRect(); const px = (e.clientX - r.left)*dpr, py = (e.clientY - r.top)*dpr; return { x:(px - view.ox)/view.s, y:(py - view.oy)/view.s, px, py, cx:e.clientX - r.left, cy:e.clientY - r.top }; }
+function hitPet(q){ let best=null, bd=16; for (const p of PETS){ const d = Math.hypot(q.x - p.x, (q.y - (p.y-7))*.9); if (d < bd){ bd=d; best=p; } } return best; }
 function hitAgent(q){ let best=null, bd=22; for (const a of AGENTS){ const s = st[a.id]; const d = Math.hypot(q.x - s.x, (q.y - (s.y-12))*.8); if (d < bd){ bd=d; best=a.id; } } return best; }
 function hitBuilding(q){
   if (((q.x-PLAZA.x)/PLAZA.rx)**2 + ((q.y-PLAZA.y)/PLAZA.ry)**2 < 1) return 'atlas';
@@ -1028,8 +1203,9 @@ cv.addEventListener('pointermove', e => {
   if (pinch && pointers.size === 2){ const [a,b] = [...pointers.values()], r = cv.getBoundingClientRect(); const d = Math.hypot(a.x-b.x, a.y-b.y); zoomAt((pinch.s * d/pinch.d)/view.s, ((a.x+b.x)/2 - r.left)*dpr, ((a.y+b.y)/2 - r.top)*dpr); tween = null; return; }
   if (drag && pointers.size === 1){ const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.hypot(dx,dy) > 5) drag.moved = true;
     if (drag.moved){ view.ox = drag.ox + dx*dpr; view.oy = drag.oy + dy*dpr; clampView(); placeLabels(); tween = null; cv.classList.add('dragging'); tip.hidden = true; return; } }
-  const q = toImage(e); hoverAgent = hitAgent(q); hovered = hoverAgent ? null : hitBuilding(q);
+  const q = toImage(e); hoverAgent = hitAgent(q); const pet = hoverAgent ? null : hitPet(q); hovered = (hoverAgent || pet) ? null : hitBuilding(q);
   cv.classList.toggle('hot', !!(hoverAgent || hovered));
+  if (pet && !hoverAgent){ tip.innerHTML = `<b>${esc(pet.label)}</b><small>${pet.route.length ? 'unterwegs im Dorf' : pet.sit ? 'macht es sich gemütlich' : 'schaut sich um'}</small>`; tip.style.left = q.cx + 'px'; tip.style.top = q.cy + 'px'; tip.hidden = false; return; }
   if (hoverAgent){ const a = A[hoverAgent], s = st[hoverAgent], where = s.target==='home' ? 'am KI-Kern' : P[s.target]?.name || '';
     tip.innerHTML = `<b style="color:${a.color}">${esc(a.name)}</b> · ${STATUS_TXT[s.status]}<small>${s.task ? esc(where) + ': ' + esc(s.task) : esc(a.role)}</small>`;
     tip.style.left = q.cx + 'px'; tip.style.top = q.cy + 'px'; tip.hidden = false; } else tip.hidden = true;
@@ -1039,7 +1215,7 @@ function endPointer(e){
   pointers.delete(e.pointerId); cv.classList.remove('dragging');
   if (pointers.size < 2) pinch = null;
   if (single && drag && !wasDrag && e.type === 'pointerup'){ const q = toImage(e); const ag = hitAgent(q);
-    if (ag){ const t = st[ag].target; select(t==='home' ? 'atlas' : t); } else { const b = hitBuilding(q); if (b) select(b); } }
+    if (ag){ const t = st[ag].target; select(t==='home' ? 'atlas' : t); } else { const b = hitBuilding(q); if (b) P[b].plot ? select(b) : openDetail(b); } }
   if (!pointers.size) drag = null;
 }
 cv.addEventListener('pointerup', endPointer); cv.addEventListener('pointercancel', endPointer);
@@ -1071,6 +1247,366 @@ function updateClock(){
 }
 
 /* =========================================================
+   Notion live: lesen über die Datenbank-Ansichten, schreiben als Flo
+   ========================================================= */
+const NOTION_DS = { tasks:'b19c21e5-bb94-434e-a17e-e5ff9e29d951', ms:'0df8af82-ff58-47af-80d2-ff5f549325d8' };
+const NOTION_VIEWS = { proj:'view://d94c5cce-eef1-4be0-aece-39b5f344602b', tasks:'view://4711c54c-b453-4086-a986-890248a94bba', ms:'view://7e256a73-16aa-47f8-874a-bd84b7ab1d26' };
+const TRASH_PAGE = '3ebf5a8714b3811a80f8ff4d7426137c'; // „Papierkorb (aus dem Dashboard entfernt)“ unter der Hub-Seite
+const KI_OF = { '3ebf5a8714b381e3b511cc98927a6fe7':'gpt', '3ebf5a8714b381538de1d42c6ea5acb2':'gem', '3ebf5a8714b381768e8afd7db893a1b2':'claude', '3ebf5a8714b381f98616cf33b0166b43':'code' };
+const DENIED = ['not_in_manifest','consent_required','not_granted','needs_reauth','server_not_connected','selection_required','blocked_by_policy','approval_required','capability_disabled','capability_removed'];
+const live = { mcp:null, ok:false, denied:false, state:'off', msg:'', at:null, busy:0 };
+const idOf = u => { const m = /[0-9a-f]{32}/.exec(String(u || '').replace(/-/g, '')); return m ? m[0] : null; };
+const rel = v => { try { const a = typeof v === 'string' ? JSON.parse(v || '[]') : v; return Array.isArray(a) ? a.map(idOf).filter(Boolean) : []; } catch { return []; } };
+const canEdit = () => !!(live.mcp && live.ok && !live.denied);
+const hhmm = d => d ? new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Nicosia'}).format(d) + ' Uhr' : '';
+const fmtDate = iso => { const [y,m,d] = String(iso).split('-'); return d ? `${d}.${m}.${y}` : iso; };
+function payloadOf(r){ let p = r && typeof r === 'object' && 'payload' in r ? r.payload : r; if (typeof p === 'string'){ try { p = JSON.parse(p); } catch { /* Text bleibt Text */ } } return p; }
+async function callNotion(tool, input){ return payloadOf(await live.mcp.callTool('Notion', tool, input, { cache:false })); }
+function errText(e){
+  switch (e && e.code){
+    case 'needs_reauth': return 'Notion-Verbindung abgelaufen – in claude.ai unter Einstellungen → Konnektoren neu verbinden.';
+    case 'server_not_connected': case 'selection_required': return 'Notion-Konnektor fehlt – in claude.ai unter Einstellungen → Konnektoren hinzufügen.';
+    case 'not_in_manifest': case 'consent_required': case 'not_granted': return 'Notion ist für dieses Dashboard noch nicht erlaubt.';
+    case 'blocked_by_policy': case 'approval_required': return 'Notion ist hier durch eine Richtlinie gesperrt.';
+    case 'server_unavailable': case 'upstream_error': return 'Notion antwortet gerade nicht.';
+    case 'capability_disabled': case 'capability_removed': return 'Diese Ansicht kann Notion nicht erreichen.';
+    case 'tool_error': return 'Notion meldet: ' + (e.message || 'Fehler');
+    default: return 'Notion-Fehler: ' + ((e && e.message) || 'unbekannt');
+  }
+}
+function setSync(state, msg){ live.state = state; live.msg = msg || ''; paintSync(); }
+function paintSync(){
+  const st2 = live.state;
+  const txt = st2==='live' ? `Live aus Notion · ${hhmm(live.at)}` : st2==='busy' ? live.msg : st2==='err' ? live.msg : st2==='conn' ? 'Verbinde mit Notion …' : 'Offline-Stand 30.09.2026 · nur Ansicht';
+  const cls = st2==='live' ? 'live' : (st2==='busy' || st2==='conn') ? 'busy' : st2==='err' ? 'err' : '';
+  for (const el of document.querySelectorAll('[data-sync]')){ el.className = 'sync ' + cls; el.innerHTML = `<i></i>${esc(txt)}`; }
+  const note = $('#srcNote');
+  if (note) note.textContent = live.ok ? 'Quelle: Notion „Flo Dashboard“ (Projekte, Aufgaben, Meilensteine), live geladen. Änderungen aus der Detailansicht landen direkt dort.' : 'Quelle: Notion „Flo Dashboard“ (Projekte, Aufgaben, Meilensteine), Offline-Stand vom 30.09.2026. Mit Notion-Verbindung lädt das Dashboard live.';
+  paintRo();
+}
+async function queryView(view){
+  const rows = []; let cursor = null, guard = 0;
+  do {
+    const p = await callNotion('notion-query-data-sources', { data: Object.assign({ mode:'view', view_url:view, page_size:100 }, cursor ? { start_cursor:cursor } : {}) });
+    rows.push(...((p && p.results) || [])); cursor = p && p.has_more ? p.next_cursor : null;
+  } while (cursor && ++guard < 10);
+  return rows;
+}
+let loading = null, reT = 0;
+function refreshLive(){
+  if (!live.mcp) return Promise.resolve();
+  if (loading) return loading;
+  if (!live.ok) setSync('conn'); else setSync('busy', 'Lädt aus Notion …');
+  loading = Promise.all([queryView(NOTION_VIEWS.proj), queryView(NOTION_VIEWS.tasks), queryView(NOTION_VIEWS.ms)])
+    .then(([pr, ts, ms]) => {
+      if (live.busy){ clearTimeout(reT); reT = setTimeout(refreshLive, 1500); return; } // laufende Änderung nicht überschreiben
+      applyLive(pr, ts, ms); live.ok = true; live.denied = false; live.at = new Date(); setSync('live');
+    })
+    .catch(e => { if (DENIED.includes(e && e.code)) live.denied = true; setSync(live.ok && !live.denied ? 'live' : 'err', errText(e)); if (live.ok && !live.denied) toastMsg(errText(e) + ' Angezeigt wird der letzte Stand.'); })
+    .finally(() => { loading = null; });
+  return loading;
+}
+function applyLive(projRows, taskRows, msRows){
+  const byId = {}; for (const p of PROJECTS) byId[p.notion] = p;
+  for (const r of projRows){ const p = byId[idOf(r.url)]; if (!p) continue; // nur Projekte, die im Dorf ein Gebäude haben
+    if (r.Projektname) p.name = r.Projektname;
+    if (r.Status) p.status = r.Status;
+    p.desc = r.Beschreibung || '';
+    p.progress = typeof r['Fortschritt Prozent'] === 'number' ? r['Fortschritt Prozent'] : null; }
+  for (const p of PROJECTS){ p.tasks = []; p.milestones = []; }
+  for (const r of taskRows) for (const pid of rel(r.Projekt)){ const p = byId[pid]; if (!p) continue;
+    p.tasks.push({ id:idOf(r.url), title:r.Titel || '(ohne Titel)', status:r.Status || 'Nicht begonnen', prio:r['Priorität'] || 'Mittel', who:KI_OF[rel(r['Zuständige KI'])[0]] || null }); }
+  for (const r of msRows) for (const pid of rel(r.Projekt)){ const p = byId[pid]; if (!p) continue;
+    p.milestones.push({ id:idOf(r.url), title:r.Titel || '(ohne Titel)', status:r.Status || 'Nicht begonnen', date:r['date:Zieldatum:start'] || '' }); }
+  buildLabels(); placeLabels(); changed();
+  if (detailId) renderDetail(true);
+}
+// Schreiben: nacheinander, optimistisch, bei Fehler zurückrollen
+let writeChain = Promise.resolve();
+function write(label, fn, undo){
+  live.busy++; setSync('busy', label + ' …'); changed(); renderDetailLists();
+  const run = writeChain.then(fn).then(() => {}, e => {
+    undo && undo();
+    const unsure = e && (e.code==='server_unavailable' || e.code==='upstream_error');
+    toastMsg(errText(e) + (unsure ? ' Ob es gespeichert wurde, zeigt das Neuladen gleich.' : ' Änderung zurückgenommen.'));
+    if (DENIED.includes(e && e.code)) live.denied = true;
+  }).finally(() => {
+    live.busy--; if (!live.busy){ setSync('live'); clearTimeout(reT); reT = setTimeout(refreshLive, 1800); }
+    changed(); renderDetailLists();
+  });
+  writeChain = run; return run;
+}
+const pageUrl = id => NOTION + id;
+const updProps = (id, props) => callNotion('notion-update-page', { page_id:id, command:'update_properties', properties:props, allow_async:false });
+const toTrash = id => callNotion('notion-move-pages', { page_or_database_ids:[id], new_parent:{ type:'page_id', page_id:TRASH_PAGE } });
+function setField(item, key, val, label, notionProps){ const prev = item[key]; item[key] = val; write(label, () => updProps(item.id, notionProps), () => { item[key] = prev; }); }
+function removeItem(list, item, label){ const i = list.indexOf(item); if (i < 0) return; list.splice(i, 1); write(label, () => toTrash(item.id), () => list.splice(Math.min(i, list.length), 0, item)); }
+function addTask(pr, title, prio){
+  const t = { id:null, title, status:'Nicht begonnen', prio, who:null, pending:true }; pr.tasks.push(t);
+  write('Aufgabe anlegen', async () => {
+    const r = await callNotion('notion-create-pages', { parent:{ type:'data_source_id', data_source_id:NOTION_DS.tasks }, pages:[{ properties:{ Titel:title, Status:'Nicht begonnen', 'Priorität':prio, Projekt:[pageUrl(pr.notion)] } }] });
+    t.id = idOf(r && r.pages && r.pages[0] && r.pages[0].id); t.pending = false;
+    if (!t.id) throw { code:'upstream_error', message:'keine Seiten-ID erhalten' };
+  }, () => { const i = pr.tasks.indexOf(t); if (i >= 0) pr.tasks.splice(i, 1); });
+}
+function addMilestone(pr, title, date){
+  const m = { id:null, title, status:'Nicht begonnen', date:date || '', pending:true }; pr.milestones.push(m);
+  const props = { Titel:title, Status:'Nicht begonnen', Projekt:[pageUrl(pr.notion)] };
+  if (date){ props['date:Zieldatum:start'] = date; props['date:Zieldatum:is_datetime'] = 0; }
+  write('Meilenstein anlegen', async () => {
+    const r = await callNotion('notion-create-pages', { parent:{ type:'data_source_id', data_source_id:NOTION_DS.ms }, pages:[{ properties:props }] });
+    m.id = idOf(r && r.pages && r.pages[0] && r.pages[0].id); m.pending = false;
+    if (!m.id) throw { code:'upstream_error', message:'keine Seiten-ID erhalten' };
+  }, () => { const i = pr.milestones.indexOf(m); if (i >= 0) pr.milestones.splice(i, 1); });
+}
+
+/* =========================================================
+   Detailansicht: animiertes Gebäude links, alle Infos rechts
+   ========================================================= */
+const ART_FX = {
+  sb:{ lights:[[0.404,0.445],[0.718,0.536],[0.411,0.649],[0.168,0.552],[0.58,0.586],[0.896,0.591],[0.285,0.877],[0.922,0.388],[0.071,0.727],[0.917,0.822],[0.666,0.953],[0.103,0.876],[0.721,0.223],[0.109,0.328],[0.27,0.687],[0.844,0.372],[0.276,0.953],[0.924,0.297],[0.207,0.936],[0.635,0.316],[0.896,0.922],[0.083,0.391]], sparkle:[[0.431,0.051]], smoke:[] },
+  etsy:{ lights:[[0.147,0.51],[0.2,0.44],[0.21,0.565],[0.26,0.565],[0.32,0.57],[0.39,0.56],[0.303,0.77],[0.61,0.63],[0.77,0.585],[0.817,0.565],[0.818,0.478],[0.875,0.555]], sparkle:[], smoke:[[0.521,0.088]] },
+};
+const artImgs = {};
+for (const p of PROJECTS) if (p.art){ const im = new Image(); im.src = p.art; artImgs[p.id] = im; }
+const sceneEl = $('#scene'), sceneCv = $('#sceneCv'), sctx = sceneCv.getContext('2d');
+let detailId = null, lastFocus = null, scene = null, sceneBg = null, sceneSmoke = [], shownTasks = [], shownMs = [];
+const motes = Array.from({length:22}, () => ({ u:rnd(), v:.15 + rnd()*.8, ph:rnd()*6.28, sp:.3 + rnd()*.5 }));
+const TRASH_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>';
+
+function buildScene(id){
+  const pr = P[id], W = sceneCv.width, H = sceneCv.height, im = artImgs[id];
+  if (im && im.complete && im.naturalWidth){
+    const fx = ART_FX[id] || { lights:[], sparkle:[], smoke:[] }, iw = im.naturalWidth, ih = im.naturalHeight;
+    return { img:im, art:true, sx:0, sy:0, sw:iw, sh:ih, smooth:true,
+      lights:fx.lights.map(([x,y]) => [x*iw, y*ih, 1]), smoke:fx.smoke.map(([x,y]) => [x*iw, y*ih]), sparkle:fx.sparkle.map(([x,y]) => [x*iw, y*ih]), cyan:[], water:[], blink:[] };
+  }
+  // Kein eigenes Bild: Ausschnitt der Dorf-Karte im Seitenverhältnis der Bühne
+  const b = id==='atlas' ? [640,330,915,560] : BLD[id].box, cx = (b[0]+b[2])/2, cy = (b[1]+b[3])/2;
+  let sw = (b[2]-b[0])*1.45, sh = (b[3]-b[1])*1.45; const ar = W/H;
+  if (sw/sh < ar) sw = sh*ar; else sh = sw/ar;
+  sw = Math.min(sw, IW); sh = Math.min(sh, IH);
+  const sx = clamp(cx - sw/2, 0, IW - sw), sy = clamp(cy - sh/2, 0, IH - sh), inR = (x,y) => x >= sx && x <= sx+sw && y >= sy && y <= sy+sh;
+  return { img:baseImg, art:false, sx, sy, sw, sh, smooth:false,
+    lights:MD.warm.filter(([x,y,c]) => c >= 8 && inR(x,y)).map(([x,y,c]) => [x, y, Math.min(1.6, .6 + Math.sqrt(c)*.12)]),
+    cyan:MD.cyan.filter(([x,y]) => inR(x,y)), smoke:SMOKE_SRC.filter(([x,y]) => inR(x,y)), sparkle:[],
+    water:MD.water.filter(([x,y]) => inR(x,y)), blink:inR(1333,24) ? [[1333,24]] : [], crystal:inR(CRYSTAL.x, CRYSTAL.y) };
+}
+function sizeScene(){
+  const r = sceneEl.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
+  sceneCv.width = Math.max(1, Math.round(r.width*d)); sceneCv.height = Math.max(1, Math.round(r.height*d));
+  if (detailId){ scene = buildScene(detailId); buildSceneBg(); }
+}
+function buildSceneBg(){
+  sceneBg = null; if (!scene || !scene.art) return;
+  const W = sceneCv.width, H = sceneCv.height, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), k = Math.max(W/scene.sw, H/scene.sh)*1.15;
+  g.filter = 'blur(22px) saturate(1.15)'; g.drawImage(scene.img, (W - scene.sw*k)/2, (H - scene.sh*k)/2, scene.sw*k, scene.sh*k);
+  g.filter = 'none'; g.fillStyle = 'rgba(9,16,22,.45)'; g.fillRect(0, 0, W, H); sceneBg = c;
+}
+new ResizeObserver(() => { if (detailId) sizeScene(); }).observe(sceneEl);
+
+function sGlow(x,y,r,col,a){ if (r <= 0 || a <= 0) return; const g = sctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0, rgba(col,a)); g.addColorStop(1, rgba(col,0)); sctx.fillStyle = g; sctx.fillRect(x-r,y-r,r*2,r*2); }
+function renderScene(t){
+  const W = sceneCv.width, H = sceneCv.height;
+  sctx.setTransform(1,0,0,1,0,0); sctx.globalCompositeOperation = 'source-over'; sctx.globalAlpha = 1;
+  sctx.fillStyle = '#0b1512'; sctx.fillRect(0, 0, W, H);
+  if (!scene){ if (ready) { scene = buildScene(detailId); buildSceneBg(); } else return; }
+  const sp = scene, kb = reduceMotion ? 1 : 1 + .018*(1 + Math.sin(t*.13));
+  const fitS = sp.art ? Math.min(W/sp.sw, (H*.92)/sp.sh) : Math.max(W/sp.sw, H/sp.sh), s = fitS*kb;
+  const panX = reduceMotion ? 0 : Math.sin(t*.07)*sp.sw*.008, panY = reduceMotion ? 0 : Math.cos(t*.09)*sp.sh*.006;
+  const ox = W/2 - (sp.sx + sp.sw/2 + panX)*s, oy = H/2 - (sp.sy + sp.sh/2 + panY)*s, X = x => ox + x*s, Y = y => oy + y*s;
+  if (sceneBg) sctx.drawImage(sceneBg, 0, 0);
+  sctx.imageSmoothingEnabled = sp.smooth; sctx.imageSmoothingQuality = 'high';
+  if (sp.art){ sctx.save(); sctx.shadowColor = 'rgba(0,0,0,.55)'; sctx.shadowBlur = 40; sctx.drawImage(sp.img, X(0), Y(0), sp.sw*s, sp.sh*s); sctx.restore(); }
+  else { const m = 60, x0 = Math.max(0, sp.sx-m), y0 = Math.max(0, sp.sy-m), x1 = Math.min(IW, sp.sx+sp.sw+m), y1 = Math.min(IH, sp.sy+sp.sh+m); sctx.drawImage(sp.img, x0, y0, x1-x0, y1-y0, X(x0), Y(y0), (x1-x0)*s, (y1-y0)*s); }
+  const L = lighting(), lit = Math.max(L.dark, L.warm*.6), rect = sp.art ? [X(0), Y(0), sp.sw*s, sp.sh*s] : [0, 0, W, H];
+  // Wasser glitzert
+  if (!reduceMotion) for (const q of sp.water){ const v = Math.sin(t*1.7 + q[0]*.13 + q[1]*.07); if (v > .86){ sctx.fillStyle = `rgba(235,250,255,${(v-.86)*5})`; sctx.fillRect(X(q[0]), Y(q[1]), Math.max(1, 2*s), Math.max(1, 2*s)); } }
+  // Tageszeit wie in der Welt (gemalte Bilder sind schon abendlich, daher sanfter)
+  const dk = sp.art ? L.dark*.5 : L.dark*.84;
+  if (L.warm > 0 && !sp.art){ sctx.globalCompositeOperation = 'multiply'; sctx.fillStyle = `rgba(255,172,122,${L.warm*.5})`; sctx.fillRect(...rect); }
+  if (dk > 0){ sctx.globalCompositeOperation = 'multiply'; sctx.fillStyle = `rgba(38,52,108,${dk})`; sctx.fillRect(...rect); }
+  sctx.globalCompositeOperation = 'source-over';
+  if (!sp.art && lit > 0){ const m = 60, x0 = Math.max(0, sp.sx-m), y0 = Math.max(0, sp.sy-m), x1 = Math.min(IW, sp.sx+sp.sw+m), y1 = Math.min(IH, sp.sy+sp.sh+m); sctx.globalAlpha = Math.min(1, lit*1.05); sctx.drawImage(lightImg, x0, y0, x1-x0, y1-y0, X(x0), Y(y0), (x1-x0)*s, (y1-y0)*s); sctx.globalAlpha = 1; }
+  // Fenster und Laternen flackern
+  sctx.globalCompositeOperation = 'lighter';
+  const base = sp.art ? .22 + .5*L.dark : .12 + .7*lit, rr = sp.art ? sp.sw*.028 : 13;
+  sp.lights.forEach(([x,y,w], i) => { const fl = reduceMotion ? 1 : .78 + .22*Math.sin(t*(2.1 + (i%4)*.7) + i*1.7) + (Math.sin(t*11 + i) > .97 ? -.25 : 0); sGlow(X(x), Y(y), rr*w*s*(.9 + .1*fl), '#ffc46e', base*fl); });
+  for (const [x,y] of sp.cyan) sGlow(X(x), Y(y), 30*s, '#6ee7d8', .3 + .3*lit);
+  if (sp.crystal){ const pulse = .5 + .5*Math.sin(t*1.6); sGlow(X(CRYSTAL.x), Y(CRYSTAL.y), (80 + pulse*14)*s, '#6ee7d8', .22 + lit*.25);
+    if (!reduceMotion) for (let k=0;k<6;k++){ const ang = t*.9 + k*1.047; sGlow(X(CRYSTAL.x + Math.cos(ang)*34), Y(CRYSTAL.y - 6 + Math.sin(ang)*12 - ((t*12 + k*9) % 40)*.4), 5*s, k%2 ? '#f4c86a' : '#bff7f0', .8); } }
+  for (const [x,y] of sp.blink) if (Math.sin(t*3) > 0) sGlow(X(x), Y(y), 16*s, '#ff5a4a', .55 + .4*lit);
+  for (const [x,y] of sp.sparkle){ const k = reduceMotion ? 1 : .6 + .4*Math.sin(t*2.6), r = sp.sw*.03*s*k; sGlow(X(x), Y(y), r*1.6, '#ffd978', .5*k);
+    sctx.fillStyle = `rgba(255,244,200,${.75*k})`; sctx.fillRect(X(x) - r, Y(y) - Math.max(1, s*1.5), r*2, Math.max(2, s*3)); sctx.fillRect(X(x) - Math.max(1, s*1.5), Y(y) - r, Math.max(2, s*3), r*2); }
+  // Glühwürmchen (Nacht) bzw. Staub im Licht (Tag)
+  if (!reduceMotion) for (const m of motes){ const x = sp.sx + (m.u + Math.sin(t*m.sp + m.ph)*.02)*sp.sw, y = sp.sy + (m.v + Math.cos(t*m.sp*.8 + m.ph)*.02)*sp.sh, a = (Math.sin(t*2 + m.ph)*.5 + .5);
+    if (L.dark > .3) sGlow(X(x), Y(y), sp.sw*.008*s + 4, '#d9f77a', .55*a*L.dark); else sGlow(X(x), Y(y), 3 + sp.sw*.003*s, '#fff1c9', .25*a); }
+  sctx.globalCompositeOperation = 'source-over';
+  // Rauch
+  for (const q of sceneSmoke){ const a = clamp(q.life,0,1)*.38; sctx.fillStyle = `rgba(228,231,235,${a})`; const sz = Math.max(2, q.size*s); sctx.fillRect(X(q.x) - sz/2, Y(q.y) - sz/2, sz, sz); }
+  // Vignette + Verlauf für die Beschriftung
+  const vg = sctx.createRadialGradient(W/2, H/2, Math.min(W,H)*.35, W/2, H/2, Math.max(W,H)*.75); vg.addColorStop(0, 'rgba(5,10,12,0)'); vg.addColorStop(1, 'rgba(5,10,12,.55)'); sctx.fillStyle = vg; sctx.fillRect(0, 0, W, H);
+  const bg = sctx.createLinearGradient(0, H*.72, 0, H); bg.addColorStop(0, 'rgba(5,10,12,0)'); bg.addColorStop(1, 'rgba(5,10,12,.6)'); sctx.fillStyle = bg; sctx.fillRect(0, H*.72, W, H*.28);
+}
+let sceneSmokeT = 0;
+function simulateScene(dt){
+  if (!scene || reduceMotion) return;
+  sceneSmokeT += dt;
+  if (sceneSmokeT > .22){ sceneSmokeT = 0; const u = scene.sw; for (const [x,y] of scene.smoke) sceneSmoke.push({ x:x + (rnd()-.5)*u*.006, y, vx:(rnd()-.2)*u*.006, vy:-u*(scene.art ? .03 : .012) - rnd()*u*.008, life:1, size:u*(scene.art ? .012 : .01) + rnd()*u*.006 }); }
+  for (let i=sceneSmoke.length-1;i>=0;i--){ const q = sceneSmoke[i]; q.x += q.vx*dt; q.y += q.vy*dt; q.size += dt*scene.sw*.006; q.life -= dt*.28; if (q.life <= 0) sceneSmoke.splice(i, 1); }
+}
+
+function openDetail(id){
+  if (!P[id] || P[id].plot){ select(id); return; }
+  select(id);
+  if (detailId === id) return;
+  const wasOpen = !!detailId;
+  detailId = id; if (!wasOpen) lastFocus = document.activeElement;
+  const d = $('#detail'), app = $('.app');
+  d.hidden = false; document.body.classList.add('detail-open'); app.setAttribute('aria-hidden', 'true'); app.inert = true;
+  requestAnimationFrame(() => d.classList.add('show'));
+  sceneSmoke = []; scene = null; sizeScene();
+  const pr = P[id];
+  $('#sceneCap').innerHTML = `<b>${esc(pr.building)}</b><span>${pr.art ? 'Illustration: ChatGPT' : 'Ausschnitt der Dorf-Karte · eigene Illustration folgt'}</span>`;
+  renderDetail(); $('#dClose').focus();
+  if (live.mcp && (!live.at || Date.now() - live.at > 20000)) refreshLive();
+}
+function closeDetail(){
+  if (!detailId) return;
+  detailId = null;
+  const d = $('#detail'), app = $('.app');
+  d.classList.remove('show'); document.body.classList.remove('detail-open'); app.removeAttribute('aria-hidden'); app.inert = false;
+  setTimeout(() => { if (!detailId) d.hidden = true; }, reduceMotion ? 0 : 300);
+  if (lastFocus && lastFocus.isConnected && lastFocus.focus) lastFocus.focus();
+  changed();
+}
+function paintRo(){
+  const el = $('#dRo'); if (!el) return;
+  if (canEdit()){ el.hidden = true; return; }
+  el.hidden = false;
+  if (!live.mcp) el.textContent = 'Nur Ansicht: Bearbeiten klappt, wenn du das Dashboard in Claude öffnest und Notion erlaubst.';
+  else if (live.state === 'conn') el.textContent = 'Verbinde mit Notion … Beim ersten Mal fragt Claude, ob das Dashboard Notion nutzen darf.';
+  else el.innerHTML = `${esc(live.msg || 'Keine Verbindung zu Notion.')} <button type="button" data-act="reconnect">Erneut verbinden</button>`;
+}
+function renderDetail(keep){
+  const pr = P[detailId]; if (!pr) return;
+  const info = $('#info');
+  const active = document.activeElement && info.contains(document.activeElement) ? document.activeElement.id : null;
+  if (keep && (active === 'dDesc' || document.querySelector('.ttl-in'))) { renderDetailLists(); return; } // nicht mitten im Tippen neu aufbauen
+  const draftT = $('#dAddT') ? [$('#dAddT').elements.t.value, $('#dAddT').elements.p.value] : null, draftM = $('#dAddM') ? [$('#dAddM').elements.t.value, $('#dAddM').elements.d.value] : null;
+  const ed = canEdit(), dis = ed ? '' : ' disabled';
+  const grp = pr.id==='atlas' ? 'Dashboard-Kern' : pr.group==='sb' ? 'SternenBücher-Bereich' : 'Weiteres Projekt';
+  let h = `<div><div class="eyebrow">${esc(pr.building)} · ${grp}</div><h2 id="dTitle">${esc(pr.name)}</h2><div class="d-row" style="margin-top:8px"><span class="sync" data-sync></span></div></div>`;
+  h += `<div class="ro" id="dRo" hidden></div>`;
+  h += `<div class="grid2"><label class="fld"><span>Projektstatus</span><select class="sel" id="dStatus"${dis}>${['Nicht begonnen','In Bearbeitung','Erledigt'].map(o => `<option${o===pr.status ? ' selected' : ''}>${o}</option>`).join('')}</select></label>` +
+    (pr.progressFrom==='tasks' ? `<div class="fld"><span>Fortschritt</span><b id="dPgTxt" style="font-family:var(--f-ui);font-size:20px;padding:6px 0"></b></div>`
+      : `<label class="fld"><span>Fortschritt %</span><input class="inp" id="dProg" type="number" min="0" max="100" step="5" inputmode="numeric" value="${pr.progress ?? ''}" placeholder="–"${dis}></label>`) + `</div>`;
+  h += `<div id="dMeter"></div>`;
+  h += `<label class="fld"><span>Beschreibung</span><textarea class="area" id="dDesc" rows="3" placeholder="Worum geht es in diesem Projekt?"${dis}>${esc(pr.desc || '')}</textarea></label>`;
+  h += `<div class="kpis" id="dKpis" style="margin-top:0"></div>`;
+  if (pr.zodiac){
+    const lv = ['offen','in Arbeit','fertig'];
+    h += `<section><h3>Sternzeichen-Produktion <small>Stand 30.09.2026</small></h3><div class="zodiac">` + pr.zodiac.map(([n,g,z]) => { const q = z || [0,0,0,0];
+      return `<div class="zs ${q.some(v => v>0)?'on':''}" title="${esc(n)}: Story ${lv[q[0]]}, Charakter ${lv[q[1]]}, Illustration ${lv[q[2]]}, Layout ${lv[q[3]]}"><span class="g">${g}︎</span><span class="d">${q.map(v => `<i class="${v===2?'done':v===1?'wip':''}"></i>`).join('')}</span></div>`; }).join('') +
+      `</div><div class="legend"><span>Punkte: Story · Charakter · Illustration · Layout</span><span><i style="background:var(--ok)"></i>fertig</span><span><i style="background:var(--star)"></i>in Arbeit</span></div></section>`;
+  }
+  h += `<section><h3>Aufgaben <small id="dTc"></small></h3><ul class="tlist" id="dTasks"></ul>` + (ed ? `<form class="add" id="dAddT"><input class="inp" name="t" placeholder="Neue Aufgabe …" maxlength="200" required aria-label="Neue Aufgabe"><select class="sel" name="p" aria-label="Priorität"><option>Hoch</option><option selected>Mittel</option><option>Niedrig</option></select><button class="btn pri" type="submit">Hinzufügen</button></form>` : '') + `</section>`;
+  h += `<section><h3>Meilensteine <small id="dMc"></small></h3><ul class="tlist" id="dMs"></ul>` + (ed ? `<form class="add" id="dAddM"><input class="inp" name="t" placeholder="Neuer Meilenstein …" maxlength="200" required aria-label="Neuer Meilenstein"><input class="inp" name="d" type="date" aria-label="Zieldatum"><button class="btn pri" type="submit">Hinzufügen</button></form>` : '') + `</section>`;
+  h += `<section><h3>KIs an diesem Projekt</h3><div id="dHere"></div></section>`;
+  h += `<div class="btns"><a class="btn" href="${NOTION + pr.notion}" target="_blank" rel="noopener">In Notion öffnen <span aria-hidden="true">↗</span></a></div>`;
+  info.innerHTML = h;
+  if (draftT && $('#dAddT')){ $('#dAddT').elements.t.value = draftT[0]; $('#dAddT').elements.p.value = draftT[1]; }
+  if (draftM && $('#dAddM')){ $('#dAddM').elements.t.value = draftM[0]; $('#dAddM').elements.d.value = draftM[1]; }
+  if (active && document.getElementById(active)) document.getElementById(active).focus();
+  paintSync(); renderDetailLists();
+}
+function itemRow(t, i, kind){
+  const k = stKey(t.status), off = !canEdit() || !t.id, dis = off ? ' disabled' : '';
+  const who = t.who && A[t.who] ? `<span class="who" style="background:${A[t.who].color}" title="${esc(A[t.who].name)}"></span>` : '';
+  const LBL = { todo:'Offen', run:'In Arbeit', done:'Erledigt' };
+  return `<li class="trow st-${k}${kind==='ms' ? ' ms' : ''}${t.pending ? ' pending' : ''}" data-k="${kind}" data-i="${i}">` +
+    `<button type="button" class="chk" data-act="toggle" aria-pressed="${k==='done'}" aria-label="${esc(t.title)}: ${k==='done' ? 'wieder öffnen' : 'als erledigt markieren'}"${dis}></button>` +
+    `<span class="ttl" data-act="rename"${off ? '' : ' tabindex="0" role="button" title="Klicken zum Umbenennen"'}>${who}${esc(t.title)}</span>` +
+    (kind==='task' ? `<button type="button" class="pill st s-${k}" data-act="cycle" title="Status wechseln"${dis}>${LBL[k]}</button><button type="button" class="pill p-${esc(t.prio)}" data-act="prio" title="Priorität wechseln"${dis}>${esc(t.prio)}</button>`
+                   : `<span class="date">${t.date ? fmtDate(t.date) : 'ohne Datum'}</span>`) +
+    `<button type="button" class="del" data-act="del" aria-label="${esc(t.title)} entfernen" title="Entfernen – landet im Notion-Papierkorb"${dis}>${TRASH_SVG}</button></li>`;
+}
+function renderDetailLists(){
+  if (!detailId || document.querySelector('.ttl-in')) return;
+  const pr = P[detailId], tl = $('#dTasks'), ml = $('#dMs'); if (!tl) return;
+  shownTasks = [...pr.tasks].sort(byOrder);
+  shownMs = [...pr.milestones].sort((a,b) => ORDER[stKey(a.status)] - ORDER[stKey(b.status)] || String(a.date || '9').localeCompare(String(b.date || '9')));
+  tl.innerHTML = shownTasks.length ? shownTasks.map((t,i) => itemRow(t, i, 'task')).join('') : `<li class="empty">Noch keine Aufgaben.${canEdit() ? ' Leg unten die erste an.' : ''}</li>`;
+  ml.innerHTML = shownMs.length ? shownMs.map((m,i) => itemRow(m, i, 'ms')).join('') : `<li class="empty">Noch keine Meilensteine.</li>`;
+  const dn = pr.tasks.filter(isDone).length, mdn = pr.milestones.filter(isDone).length, pg = progressOf(pr);
+  $('#dTc').textContent = `${dn} von ${pr.tasks.length} erledigt`; $('#dMc').textContent = `${mdn} von ${pr.milestones.length} erreicht`;
+  $('#dKpis').innerHTML = `<div class="kpi"><b>${pr.tasks.length - dn}</b><span>offen</span></div><div class="kpi"><b>${pr.tasks.filter(t => t.status==='In Bearbeitung').length}</b><span>in Bearbeitung</span></div><div class="kpi"><b>${pr.tasks.filter(t => !isDone(t) && t.prio==='Hoch').length}</b><span>offen, Prio hoch</span></div>`;
+  $('#dMeter').innerHTML = pg !== null ? `<div class="meter" style="margin-top:0"><div class="bar ${pr.group==='sb'?'sb':''}"><i style="width:${pg}%"></i></div><small>${pr.progressFrom==='tasks' ? 'berechnet aus erledigten Aufgaben' : 'laut Notion-Feld „Fortschritt Prozent“'}</small></div>` : '';
+  if ($('#dPgTxt')) $('#dPgTxt').textContent = pg + ' %';
+  const sel = $('#dStatus'); if (sel && document.activeElement !== sel) sel.value = pr.status;
+  const pgIn = $('#dProg'); if (pgIn && document.activeElement !== pgIn) pgIn.value = pr.progress ?? '';
+  renderDetailHere();
+}
+function renderDetailHere(){
+  const el = $('#dHere'); if (!el || !detailId) return;
+  const here = headingTo(detailId);
+  const html = here.length ? `<div class="here">${here.map(id => `<span><i style="background:${A[id].color}"></i>${esc(A[id].name)} · ${esc(st[id].status==='walk' ? 'unterwegs' : st[id].task)}</span>`).join('')}</div>` : `<div class="empty">Gerade arbeitet keine KI hier.${mode==='demo' ? ' (Demo-Modus)' : ''}</div>`;
+  if (el.innerHTML !== html) el.innerHTML = html;
+}
+function startRename(li, item, kind){
+  const span = li.querySelector('.ttl'), input = document.createElement('input');
+  input.className = 'ttl-in'; input.value = item.title; input.maxLength = 200; input.setAttribute('aria-label', kind==='task' ? 'Aufgabe umbenennen' : 'Meilenstein umbenennen');
+  span.replaceWith(input); input.focus(); input.select();
+  let done = false;
+  const finish = save => { if (done) return; done = true; const v = input.value.trim(); input.remove();
+    if (save && v && v !== item.title) setField(item, 'title', v, 'Umbenennen', { Titel:v }); else renderDetailLists(); };
+  input.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); finish(true); } else if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); finish(false); } });
+  input.addEventListener('blur', () => finish(true));
+}
+$('#info').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  if (b.dataset.act === 'reconnect'){ live.denied = false; refreshLive(); return; }
+  const li = b.closest('.trow'); if (!li || !canEdit()) return;
+  const pr = P[detailId], kind = li.dataset.k, list = kind==='task' ? pr.tasks : pr.milestones, item = (kind==='task' ? shownTasks : shownMs)[+li.dataset.i];
+  if (!item || !item.id) return;
+  const act = b.dataset.act;
+  if (act === 'toggle'){ const v = isDone(item) ? 'Nicht begonnen' : 'Erledigt'; setField(item, 'status', v, v==='Erledigt' ? 'Abhaken' : 'Wieder öffnen', { Status:v }); }
+  else if (act === 'cycle'){ const v = { 'Nicht begonnen':'In Bearbeitung', 'In Bearbeitung':'Erledigt', 'Erledigt':'Nicht begonnen' }[item.status] || 'Nicht begonnen'; setField(item, 'status', v, 'Status', { Status:v }); }
+  else if (act === 'prio'){ const v = { Hoch:'Mittel', Mittel:'Niedrig', Niedrig:'Hoch' }[item.prio] || 'Mittel'; setField(item, 'prio', v, 'Priorität', { 'Priorität':v }); }
+  else if (act === 'rename') startRename(li, item, kind);
+  else if (act === 'del'){
+    if (!b.classList.contains('arm')){ b.classList.add('arm'); b.textContent = 'Entfernen?'; setTimeout(() => { if (b.isConnected){ b.classList.remove('arm'); b.innerHTML = TRASH_SVG; } }, 3500); return; }
+    removeItem(list, item, 'Entfernen');
+  }
+});
+$('#info').addEventListener('keydown', e => { const t = e.target.closest && e.target.closest('.ttl[tabindex]'); if (t && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); t.click(); } });
+$('#info').addEventListener('submit', e => {
+  e.preventDefault(); if (!canEdit()) return;
+  const f = e.target, pr = P[detailId], title = f.elements.t.value.trim(); if (!title) return;
+  if (f.id === 'dAddT') addTask(pr, title, f.elements.p.value); else addMilestone(pr, title, f.elements.d.value);
+  f.elements.t.value = ''; if (f.elements.d) f.elements.d.value = ''; f.elements.t.focus();
+});
+$('#info').addEventListener('change', e => {
+  if (!canEdit()) return; const pr = P[detailId], el = e.target;
+  if (el.id === 'dStatus' && el.value !== pr.status){ const prev = pr.status; pr.status = el.value; buildLabels(); placeLabels(); write('Projektstatus', () => updProps(pr.notion, { Status:pr.status }), () => { pr.status = prev; buildLabels(); placeLabels(); if (detailId) renderDetail(); }); }
+  if (el.id === 'dDesc' && el.value.trim() !== (pr.desc || '')){ const prev = pr.desc, v = el.value.trim(); pr.desc = v; write('Beschreibung', () => updProps(pr.notion, { Beschreibung:v }), () => { pr.desc = prev; if (detailId) renderDetail(); }); }
+  if (el.id === 'dProg'){ const raw = el.value.trim(), v = raw === '' ? null : clamp(Math.round(+raw), 0, 100); if (raw !== '' && !Number.isFinite(+raw)) { el.value = pr.progress ?? ''; return; }
+    if (v !== pr.progress){ const prev = pr.progress; pr.progress = v; el.value = v ?? ''; buildLabels(); placeLabels(); write('Fortschritt', () => updProps(pr.notion, { 'Fortschritt Prozent':v }), () => { pr.progress = prev; buildLabels(); placeLabels(); if (detailId) renderDetail(); }); } }
+});
+$('#dClose').addEventListener('click', closeDetail);
+$('#detail').addEventListener('mousedown', e => { if (e.target.id === 'detail') closeDetail(); });
+document.addEventListener('keydown', e => {
+  if (!detailId) return;
+  if (e.key === 'Escape'){ e.preventDefault(); closeDetail(); return; }
+  if (e.key === 'Tab'){ const f = [...$('#detail').querySelectorAll('button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]')].filter(x => x.offsetParent !== null);
+    if (!f.length) return; const i = f.indexOf(document.activeElement);
+    if (e.shiftKey && (i <= 0)){ e.preventDefault(); f[f.length-1].focus(); } else if (!e.shiftKey && i === f.length-1){ e.preventDefault(); f[0].focus(); } }
+});
+$('#projCard').addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) openDetail(b.dataset.open); });
+function toastMsg(txt){ toast.textContent = txt; toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 4200); }
+
+/* =========================================================
    Start
    ========================================================= */
 buildLabels();
@@ -1085,11 +1621,24 @@ Promise.all([loadImg(baseImg, 'assets/dorf.webp'), loadImg(lightImg, 'assets/lic
 let last = performance.now()/1000;
 function loop(){
   const t = performance.now()/1000, dt = Math.min(.05, t - last); last = t;
-  simulate(dt, t); render(t); flush();
+  simulate(dt, t);
+  if (detailId){ simulateScene(dt); renderScene(t); } else render(t); // hinter der Detailansicht ruht die Welt
+  flush();
   requestAnimationFrame(loop);
 }
-if (reduceMotion) setInterval(() => { const t = performance.now()/1000; simulate(1, t); render(t); flush(); }, 1000);
+if (reduceMotion) setInterval(() => { const t = performance.now()/1000; simulate(1, t); if (detailId) renderScene(t); else render(t); flush(); }, 1000);
 else requestAnimationFrame(loop);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeLabels);
+paintSync();
+(async () => {
+  let mcp = null;
+  try { mcp = window.claude && typeof window.claude.use === 'function' ? await window.claude.use('mcp') : null; } catch { mcp = null; }
+  if (!mcp) return; // außerhalb von Claude: Offline-Stand, nur Ansicht
+  live.mcp = mcp; paintSync();
+  await refreshLive();
+  if (detailId) renderDetail(true);
+  setInterval(() => { if (!document.hidden && !live.busy && live.ok) refreshLive(); }, 120000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && live.ok && Date.now() - live.at > 30000) refreshLive(); });
+})();
 })();
 </script>
