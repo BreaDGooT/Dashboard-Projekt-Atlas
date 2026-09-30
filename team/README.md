@@ -25,7 +25,7 @@ Claude Code ist der **Dirigent**: Er nimmt Flos Auftrag an, verteilt Teilaufgabe
 
 ./team/chatgpt.sh status                                       # Login noch gültig?
 ./team/chatgpt.sh image "Pixel-Art Dorfhaus …" assets/haus.png
-./team/chatgpt.sh image "Nahansicht des Gebäudes …" assets/haus.png vorlage.png   # mit Bildvorlage für einheitlichen Stil
+./team/chatgpt.sh image "Nahansicht des Gebäudes …" assets/haus.png vorlage.png [stil.png …]   # eine oder mehrere Bildvorlagen
 ./team/chatgpt.sh text  "Zweitmeinung zu …"
 ```
 
