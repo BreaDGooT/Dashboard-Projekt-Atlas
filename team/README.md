@@ -6,7 +6,7 @@ Claude Code ist der **Dirigent**: Er nimmt Flos Auftrag an, verteilt Teilaufgabe
 |---|---|---|---|
 | Claude Code | Dirigent, Code, Zusammenführung | läuft hier | aktiv |
 | Gemini | Recherche, Texte (Bilder erst mit Abrechnung) | `team/gemini.sh` – Schlüssel als API-Credential (oder `GEMINI_API_KEY`) | aktiv für Text (getestet 30.09.2026) |
-| ChatGPT | Zweitmeinung, Bilder, Codex-Aufgaben | Codex CLI (ChatGPT-Plus-Login) oder OpenAI-API | geplant – Netzwerkfreigabe für `api.openai.com` und `auth.openai.com` nötig |
+| ChatGPT | Bilder, Zweitmeinung | Codex CLI mit ChatGPT-Plus-Login (Gerätecode) | geplant – Netzwerkfreigabe für `auth.openai.com`, `chatgpt.com`, `api.openai.com` nötig |
 | Claude (App) | Konzept & Texte im Chat mit Flo | Notion-Konnektor | manuell / One-Klick |
 
 ## Gemini einrichten (einmalig)
@@ -31,6 +31,17 @@ Das Skript nimmt das neueste passende Flash-Modell. Ist es überlastet (503), ab
 - Schlüssel kommt über das API-Credential an, Modellliste abrufbar.
 - **Text:** funktioniert im Free Tier. `gemini-3.8-flash` und `gemini-3.7-flash` meldeten beim Test 503 (Überlast), `gemini-3.6-flash` antwortete.
 - **Bilder:** im Free Tier gesperrt (Google meldet Limit 0 für alle Bildmodelle). Erst nutzbar, wenn im Google-AI-Studio-Projekt die Abrechnung aktiviert ist.
+
+## ChatGPT einrichten (Bilder über das Plus-Abo)
+
+Die Bildgenerierung in Codex (`image_generation`, in Codex 0.159 stabil) läuft über den ChatGPT-Login und zählt gegen die Codex-Limits des Abos. Es gibt keine Abrechnung pro Bild wie bei der API.
+
+1. Auf claude.ai/code: Cloud-Umgebung → Zahnrad → **Update cloud environment** → **Network access**: `auth.openai.com`, `chatgpt.com` und `api.openai.com` erlauben.
+2. Neue Sitzung starten. Claude Code führt `npx -y @openai/codex login --device-auth` aus und zeigt einen Link mit Code.
+3. Flo öffnet den Link, meldet sich mit dem ChatGPT-Konto an und gibt den Code ein. Falls ChatGPT das verlangt, vorher unter Einstellungen → Sicherheit die Gerätecode-Anmeldung für Codex erlauben.
+4. Der Login gilt für diese Sitzung (Container), in jeder neuen Sitzung ist er noch einmal nötig.
+
+Noch nicht getestet. Laut einem offenen Codex-Fehlerbericht (openai/codex#37496) fehlt bei manchen Konten trotz Login das Bildwerkzeug. Alternative ist die OpenAI-API mit eigenem Schlüssel, die aber pro Bild kostet.
 
 ## Regeln
 
