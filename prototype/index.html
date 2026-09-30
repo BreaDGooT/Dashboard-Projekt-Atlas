@@ -269,9 +269,17 @@ a{color:inherit}
 .star.on{color:var(--star)} .star.on svg{fill:var(--star)}
 .burst{position:fixed;z-index:40;width:7px;height:7px;border-radius:2px;pointer-events:none}
 .wxwrap{position:relative}
-.wxmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:30;min-width:230px;display:flex;flex-direction:column;gap:2px;padding:8px;border-radius:12px;background:rgba(12,21,28,.96);border:1px solid var(--line-2);box-shadow:0 14px 36px rgba(0,0,0,.5)}
+.wxmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:30;min-width:230px;display:flex;flex-direction:column;gap:2px;padding:8px;border-radius:12px;background:#0c161d;border:1px solid var(--line-2);box-shadow:0 14px 36px rgba(0,0,0,.5)}
 .wxmenu[hidden]{display:none}
 .wxsun{margin:2px 6px 6px;font-size:11.5px;color:var(--fg-3);line-height:1.35}
+.wxlive{margin:0 6px 6px;font-size:12px;color:var(--fg-2);line-height:1.4}
+.wxlive b{color:var(--fg)}
+.wxlive .warn{display:block;margin-top:4px;color:#f0b35a;font-weight:600}
+.wxcity{display:flex;align-items:center;gap:8px;margin:0 6px 6px;font-family:var(--f-ui);font-size:12px;font-weight:600;color:var(--fg-3)}
+.wxcity .sel{flex:1;padding:5px 8px;font-size:13px}
+.wxmenu button:disabled{opacity:.5;cursor:not-allowed}
+.wxb.alert{border-color:rgba(240,179,90,.6)}
+.wxb.alert .wx-ic{color:#f0b35a}
 .wxmenu button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:7px 10px 7px 28px;border:0;border-radius:8px;background:none;color:var(--fg-2);font-family:var(--f-ui);font-weight:600;font-size:13px;cursor:pointer;text-align:left;position:relative}
 .wxmenu button small{font-size:11px;color:var(--fg-3);font-weight:500}
 .wxmenu button:hover,.wxmenu button:focus-visible{background:var(--glass-3);color:var(--fg)}
@@ -446,7 +454,7 @@ body.detail-open{overflow:hidden}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v0.5 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
+      <small>Hybrid-Prototyp v0.6 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
     </div>
   </aside>
 
@@ -479,7 +487,10 @@ body.detail-open{overflow:hidden}
         <button type="button" class="wxb" id="wxBtn" aria-haspopup="true" aria-expanded="false" aria-controls="wxMenu"><span class="wx-ic" id="wxIc" aria-hidden="true"></span><b id="wxName">Klar</b><small id="wxMode">Auto</small></button>
         <div class="wxmenu" id="wxMenu" role="menu" aria-label="Wetter" hidden>
           <p class="wxsun" id="wxSun"></p>
-          <button type="button" role="menuitemradio" data-wx="auto">Automatisch <small>wechselt nach Zypern-Klima</small></button>
+          <p class="wxlive" id="wxLiveInfo" hidden></p>
+          <label class="wxcity" for="wxCity">Ort <select class="sel" id="wxCity"><option value="124034">Limassol</option><option value="124697">Nikosia</option><option value="123769">Larnaka</option><option value="124968">Paphos</option><option value="122485">Ayia Napa</option></select></label>
+          <button type="button" role="menuitemradio" data-wx="live">Live-Wetter <small id="wxLiveHint">AccuWeather, alle 20 Minuten</small></button>
+          <button type="button" role="menuitemradio" data-wx="auto">Zufall <small>nach Zypern-Klima</small></button>
           <button type="button" role="menuitemradio" data-wx="klar">Klar</button>
           <button type="button" role="menuitemradio" data-wx="wolkig">Wolkig</button>
           <button type="button" role="menuitemradio" data-wx="wind">Windig</button>
@@ -908,9 +919,10 @@ const wx = { cur:'klar', manual:null, timer:60 + rnd()*60, amt:{ klar:1, wolkig:
 let rain = [];
 const fogBlobs = Array.from({length:7}, (_,i) => ({ x:rnd()*1.2 - .1, y:.1 + i*.13 + rnd()*.05, r:.22 + rnd()*.18, sp:.004 + rnd()*.006 }));
 function nextWeather(){ const w = climateWeights(), opts = WEATHER_TYPES.filter(k => k !== wx.cur); let r = rnd()*opts.reduce((n,k) => n + w[k], 0); for (const k of opts){ r -= w[k]; if (r <= 0) return k; } return 'klar'; }
-function paintWeather(){ $('#wxName').textContent = WEATHER_LABEL[wx.cur]; $('#wxMode').textContent = wx.manual ? 'fest' : 'Auto'; $('#wxIc').innerHTML = WEATHER_ICON[wx.cur]; $('#wxBtn').setAttribute('aria-label', `Wetter: ${WEATHER_LABEL[wx.cur]}, ${wx.manual ? 'festgelegt' : 'wechselt automatisch'}. Menü öffnen.`); for (const b of document.querySelectorAll('#wxMenu [data-wx]')) b.setAttribute('aria-checked', (b.dataset.wx === 'auto' ? !wx.manual : wx.manual === b.dataset.wx) ? 'true' : 'false'); }
+function paintWeather(){ const lv = !wx.manual && wxLive.on && wxLive.data; $('#wxName').textContent = WEATHER_LABEL[wx.cur]; $('#wxMode').textContent = wx.manual ? 'fest' : lv ? `${Math.round(wxLive.data.temp)}° live` : wxLive.on && wxLive.loading ? 'lädt …' : 'Zufall';
+  paintWeatherMenu(); $('#wxIc').innerHTML = WEATHER_ICON[wx.cur]; $('#wxBtn').setAttribute('aria-label', `Wetter: ${WEATHER_LABEL[wx.cur]}, ${wx.manual ? 'festgelegt' : 'wechselt automatisch'}. Menü öffnen.`); for (const b of document.querySelectorAll('#wxMenu [data-wx]')){ const k = b.dataset.wx; b.setAttribute('aria-checked', (k === 'live' ? !wx.manual && wxLive.on : k === 'auto' ? !wx.manual && !wxLive.on : wx.manual === k) ? 'true' : 'false'); } }
 function simulateWeather(dt){
-  if (!wx.manual){ wx.timer -= dt; if (wx.timer <= 0){ wx.cur = nextWeather(); wx.timer = 120 + rnd()*120; paintWeather(); } }
+  if (!wx.manual && !(wxLive.on && wxLive.data)){ wx.timer -= dt; if (wx.timer <= 0){ wx.cur = nextWeather(); wx.timer = 120 + rnd()*120; paintWeather(); } }
   const rate = reduceMotion ? 1 : dt/7;
   for (const k of WEATHER_TYPES) wx.amt[k] += clamp((k === wx.cur ? 1 : 0) - wx.amt[k], -rate, rate);
   const wet = Math.min(1, wx.amt.regen + wx.amt.gewitter), want = reduceMotion ? 0 : Math.round(280*wet);
@@ -1911,8 +1923,8 @@ function toastMsg(txt){ toast.textContent = txt; toast.classList.add('show'); cl
 const cyToday = () => new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'Asia/Nicosia'}).format(new Date());
 const addDays = (iso, n) => new Date(Date.parse(iso + 'T12:00:00Z') + n*864e5).toISOString().slice(0,10);
 function tzOffsetHours(tz, d){ const loc = new Date(d.toLocaleString('en-US',{timeZone:tz})), utc = new Date(d.toLocaleString('en-US',{timeZone:'UTC'})); return (loc - utc)/36e5; }
-function sunTimes(date){ // NOAA-Näherung für Limassol, Ergebnis in zyprischer Ortszeit (Stunden)
-  const lat = 34.68, lon = 33.04, rad = Math.PI/180;
+function sunTimes(date, lat = 34.68, lon = 33.04){ // NOAA-Näherung, Ergebnis in zyprischer Ortszeit (Stunden)
+  const rad = Math.PI/180;
   const day = Math.floor((date - Date.UTC(date.getUTCFullYear(),0,0))/864e5), g = 2*Math.PI/365*(day - 1);
   const eqt = 229.18*(0.000075 + 0.001868*Math.cos(g) - 0.032077*Math.sin(g) - 0.014615*Math.cos(2*g) - 0.040849*Math.sin(2*g));
   const decl = 0.006918 - 0.399912*Math.cos(g) + 0.070257*Math.sin(g) - 0.006758*Math.cos(2*g) + 0.000907*Math.sin(2*g) - 0.002697*Math.cos(3*g) + 0.00148*Math.sin(3*g);
@@ -1921,7 +1933,41 @@ function sunTimes(date){ // NOAA-Näherung für Limassol, Ergebnis in zyprischer
   return { rise:(720 - 4*(lon + ha) - eqt)/60 + off, set:(720 - 4*(lon - ha) - eqt)/60 + off };
 }
 let sunCache = { day:'', v:{ rise:6.7, set:18.6 } };
-function sunToday(){ const d = cyToday(); if (sunCache.day !== d){ try { sunCache = { day:d, v:sunTimes(new Date()) }; } catch { sunCache.day = d; } } return sunCache.v; }
+// Live-Wetter über den AccuWeather-Konnektor (Orts-Schlüssel von AccuWeather)
+const CITIES = { '124034':['Limassol',34.68,33.04], '124697':['Nikosia',35.17,33.36], '123769':['Larnaka',34.92,33.62], '124968':['Paphos',34.77,32.42], '122485':['Ayia Napa',34.99,34.00] };
+const store = { get:k => { try { return localStorage.getItem(k); } catch { return null; } }, set:(k,v) => { try { localStorage.setItem(k, v); } catch {} } };
+let wxCity = CITIES[store.get('atlas-city')] ? store.get('atlas-city') : '124034';
+const wxLive = { mcp:null, data:null, err:'', loading:false, on:store.get('atlas-wxsrc') !== 'auto', denied:false };
+function mapAccu(code, wind){ // AccuWeather-Symbolcodes → Wetter im Dorf
+  const c = +code;
+  if ([15,16,17,41,42].includes(c)) return 'gewitter';
+  if ([12,13,14,18,19,20,21,22,23,24,25,26,29,39,40,43,44].includes(c)) return 'regen';
+  if (c === 11) return 'nebel';
+  if (c === 32 || wind >= 35) return 'wind';
+  if ([3,4,6,7,8,35,36,38].includes(c)) return 'wolkig';
+  return 'klar';
+}
+function applyWeatherSource(){ if (!wx.manual && wxLive.on && wxLive.data) wx.cur = wxLive.data.type; }
+async function loadLiveWeather(force){
+  if (!wxLive.mcp || wxLive.loading) return;
+  wxLive.loading = true; paintWeather();
+  try {
+    const r = await wxLive.mcp.callTool('AccuWeather', 'widgets-current-claude', { queryParams:{ locationKey:wxCity, unit:'metric', lang:'de' } }, { cache:{ staleTime: force ? 0 : 600000 } });
+    const p = payloadOf(r), c = p && p.currentConditions;
+    if (!c) throw { code:'tool_error', message:'keine Wetterdaten' };
+    const num = v => parseFloat(String(v || '').replace(',', '.').replace(/[^\d.]/g, '')) || 0;
+    const wind = Math.max(num(c.extended && c.extended.wind), .7*num(c.extended && c.extended.gusts));
+    wxLive.data = { type:mapAccu(c.iconCode, wind), phrase:c.phrase || '', temp:c.temperatureValue, wind:num(c.extended && c.extended.wind), at:(r.cache && r.cache.storedAt) || Date.now(),
+      alerts:(p.alerts || []).filter(a => a.isActive !== false).map(a => `${a.alertName || ''} ${a.alertDescription || ''}`.trim()).filter(Boolean) };
+    wxLive.err = ''; wxLive.denied = false;
+  } catch (e){
+    const code = e && e.code;
+    wxLive.denied = ['not_in_manifest','consent_required','not_granted','server_not_connected','needs_reauth','selection_required','blocked_by_policy'].includes(code);
+    wxLive.err = code === 'server_not_connected' ? 'AccuWeather ist nicht verbunden (claude.ai → Einstellungen → Konnektoren).' : code === 'needs_reauth' ? 'AccuWeather neu verbinden (claude.ai → Einstellungen → Konnektoren).' : wxLive.denied ? 'AccuWeather ist für dieses Dashboard nicht erlaubt.' : 'AccuWeather antwortet gerade nicht. Das Dorf nutzt solange Zufallswetter.';
+  }
+  wxLive.loading = false; applyWeatherSource(); paintWeather();
+}
+function sunToday(){ const d = cyToday() + wxCity; if (sunCache.day !== d){ try { const c = CITIES[wxCity] || CITIES['124034']; sunCache = { day:d, v:sunTimes(new Date(), c[1], c[2]) }; } catch { sunCache.day = d; } } return sunCache.v; }
 const hm = h => `${Math.floor(h)}:${String(Math.round((h % 1)*60) % 60).padStart(2,'0')}`;
 
 /* Zufallswetter nach Zypern-Klima: grobe Richtwerte (Regentage pro Monat, Limassol), kein Live-Wetter */
@@ -1937,14 +1983,31 @@ function toggleWxMenu(open){
   if (show){ const s = sunToday(); $('#wxSun').textContent = `Sonnenaufgang ${hm(s.rise)} · Untergang ${hm(s.set)} Uhr (Zypern)`; (m.querySelector('[aria-checked="true"]') || m.querySelector('button')).focus(); }
 }
 $('#wxBtn').addEventListener('click', e => { e.stopPropagation(); toggleWxMenu(); });
+function paintWeatherMenu(){
+  const info = $('#wxLiveInfo'), live = $('#wxMenu [data-wx="live"]'), d = wxLive.data, city = (CITIES[wxCity] || [''])[0];
+  $('#wxCity').value = wxCity;
+  live.disabled = !wxLive.mcp; $('#wxLiveHint').textContent = wxLive.mcp ? 'AccuWeather, alle 20 Minuten' : 'nur wenn das Dashboard in Claude geöffnet ist';
+  const alerts = d && d.alerts.length ? d.alerts : [];
+  $('#wxBtn').classList.toggle('alert', !!alerts.length); $('#wxBtn').title = alerts.length ? 'Wetterwarnung: ' + alerts.join(' · ') : 'Wetter';
+  if (!wxLive.mcp){ info.hidden = true; return; }
+  info.hidden = false;
+  info.innerHTML = wxLive.err ? esc(wxLive.err) : wxLive.loading && !d ? 'Lade Live-Wetter …'
+    : d ? `<b>${esc(city)}: ${esc(d.phrase)}, ${Math.round(d.temp)} °C</b>, Wind ${Math.round(d.wind)} km/h · Stand ${esc(hhmm(new Date(d.at)))}${alerts.map(a => `<span class="warn">${esc(a)}</span>`).join('')}` : 'Noch keine Live-Daten.';
+}
+$('#wxCity').addEventListener('change', e => { wxCity = e.target.value; store.set('atlas-city', wxCity); sunCache.day = ''; wxLive.data = null; if (wxLive.on) loadLiveWeather(true); paintWeather(); });
+$('#wxCity').addEventListener('click', e => e.stopPropagation());
 $('#wxMenu').addEventListener('click', e => {
   const b = e.target.closest('[data-wx]'); if (!b) return;
-  const k = b.dataset.wx; wx.manual = k === 'auto' ? null : k; if (wx.manual) wx.cur = wx.manual; else wx.timer = 90;
+  const k = b.dataset.wx;
+  if (k === 'live'){ wx.manual = null; wxLive.on = true; loadLiveWeather(!wxLive.data); }
+  else if (k === 'auto'){ wx.manual = null; wxLive.on = false; wx.timer = 90; }
+  else { wx.manual = k; wx.cur = k; }
+  store.set('atlas-wxsrc', k === 'live' ? 'live' : 'auto'); applyWeatherSource();
   paintWeather(); toggleWxMenu(false); $('#wxBtn').focus();
 });
 document.addEventListener('click', e => { if (!$('#wxMenu').hidden && !e.target.closest('.wxwrap')) toggleWxMenu(false); });
 $('#wxMenu').addEventListener('keydown', e => {
-  const items = [...$('#wxMenu').querySelectorAll('[data-wx]')], i = items.indexOf(document.activeElement);
+  const items = [...$('#wxMenu').querySelectorAll('[data-wx]:not(:disabled)')], i = items.indexOf(document.activeElement);
   if (e.key === 'Escape'){ e.preventDefault(); toggleWxMenu(false); $('#wxBtn').focus(); }
   else if (e.key === 'ArrowDown'){ e.preventDefault(); items[(i + 1) % items.length].focus(); }
   else if (e.key === 'ArrowUp'){ e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
@@ -2169,6 +2232,8 @@ paintSync();
   try { mcp = window.claude && typeof window.claude.use === 'function' ? await window.claude.use('mcp') : null; } catch { mcp = null; }
   if (!mcp) return; // außerhalb von Claude: Offline-Stand, nur Ansicht
   live.mcp = mcp; paintSync();
+  wxLive.mcp = mcp; if (wxLive.on) loadLiveWeather(); paintWeather();
+  setInterval(() => { if (!document.hidden && wxLive.on) loadLiveWeather(true); }, 20*60*1000);
   await refreshLive();
   if (detailId) renderDetail(true);
   setInterval(() => { if (!document.hidden && !live.busy && live.ok) refreshLive(); }, 120000);
