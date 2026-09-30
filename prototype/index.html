@@ -402,6 +402,7 @@ body.detail-open{overflow:hidden}
 .sync.err{color:#f08a7a} .sync.err i{background:#f08a7a}
 @keyframes pulse{50%{opacity:.3}}
 .fld{display:flex;flex-direction:column;gap:6px}
+.fld-hint{font-size:11.5px;color:var(--fg-3);line-height:1.4}
 .fld > span{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3)}
 .inp,.sel,.area{font:inherit;color:var(--fg);background:rgba(9,16,22,.6);border:1px solid var(--line-2);border-radius:9px;padding:8px 10px;min-width:0}
 .inp:focus,.sel:focus,.area:focus{outline:none;border-color:var(--core)}
@@ -556,7 +557,7 @@ body.detail-open{overflow:hidden}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v1.0 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
+      <small>Hybrid-Prototyp v1.1 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
     </div>
   </aside>
 
@@ -599,6 +600,7 @@ body.detail-open{overflow:hidden}
           <button type="button" role="menuitemradio" data-wx="regen">Regen</button>
           <button type="button" role="menuitemradio" data-wx="gewitter">Gewitter</button>
           <button type="button" role="menuitemradio" data-wx="nebel">Nebel</button>
+          <button type="button" role="menuitemradio" data-wx="schnee">Schnee <small>bleibt liegen</small></button>
         </div>
       </div>
       <div class="ctl"><span>Ton</span>
@@ -1031,8 +1033,8 @@ function lighting(){
 /* =========================================================
    Wetter: wechselt von selbst alle paar Minuten, per Klick festlegbar
    ========================================================= */
-const WEATHER_TYPES = ['klar','wolkig','wind','regen','gewitter','nebel'];
-const WEATHER_LABEL = { klar:'Klar', wolkig:'Wolkig', wind:'Windig', regen:'Regen', gewitter:'Gewitter', nebel:'Nebel' };
+const WEATHER_TYPES = ['klar','wolkig','wind','regen','gewitter','nebel','schnee'];
+const WEATHER_LABEL = { klar:'Klar', wolkig:'Wolkig', wind:'Windig', regen:'Regen', gewitter:'Gewitter', nebel:'Nebel', schnee:'Schnee' };
 const WEATHER_ICON = {
   klar:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/></svg>',
   wolkig:'<svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 18z"/></svg>',
@@ -1040,28 +1042,34 @@ const WEATHER_ICON = {
   regen:'<svg viewBox="0 0 24 24"><path d="M7 14h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 14zM8 17l-1 3M12 17l-1 3M16 17l-1 3"/></svg>',
   gewitter:'<svg viewBox="0 0 24 24"><path d="M7 13h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 13zM13 13l-3 5h4l-2 4"/></svg>',
   nebel:'<svg viewBox="0 0 24 24"><path d="M4 9h16M2 13h14M6 17h16M8 5h10"/></svg>',
+  schnee:'<svg viewBox="0 0 24 24"><path d="M12 2v20M3.5 7l17 10M3.5 17l17-10M9 3.5l3 2.2 3-2.2M9 20.5l3-2.2 3 2.2"/></svg>',
 };
-const wx = { cur:'klar', manual:null, timer:60 + rnd()*60, amt:{ klar:1, wolkig:0, wind:0, regen:0, gewitter:0, nebel:0 }, flash:0, boltT:5 };
-let rain = [];
+const wx = { cur:'klar', manual:null, timer:60 + rnd()*60, amt:{ klar:1, wolkig:0, wind:0, regen:0, gewitter:0, nebel:0, schnee:0 }, flash:0, boltT:5 };
+let rain = [], flakes = [];
 const fogBlobs = Array.from({length:7}, (_,i) => ({ x:rnd()*1.2 - .1, y:.1 + i*.13 + rnd()*.05, r:.22 + rnd()*.18, sp:.004 + rnd()*.006 }));
 function nextWeather(){ const w = climateWeights(), opts = WEATHER_TYPES.filter(k => k !== wx.cur); let r = rnd()*opts.reduce((n,k) => n + w[k], 0); for (const k of opts){ r -= w[k]; if (r <= 0) return k; } return 'klar'; }
 function paintWeather(){ const lv = !wx.manual && wxLive.on && wxLive.data; $('#wxName').textContent = WEATHER_LABEL[wx.cur]; $('#wxMode').textContent = wx.manual ? 'fest' : lv ? `${Math.round(wxLive.data.temp)}° live` : wxLive.on && wxLive.loading ? 'lädt …' : 'Zufall';
   paintWeatherMenu(); $('#wxIc').innerHTML = WEATHER_ICON[wx.cur]; $('#wxBtn').setAttribute('aria-label', `Wetter: ${WEATHER_LABEL[wx.cur]}, ${wx.manual ? 'festgelegt' : 'wechselt automatisch'}. Menü öffnen.`); for (const b of document.querySelectorAll('#wxMenu [data-wx]')){ const k = b.dataset.wx; b.setAttribute('aria-checked', (k === 'live' ? !wx.manual && wxLive.on : k === 'auto' ? !wx.manual && !wxLive.on : wx.manual === k) ? 'true' : 'false'); } }
 function simulateWeather(dt){
-  if (!wx.manual && !(wxLive.on && wxLive.data)){ wx.timer -= dt; if (wx.timer <= 0){ wx.cur = nextWeather(); wx.timer = 120 + rnd()*120; paintWeather(); } }
+  if (!wx.manual && !(wxLive.on && wxLive.data)){ wx.timer -= dt; if (wx.timer <= 0){ wx.cur = nextWeather(); wx.timer = wx.cur === 'schnee' ? 300 + rnd()*240 : 120 + rnd()*120; paintWeather(); } }
   const rate = reduceMotion ? 1 : dt/7;
   for (const k of WEATHER_TYPES) wx.amt[k] += clamp((k === wx.cur ? 1 : 0) - wx.amt[k], -rate, rate);
   const wet = Math.min(1, wx.amt.regen + wx.amt.gewitter), want = reduceMotion ? 0 : Math.round(280*wet);
   while (rain.length < want) rain.push({ x:rnd(), y:rnd(), l:.6 + rnd()*.6, v:.9 + rnd()*.5 });
   if (rain.length > want) rain.length = want;
   for (const d of rain){ d.y += dt*d.v*1.15; d.x += dt*.16; if (d.y > 1.05){ d.y = -.05; d.x = rnd(); } if (d.x > 1.05) d.x -= 1.1; }
+  const wantF = reduceMotion ? 0 : Math.round(260*wx.amt.schnee);
+  while (flakes.length < wantF) flakes.push({ x:rnd(), y:rnd(), r:.8 + rnd()*1.8, v:.035 + rnd()*.05, ph:rnd()*6.28, sw:.6 + rnd()*1.2 });
+  if (flakes.length > wantF) flakes.length = wantF;
+  for (const f of flakes){ f.y += dt*f.v*(.7 + f.r*.25); f.x += dt*(.006 + .03*wx.amt.wind); if (f.y > 1.03){ f.y = -.03; f.x = rnd(); } if (f.x > 1.03) f.x -= 1.06; }
+  simulateSnow(dt);
   if (wx.amt.gewitter > .6 && !reduceMotion){ wx.boltT -= dt; if (wx.boltT <= 0){ wx.flash = 1; wx.boltT = 6 + rnd()*10; } }
   wx.flash = Math.max(0, wx.flash - dt*2.8);
   for (const b of fogBlobs){ b.x += b.sp*dt; if (b.x - b.r > 1.1) b.x = -b.r; }
 }
 function drawWeather(t){
   const a = wx.amt, wet = Math.min(1, a.regen + a.gewitter);
-  const gray = .16*a.wolkig + .22*a.regen + .34*a.gewitter + .05*a.nebel;
+  const gray = .16*a.wolkig + .22*a.regen + .34*a.gewitter + .05*a.nebel + .14*a.schnee;
   if (gray > .005){ ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(70,82,100,${gray})`; ctx.fillRect(0, 0, cw, ch); ctx.globalCompositeOperation = 'source-over'; }
   if (a.nebel > .01){
     ctx.fillStyle = `rgba(205,214,222,${.22*a.nebel})`; ctx.fillRect(0, 0, cw, ch);
@@ -1073,6 +1081,11 @@ function drawWeather(t){
     ctx.stroke();
     ctx.strokeStyle = `rgba(215,230,245,${.35*wet})`; ctx.lineWidth = Math.max(1, dpr*.8);
     for (let i=0;i<Math.round(26*wet);i++){ const x = rnd()*cw, y = rnd()*ch; ctx.beginPath(); ctx.ellipse(x, y, (2 + rnd()*3)*dpr, (1 + rnd())*dpr, 0, 0, Math.PI*2); ctx.stroke(); }
+  }
+  if (flakes.length){ // Schneeflocken: sanft taumelnd, vorne größer
+    ctx.fillStyle = 'rgba(248,251,255,.92)';
+    for (const f of flakes){ const x = (f.x + Math.sin(t*f.sw + f.ph)*.008)*cw, y = f.y*ch, r = f.r*dpr*1.4; ctx.globalAlpha = .55 + f.r*.2; ctx.fillRect(Math.round(x - r/2), Math.round(y - r/2), Math.ceil(r), Math.ceil(r)); }
+    ctx.globalAlpha = 1;
   }
   if (wx.flash > 0){ ctx.fillStyle = `rgba(235,240,255,${wx.flash*wx.flash*.6})`; ctx.fillRect(0, 0, cw, ch); }
 }
@@ -1257,6 +1270,7 @@ function render(t){
   const s = view.s, L = lighting(), wet = Math.min(1, wx.amt.regen + wx.amt.gewitter), lit = Math.max(L.dark, L.warm*.6, .45*wet + .2*wx.amt.nebel), day = 1 - L.dark;
   ctx.imageSmoothingEnabled = s < 1.4; ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(baseImg, view.ox, view.oy, IW*s, IH*s);
+  drawSnowCover(ctx, 0, 0, IW, IH, view.ox, view.oy, IW*s, IH*s);
   ctx.save(); ctx.beginPath(); ctx.rect(view.ox, view.oy, IW*s, IH*s); ctx.clip();
 
   // Wasser: Strömung, Glitzern, Gischt, Kräuseln
@@ -1272,9 +1286,9 @@ function render(t){
   for (const q of smoke){ const a = clamp(q.life,0,1)*.4; ctx.fillStyle = `rgba(225,228,232,${a})`; const sz = Math.max(2, q.size*s); ctx.fillRect(WX(q.x)-sz/2, WY(q.y)-sz/2, sz, sz); }
   // Dorfbewohner & Tiere (werden nachts mit abgedunkelt)
   for (const d of ducks) drawDuck(d, t);
-  const walkers = [...VILLAGERS].sort((a,b) => a.y - b.y);
-  for (const v of walkers) drawVillager(v, t);
-  for (const p of [...PETS].sort((a,b) => a.y - b.y)) drawPet(p, t);
+  seasonLights(ctx, WX, WY, s, t, false);
+  const depth = [...VILLAGERS.map(v => [v.y, 0, v]), ...PETS.map(p => [p.y, 1, p]), ...worldDeko().map(d => [d.y, 2, d])].sort((a,b) => a[0] - b[0]);
+  for (const [, k, o] of depth) k === 0 ? drawVillager(o, t) : k === 1 ? drawPet(o, t) : drawDeko(ctx, WX, WY, s, t, o);
   drawAngler(t);
   for (const pr of PROJECTS) if (pr.dyn) drawSite(ctx, WX, WY, view.s, t, pr);
   for (const pr of PROJECTS) if (pr.status === 'Erledigt' && !pr.pending) drawFestive(ctx, WX, WY, view.s, t, pr);
@@ -1295,6 +1309,7 @@ function render(t){
   ctx.globalCompositeOperation = 'lighter';
   if (Math.sin(t*3) > 0) glow(WX(1333), WY(24), 16*s, '#ff5a4a', .5 + .45*lit);
   festiveGlow(t, s);
+  seasonGlow(t, s, lit);
 
   // Selektion
   ctx.globalCompositeOperation = 'source-over';
@@ -1871,8 +1886,10 @@ function drawInterior(t, X, Y, s){
   // schlafende Katze am Kamin, wenn niemand da ist
   if (sp.pet && !Object.keys(inAgents).length){ const px = sp.agentPx*.55*s, p = PETS[0]; drawSprite(PET_ROWS.coonS, p.col, X(sp.pet[0]) - 5*px, Y(sp.pet[1]) - 8*px, px, 1);
     if (!reduceMotion){ const k = (t*.5) % 1; sctx.globalAlpha = 1 - k; sctx.fillStyle = '#e6eef0'; sctx.font = `700 ${Math.round(9*px/2 + 8)}px "Chakra Petch", system-ui`; sctx.fillText('z', X(sp.pet[0]) + 4*px + k*18*s, Y(sp.pet[1]) - 10*px - k*40*s); sctx.globalAlpha = 1; } }
-  const list = Object.values(inAgents).sort((a,b) => a.y - b.y);
+  const deko = interiorDeko(sp);
+  const list = [...Object.values(inAgents), ...deko].sort((a,b) => a.y - b.y);
   for (const ia of list){
+    if (ia.deko){ drawDeko(sctx, X, Y, s, t, ia); continue; }
     const a = A[ia.id], s0 = sp.spots[ia.spot], px = sp.agentPx*s, moving = ia.route.length > 0, working = !moving && st[ia.id].status === 'work';
     let y = ia.y; if (!moving && s0.kind === 'ladder') y -= (Math.sin(t*.5 + ia.spot) * .5 + .5) * sp.agentPx*9;
     const lift = moving ? (Math.floor(t*8)%2)*px*.5 : working && s0.kind==='desk' ? (Math.sin(t*7 + ia.spot) > .3 ? px*.3 : 0) : 0;
@@ -1886,6 +1903,7 @@ function drawInterior(t, X, Y, s){
     sceneTag(X(ia.x), y0 - px*.6, a.name, a.color, 1);
     const cyc = ia.bub % 9; if (working && cyc < 4 && st[ia.id].task){ const txt = st[ia.id].task.length > 34 ? st[ia.id].task.slice(0, 33) + '…' : st[ia.id].task; sceneTag(X(ia.x), y0 - px*.6 - 30*Math.min(window.devicePixelRatio || 1, 2), '„' + txt + '“', '#e6eef0', Math.min(1, cyc*2, (4 - cyc)*2)); }
   }
+  interiorLights(sp, t, X, Y, s);
 }
 function renderScene(t){
   const W = sceneCv.width, H = sceneCv.height;
@@ -1900,7 +1918,7 @@ function renderScene(t){
   if (sceneBg) sctx.drawImage(sceneBg, 0, 0);
   sctx.imageSmoothingEnabled = sp.smooth; sctx.imageSmoothingQuality = 'high';
   if (sp.art){ sctx.save(); sctx.shadowColor = 'rgba(0,0,0,.6)'; sctx.shadowBlur = 50; sctx.drawImage(sp.img, X(0), Y(0), sp.sw*s, sp.sh*s); sctx.restore(); }
-  else { const m = 60, x0 = Math.max(0, sp.sx-m), y0 = Math.max(0, sp.sy-m), x1 = Math.min(IW, sp.sx+sp.sw+m), y1 = Math.min(IH, sp.sy+sp.sh+m); sctx.drawImage(sp.img, x0, y0, x1-x0, y1-y0, X(x0), Y(y0), (x1-x0)*s, (y1-y0)*s); }
+  else { const m = 60, x0 = Math.max(0, sp.sx-m), y0 = Math.max(0, sp.sy-m), x1 = Math.min(IW, sp.sx+sp.sw+m), y1 = Math.min(IH, sp.sy+sp.sh+m); sctx.drawImage(sp.img, x0, y0, x1-x0, y1-y0, X(x0), Y(y0), (x1-x0)*s, (y1-y0)*s); drawSnowCover(sctx, x0, y0, x1-x0, y1-y0, X(x0), Y(y0), (x1-x0)*s, (y1-y0)*s); }
   const L = lighting(), lit = Math.max(L.dark, L.warm*.6), rect = sp.art ? [X(0), Y(0), sp.sw*s, sp.sh*s] : [0, 0, W, H];
   if (!reduceMotion) for (const q of sp.water){ const v = Math.sin(t*1.7 + q[0]*.13 + q[1]*.07); if (v > .86){ sctx.fillStyle = `rgba(235,250,255,${(v-.86)*5})`; sctx.fillRect(X(q[0]), Y(q[1]), Math.max(1, 2*s), Math.max(1, 2*s)); } }
   // Tageszeit (Innenräume bleiben warm beleuchtet)
@@ -1930,7 +1948,8 @@ function renderScene(t){
   if (!reduceMotion && sp.interior) for (const m of motes){ const x = sp.sw*(.2 + m.u*.6) + Math.sin(t*m.sp + m.ph)*sp.sw*.01, y = sp.sh*(.25 + ((m.v + t*.012*m.sp) % .6)), a = (Math.sin(t*1.5 + m.ph)*.5 + .5); sGlow(X(x), Y(y), 3 + sp.sw*.002*s, '#fff1c9', .22*a); }
   sctx.globalCompositeOperation = 'source-over';
   for (const q of sceneSmoke){ const a = clamp(q.life,0,1)*.38; sctx.fillStyle = `rgba(228,231,235,${a})`; const sz = Math.max(2, q.size*s); sctx.fillRect(X(q.x) - sz/2, Y(q.y) - sz/2, sz, sz); }
-  if (!sp.art) for (const pr of PROJECTS){ if (pr.dyn) drawSite(sctx, X, Y, s, t, pr); if (pr.status === 'Erledigt' && !pr.pending && pr.id !== 'atlas') drawFestive(sctx, X, Y, s, t, pr); }
+  if (!sp.art){ for (const pr of PROJECTS){ if (pr.dyn) drawSite(sctx, X, Y, s, t, pr); if (pr.status === 'Erledigt' && !pr.pending && pr.id !== 'atlas') drawFestive(sctx, X, Y, s, t, pr); }
+    seasonLights(sctx, X, Y, s, t, true); for (const d of worldDeko().sort((a,b) => a.y - b.y)) if (d.kind !== 'builder') drawDeko(sctx, X, Y, s, t, d); }
   drawInterior(t, X, Y, s);
   drawFw(sctx, fwScene, X, Y, s, sGlow, 3.2);
   // Vignette + Verlauf für die Beschriftung
@@ -2211,7 +2230,8 @@ const wxLive = { mcp:null, data:null, err:'', loading:false, on:store.get('atlas
 function mapAccu(code, wind){ // AccuWeather-Symbolcodes → Wetter im Dorf
   const c = +code;
   if ([15,16,17,41,42].includes(c)) return 'gewitter';
-  if ([12,13,14,18,19,20,21,22,23,24,25,26,29,39,40,43,44].includes(c)) return 'regen';
+  if ([19,20,21,22,23,24,25,29,43,44].includes(c)) return 'schnee';
+  if ([12,13,14,18,26,39,40].includes(c)) return 'regen';
   if (c === 11) return 'nebel';
   if (c === 32 || wind >= 35) return 'wind';
   if ([3,4,6,7,8,35,36,38].includes(c)) return 'wolkig';
@@ -2245,7 +2265,8 @@ function climateWeights(){
   const m = +new Intl.DateTimeFormat('en-US',{month:'numeric',timeZone:'Asia/Nicosia'}).format(new Date()) - 1;
   const rd = [9,8,6,3,1.5,.3,.1,.1,.6,2.5,5,8.5][m], winter = [0,1,2,10,11].includes(m);
   const regen = rd/30*60, gewitter = regen*(winter || m === 9 ? .35 : .15), nebel = winter ? 6 : 2, wolkig = 8 + rd*1.8, wind = 10;
-  return { regen, gewitter, nebel, wolkig, wind, klar:Math.max(20, 100 - regen - gewitter - nebel - wolkig - wind) };
+  const schnee = [11,0,1].includes(m) ? 7 : 0; // Winter-Zufall: ab und zu Schnee (Dezember bis Februar)
+  return { regen, gewitter, nebel, wolkig, wind, schnee, klar:Math.max(20, 100 - regen - gewitter - nebel - wolkig - wind - schnee) };
 }
 function toggleWxMenu(open){
   const m = $('#wxMenu'), b = $('#wxBtn'), show = open ?? m.hidden;
@@ -2483,6 +2504,206 @@ paintSound();
 const prevMs = {};
 
 /* =========================================================
+   Jahreszeiten: Festdeko (Halloween, Weihnachten) und Schnee
+   Deko-Figuren gemalt von ChatGPT (assets/deko/*.webp), freigestellt mit tools/cut_sprites.py
+   ========================================================= */
+const DEKO = {
+  halloween:{ src:'assets/deko/halloween.webp', r:[[0,114,287,230],[289,47,315,297],[606,71,313,273],[921,0,305,344],[1228,65,255,279],[1485,5,295,339],[1782,31,308,313],[2092,5,273,339]] },
+  xmas:{ src:'assets/deko/weihnachten.webp', r:[[0,0,355,490],[357,186,232,304],[591,209,296,281],[889,203,291,287],[1182,121,265,369],[1449,170,373,320],[1824,79,157,411],[1983,116,206,374]] },
+};
+const HW = { jack:0, trio:1, hay:2, scare:3, ghost:4, candles:5, tomb:6, lantern:7 }, XM = { tree:0, pine:1, wreath:2, gifts:3, snowman:4, sleigh:5, post:6, deer:7 };
+// Leuchten je Figur: [Höhe des Lichts (Anteil), Radius (Anteil der Höhe), Farbe, Stärke]
+const DEKO_GLOW = { halloween:{ [HW.jack]:[.42,.9,'#ff9a3c',.85], [HW.trio]:[.3,.65,'#ff9a3c',.6], [HW.candles]:[.75,.8,'#ffc46e',.85], [HW.lantern]:[.42,.9,'#ffa04a',.9] },
+  xmas:{ [XM.tree]:[.55,.55,'#ffd27a',.45], [XM.pine]:[.45,.6,'#ffd27a',.4], [XM.post]:[.72,.45,'#ffc46e',.9] } };
+const SEASON_BULBS = { halloween:['#ff9a3c','#b46cff','#ffb347','#8cff6b'], xmas:['#fff1b8','#ff5a4a','#62d69c','#f4c86a','#8fd3ff'] };
+const SEASON_LABEL = { halloween:'Halloween', xmas:'Weihnachten' };
+function loadDeko(set){ const d = DEKO[set]; if (d.img) return; d.img = new Image(); d.img.onload = () => { d.ok = true; changed(); }; d.img.src = d.src; }
+// Figur zeichnen: (x, y) = Fußpunkt, h = Höhe in Bildpixeln; clip < 1 zeigt nur den unteren Teil (Schneemann im Bau)
+function dekoSprite(c, set, i, X, Y, s, x, y, h, o = {}){
+  const d = DEKO[set]; if (!d.ok) return;
+  const [sx, sy, sw, sh] = d.r[i], w = sw*h/sh, f = o.clip ?? 1, top = Y(y - (o.lift || 0)) - h*f*s;
+  if (o.shadow !== false){ c.fillStyle = 'rgba(0,0,0,.22)'; c.beginPath(); c.ellipse(X(x), Y(y), w*.42*s, Math.max(1, w*.11*s), 0, 0, Math.PI*2); c.fill(); }
+  const a0 = c.globalAlpha, sm = c.imageSmoothingEnabled; if (o.alpha != null) c.globalAlpha = a0*o.alpha;
+  c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+  if (o.flip){ c.save(); c.translate(X(x), 0); c.scale(-1, 1); c.drawImage(d.img, sx, sy + sh*(1-f), sw, sh*f, -w/2*s, top, w*s, h*f*s); c.restore(); }
+  else c.drawImage(d.img, sx, sy + sh*(1-f), sw, sh*f, X(x) - w/2*s, top, w*s, h*f*s);
+  c.globalAlpha = a0; c.imageSmoothingEnabled = sm;
+}
+
+// ---------- Welche Deko gerade gilt: automatisch nach Datum (Zypern) oder fest gewählt
+let seasonPref = store.get('atlas-season') || 'auto', season = null;
+function seasonAuto(){ const md = cyToday().slice(5); return md >= '10-15' && md <= '11-02' ? 'halloween' : md >= '12-01' || md <= '01-06' ? 'xmas' : null; }
+function updateSeason(){ const sn = seasonPref === 'auto' ? seasonAuto() : seasonPref === 'off' ? null : seasonPref; if (sn === season) return; season = sn; if (sn) loadDeko(sn); changed(); }
+
+// ---------- Dorf: Fußpunkte vor den Häusern und auf dem Platz (Bildkoordinaten der Karte), [Ort, Figur, x, y, Höhe, gespiegelt]
+const WORLD_DEKO = {
+  halloween:[['sb',HW.jack,300,300,18],['sb',HW.trio,398,302,24],['sbshop',HW.jack,646,300,17],['sbweb',HW.lantern,526,238,24],['mkt',HW.trio,1150,290,24],['mkt',HW.jack,1238,292,17,1],
+    ['seo',HW.jack,1392,494,17],['seo',HW.candles,1456,494,18],['digi',HW.trio,290,774,24],['digi',HW.jack,422,786,17],['etsy',HW.hay,737,808,22],['etsy',HW.jack,905,792,17,1],
+    ['drop',HW.lantern,1176,776,24],['drop',HW.trio,1266,802,24,1],['plaza',HW.hay,893,476,24],['plaza',HW.jack,927,484,16],['plaza',HW.tomb,662,478,22]],
+  xmas:[['plaza',XM.tree,893,478,110],['plaza',XM.gifts,860,487,17],['plaza',XM.gifts,928,490,15,1],['sb',XM.pine,292,298,38],['sb',XM.gifts,400,303,17],['sbshop',XM.gifts,648,301,16],['sbweb',XM.post,526,238,44],
+    ['mkt',XM.pine,1148,290,38],['mkt',XM.sleigh,1240,294,28],['seo',XM.pine,1388,496,36],['seo',XM.gifts,1458,495,15],['digi',XM.pine,292,776,38],['digi',XM.gifts,425,787,16],
+    ['etsy',XM.deer,738,810,28],['etsy',XM.gifts,905,793,16],['drop',XM.sleigh,1180,780,28],['drop',XM.pine,1268,804,34],['plaza',XM.post,662,480,44]],
+};
+let worldDekoKey = '', worldDekoList = [];
+function worldDeko(){
+  const key = (season || '-') + PLOTS.map(p => p.taken ? 1 : 0).join('');
+  if (key !== worldDekoKey){
+    worldDekoKey = key; worldDekoList = [];
+    if (season){ const set = season, L = worldDekoList;
+      for (const [, i, x, y, h, flip] of WORLD_DEKO[set]) L.push({ deko:1, set, i, x, y, h, flip:!!flip });
+      PLOTS.forEach((p, n) => { if (p.taken) return; // freie Bauplätze: Kürbisbeet mit Vogelscheuche bzw. Tanne mit Rentier
+        if (set === 'halloween') L.push({ deko:1, set, i:HW.scare, x:p.x - 30, y:p.y + 16, h:46 }, { deko:1, set, i:HW.trio, x:p.x + 27, y:p.y + 22, h:24 });
+        else L.push({ deko:1, set, i:XM.pine, x:p.x - 28, y:p.y + 18, h:38 }, n === 0 ? { deko:1, set, i:XM.deer, x:p.x + 27, y:p.y + 24, h:28, flip:true } : { deko:1, set, i:XM.gifts, x:p.x + 25, y:p.y + 22, h:16 }); });
+    }
+  }
+  return snow.men.some(p => p > .01) || snow.builder ? [...worldDekoList, ...snowmenItems()] : worldDekoList;
+}
+function drawDeko(c, X, Y, s, t, o){
+  if (o.kind === 'snowman') return dekoSprite(c, 'xmas', XM.snowman, X, Y, s, o.x, o.y, o.h, { clip:o.clip, flip:o.flip });
+  if (o.kind === 'builder'){ if (c === ctx) drawVillager(o, t); return; }
+  if (o.float){ const bob = reduceMotion ? 0 : Math.sin(t*1.6 + o.x)*o.h*.08; return dekoSprite(c, o.set, o.i, X, Y, s, o.x, o.y, o.h, { lift:o.float + bob, alpha:.82, shadow:false, flip:o.flip }); }
+  dekoSprite(c, o.set, o.i, X, Y, s, o.x, o.y, o.h, { flip:o.flip });
+}
+// Lichterketten vom Dach (gleiche Linien wie die Wimpel beim Projektabschluss, etwas tiefer)
+const bulbCache = {};
+function bulbPoints(pr){
+  const g = festiveGeo(pr); if (!g) return [];
+  const pts = [], x0 = g.top[0], y0 = g.top[1] + 10;
+  for (const [x1, yy] of [g.l, g.r]){ const y1 = yy + 10, mx = (x0+x1)/2, my = (y0+y1)/2 + 16, n = Math.max(5, Math.round(Math.hypot(x1-x0, y1-y0)/9));
+    for (let i=0; i<=n; i++){ const u = i/n; pts.push([(1-u)*(1-u)*x0 + 2*(1-u)*u*mx + u*u*x1, (1-u)*(1-u)*y0 + 2*(1-u)*u*my + u*u*y1]); } }
+  return pts;
+}
+function seasonLights(c, X, Y, s){
+  if (!season) return; const cols = SEASON_BULBS[season], r = Math.max(1.5, 2.8*s);
+  for (const pr of PROJECTS){ if (pr.id === 'atlas' || pr.dyn || !BLD[pr.id]) continue;
+    const pts = bulbCache[pr.id] ||= bulbPoints(pr);
+    c.strokeStyle = 'rgba(40,30,24,.75)'; c.lineWidth = Math.max(1, s); c.beginPath(); pts.forEach(([x, y], i) => i && i !== Math.ceil(pts.length/2) ? c.lineTo(X(x), Y(y)) : c.moveTo(X(x), Y(y))); c.stroke();
+    pts.forEach(([x, y], i) => { c.fillStyle = cols[i % cols.length]; c.fillRect(Math.round(X(x) - r/2), Math.round(Y(y)), Math.ceil(r), Math.ceil(r*1.3)); }); }
+}
+function treeTwinkle(gl, X, Y, s, t, d, k){ // funkelnde Lichter im Baum und der Stern oben
+  const h = d.h;
+  for (let j=0; j<14; j++){ const u = ((j*37) % 13)/13, v = ((j*53) % 11)/11, hy = .2 + .72*v, tw = reduceMotion ? .7 : Math.max(0, Math.sin(t*(1.7 + (j%4)*.5) + j*2.1));
+    if (tw < .1) continue; gl(X(d.x + (u*2 - 1)*.3*h*hy), Y(d.y - h + h*hy), (3 + h*.035)*s + 1, j%3 ? '#ffd27a' : '#fff1c9', .9*tw*k); }
+  gl(X(d.x), Y(d.y - h*.93), (6 + h*.08)*s, '#ffe08a', (.6 + .3*Math.sin(t*2))*k);
+}
+function seasonGlow(t, s, lit){ // läuft im „lighter“-Modus nach der Beleuchtung
+  if (!season) return;
+  const cols = SEASON_BULBS[season], k = .3 + .7*lit;
+  for (const pr of PROJECTS){ const pts = bulbCache[pr.id]; if (!pts || pr.dyn) continue;
+    pts.forEach(([x, y], i) => { const tw = reduceMotion ? .8 : .55 + .45*Math.sin(t*(1.5 + (i%3)*.6) + i*1.3); glow(WX(x), WY(y + 2), 7*s + 2, cols[i % cols.length], .8*k*tw); }); }
+  for (const d of worldDekoList){ const gl = (DEKO_GLOW[d.set] || {})[d.i]; if (!gl) continue;
+    const fl = reduceMotion ? 1 : .82 + .18*Math.sin(t*9 + d.x)*Math.sin(t*5.3 + d.y);
+    glow(WX(d.x), WY(d.y - d.h*gl[0]), d.h*gl[1]*s, gl[2], gl[3]*k*fl);
+    if (d.set === 'xmas' && d.i === XM.tree) treeTwinkle(glow, WX, WY, s, t, d, .5 + .5*k); }
+  if (season === 'halloween'){ // freundlicher Geist über dem Platz, Fledermäuse in der Dämmerung
+    ctx.globalCompositeOperation = 'source-over';
+    const L = lighting(), gx = PLAZA.x + Math.cos(t*.11)*200, gy = PLAZA.y + 10 + Math.sin(t*.22)*70, dir = -Math.sin(t*.11);
+    loadDeko('halloween'); dekoSprite(ctx, 'halloween', HW.ghost, WX, WY, s, gx, gy, 28, { lift:26 + (reduceMotion ? 0 : Math.sin(t*1.7)*4), alpha:.45 + .45*L.dark, shadow:false, flip:dir < 0 });
+    const bat = clamp((L.dark - .2)*3, 0, 1);
+    if (bat > 0 && !reduceMotion){ ctx.fillStyle = `rgba(26,18,36,${.9*bat})`;
+      [[528,70],[1420,330],[350,110],[1240,120]].forEach(([cx, cy], n) => { for (let j=0; j<2; j++){ const a = t*(.8 + j*.25) + n*1.7 + j*2.4, x = WX(cx + Math.cos(a)*(50 + j*18)), y = WY(cy + Math.sin(a*1.6)*22 - j*10), w = (3 + 2*Math.abs(Math.sin(t*12 + n + j)))*s*1.4, u = Math.max(1, 1.6*s);
+        ctx.fillRect(x - u, y - u, u*2, u*2); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - w*2, y - w*.8 + Math.sin(t*14 + n)*w*.6); ctx.lineTo(x - w*.8, y + u); ctx.moveTo(x, y); ctx.lineTo(x + w*2, y - w*.8 + Math.sin(t*14 + n)*w*.6); ctx.lineTo(x + w*.8, y + u); ctx.fill(); } }); }
+    ctx.globalCompositeOperation = 'lighter';
+  }
+}
+
+// ---------- Innenräume: freie Bodenstellen je Raum (Bildkoordinaten des Innenraums); big = Baum bzw. Vogelscheuche
+const INTERIOR_DEKO = {
+  sb:{ big:[1085,700], small:[[330,775],[1150,760]] }, etsy:{ big:[880,500], small:[[620,830],[1080,860]] }, sbweb:{ big:[1120,720], small:[[360,760],[880,760]] },
+  sbshop:{ big:[520,700], small:[[1010,660],[300,775]] }, mkt:{ big:[1000,600], small:[[460,760],[1080,740]] }, seo:{ big:[1000,720], small:[[440,730],[1260,735]] },
+  drop:{ big:[1110,560], small:[[640,560],[260,790]] }, digi:{ big:[1000,720], small:[[450,720],[700,600]] }, atlas:{ big:[980,700], small:[[560,720],[1090,580]], ghost:[470,600] },
+};
+function interiorDeko(sp){
+  if (!season || !sp.interior || !detailId || !INTERIOR_DEKO[detailId]) return [];
+  if (sp.dekoKey === season + detailId) return sp.deko;
+  const z = INTERIOR_DEKO[detailId], set = season, it = (i, [x, y], h, o) => ({ deko:1, set, i, x, y, h, ...o });
+  sp.deko = set === 'halloween'
+    ? [it(HW.scare, z.big, 230), it(HW.trio, z.small[0], 95), it(HW.candles, z.small[1], 85), it(HW.ghost, z.ghost || [z.big[0] - 190, z.big[1] - 30], 105, { float:230, flip:true })]
+    : [it(XM.tree, z.big, 280), it(XM.gifts, z.small[0], 85), it(XM.deer, z.small[1], 115, { flip:z.small[1][0] > 760 })];
+  sp.dekoKey = set + detailId; return sp.deko;
+}
+function interiorLights(sp, t, X, Y, s){
+  if (!season || !sp.interior) return;
+  const cols = SEASON_BULBS[season], L = lighting(), k = .55 + .45*L.dark;
+  sctx.globalCompositeOperation = 'lighter';
+  for (const d of interiorDeko(sp)){ const gl = (DEKO_GLOW[d.set] || {})[d.i]; if (gl){ const fl = reduceMotion ? 1 : .82 + .18*Math.sin(t*9 + d.x)*Math.sin(t*5.3); sGlow(X(d.x), Y(d.y - d.h*gl[0]), d.h*gl[1]*s, gl[2], gl[3]*.7*fl); }
+    if (d.set === 'xmas' && d.i === XM.tree) treeTwinkle(sGlow, X, Y, s, t, d, k); }
+  sctx.globalCompositeOperation = 'source-over';
+  // Lichterkette zwischen den beiden Laternen am Eingang
+  const front = sp.lights.filter(l => l[1] > 700 && l[2] >= 1).sort((a, b) => a[0] - b[0]);
+  if (front.length < 2) return;
+  const a = front[0], b = front[front.length - 1], x0 = a[0], y0 = a[1] - 26, x1 = b[0], y1 = b[1] - 26, mx = (x0+x1)/2, my = Math.max(y0, y1) + 60, n = 24, pts = [];
+  for (let i=0; i<=n; i++){ const u = i/n; pts.push([(1-u)*(1-u)*x0 + 2*(1-u)*u*mx + u*u*x1, (1-u)*(1-u)*y0 + 2*(1-u)*u*my + u*u*y1]); }
+  sctx.strokeStyle = 'rgba(40,28,20,.9)'; sctx.lineWidth = Math.max(1, 2*s); sctx.beginPath(); pts.forEach(([x, y], i) => i ? sctx.lineTo(X(x), Y(y)) : sctx.moveTo(X(x), Y(y))); sctx.stroke();
+  const r = Math.max(2, 7*s);
+  pts.slice(1, -1).forEach(([x, y], i) => { sctx.fillStyle = cols[i % cols.length]; sctx.fillRect(X(x) - r/2, Y(y), r, r*1.3); });
+  sctx.globalCompositeOperation = 'lighter';
+  pts.slice(1, -1).forEach(([x, y], i) => { const tw = reduceMotion ? .8 : .55 + .45*Math.sin(t*(1.6 + (i%3)*.5) + i*1.4); sGlow(X(x), Y(y) + r*.6, 16*s + 2, cols[i % cols.length], .7*tw*k); });
+  sctx.globalCompositeOperation = 'source-over';
+}
+
+// ---------- Schnee: Decke wächst beim Schneien, taut langsam (nachts langsamer, bei Regen schneller) und bleibt über das Neuladen erhalten
+const SNOW_SPOTS = [[934,268,0],[510,494,1],[1134,510,2]]; // Wiesen an den Bauplätzen [x, y, Bauplatz]
+const snow = { cover:0, men:SNOW_SPOTS.map(() => 0), builder:null, levels:null, saveT:0, saved:false };
+try { const v = JSON.parse(store.get('atlas-snow') || 'null'); if (v){ snow.saved = true; snow.cover = clamp(v.c - (Date.now() - v.at)/1000/900, 0, 1); snow.men = SNOW_SPOTS.map((_, i) => Math.min((v.men || [])[i] || 0, snow.cover/.5)); } } catch {}
+const spotFree = i => !(PLOTS[SNOW_SPOTS[i][2]] || {}).taken;
+function simulateSnow(dt){
+  const falling = wx.amt.schnee, L = lighting(), wet = Math.min(1, wx.amt.regen + wx.amt.gewitter);
+  if (falling > .5) snow.cover = Math.min(1, snow.cover + (reduceMotion ? 1 : dt/150*falling));
+  else if (snow.cover > 0) snow.cover = Math.max(0, snow.cover - dt/((L.dark > .5 ? 1500 : 700)*(1 - .6*wet)));
+  if (snow.cover > .005){ loadDeko('xmas'); if (!snow.levels && ready) buildSnowLevels(); }
+  // Schneemänner: ab einer ordentlichen Decke baut ein Dorfkind einen; beim Tauen schrumpfen sie wieder
+  snow.men = snow.men.map((p, i) => spotFree(i) ? Math.min(p, snow.cover/.5) : 0);
+  const b = snow.builder;
+  if (b){ b.t += dt; if (b.t > 1.2) snow.men[b.i] = Math.min(1, snow.men[b.i] + dt/(reduceMotion ? 1 : 26));
+    if (snow.men[b.i] >= 1) b.done = (b.done || 0) + dt;
+    if (b.done > 2.5 || snow.cover < .5 || !spotFree(b.i)) snow.builder = null; }
+  else if (snow.cover > .55){ const open = snow.men.map((p, i) => [p, i]).filter(([p, i]) => p < 1 && spotFree(i)); if (open.length && rnd() < dt/8) snow.builder = { i:pick(open)[1], t:0 }; }
+  snow.saveT += dt;
+  if (snow.saveT > 5 && (snow.cover > 0 || snow.saved)){ snow.saveT = 0; snow.saved = snow.cover > 0; store.set('atlas-snow', JSON.stringify({ c:+snow.cover.toFixed(3), men:snow.men.map(p => +p.toFixed(2)), at:Date.now() })); }
+}
+function snowmenItems(){
+  const out = [];
+  snow.men.forEach((p, i) => { if (p <= .01) return; const [x, y] = SNOW_SPOTS[i];
+    out.push(p < .35 ? { kind:'snowman', x, y, h:32*(.45 + .55*p/.35), clip:.42 } : { kind:'snowman', x, y, h:32, clip:p < .7 ? .72 : 1 }); });
+  const b = snow.builder;
+  if (b && b.t > 0){ const [x, y] = SNOW_SPOTS[b.i]; out.push({ kind:'builder', x:x - 17, y:y + 3, face:1, route:snow.men[b.i] < 1 ? [0] : [], hair:'#c0392b', skin:'#f1c7a1', shirt:'#3a78b5', pants:'#3d4f7a' }); }
+  return out;
+}
+// Schneedecke aus der Karte berechnen (halbe Auflösung, wirkt wie Pixel-Schnee): Rauschen bestimmt, wo zuerst Schnee liegt;
+// Wasser bleibt frei (pixelgenau), die Schneefarbe folgt der Helligkeit darunter, damit Konturen und Schatten erkennbar bleiben
+function buildSnowLevels(){
+  const w = IW >> 1, h = IH >> 1, cv0 = document.createElement('canvas'); cv0.width = w; cv0.height = h;
+  const g = cv0.getContext('2d'); g.drawImage(baseImg, 0, 0, w, h);
+  let src; try { src = g.getImageData(0, 0, w, h).data; } catch { snow.levels = []; return; }
+  const hash = (i, j) => { let n = (i*374761393 + j*668265263) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0)/4294967296; };
+  const vn = (x, y, sc) => { const fx = x/sc, fy = y/sc, i = Math.floor(fx), j = Math.floor(fy), u = fx - i, v = fy - j, su = u*u*(3 - 2*u), sv = v*v*(3 - 2*v), a = hash(i, j), b = hash(i+1, j), c = hash(i, j+1), d = hash(i+1, j+1); return a + (b - a)*su + (c - a)*sv + (a - b - c + d)*su*sv; };
+  const th = new Float32Array(w*h), mx = new Float32Array(w*h), lum = new Float32Array(w*h);
+  for (let y=0; y<h; y++) for (let x=0; x<w; x++){
+    const i = y*w + x, p = i*4, l = .3*src[p] + .59*src[p+1] + .11*src[p+2]; lum[i] = l;
+    const r = src[p], gg = src[p+1], b = src[p+2], blue = b > r + 18 && b >= gg - 6;
+    if (blue && (isWater(x*2 + 1, y*2 + 1) || isWater(x*2 - 6, y*2) || isWater(x*2 + 8, y*2) || isWater(x*2, y*2 + 8))){ th[i] = 9; continue; }
+    th[i] = (vn(x, y, 14)*.65 + vn(x, y, 4)*.35)*.8 + (l < 70 ? (70 - l)/70*.45 : 0);
+    mx[i] = (l < 35 ? .22 : l < 95 ? .22 + (l - 35)/60*.52 : .74) * (r > 190 && gg > 130 && b < 120 && r - b > 90 ? .15 : 1); // warm leuchtende Fenster bleiben frei
+  }
+  snow.levels = [.3, .55, .8, 1].map(Lv => {
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const cg = cv.getContext('2d'), id = cg.createImageData(w, h), d = id.data;
+    for (let i=0; i<w*h; i++){ const a = clamp((Lv*1.15 - th[i])*5, 0, 1)*mx[i]; if (a <= 0) continue;
+      const p = i*4, v = 148 + lum[i]*.44; d[p] = Math.min(255, v); d[p+1] = Math.min(255, v + 6); d[p+2] = Math.min(255, v + 18); d[p+3] = a*255; }
+    cg.putImageData(id, 0, 0); return cv; });
+}
+function drawSnowCover(c, sx, sy, sw, sh, dx, dy, dw, dh){
+  if (snow.cover <= .005 || !snow.levels || !snow.levels.length) return;
+  const k = snow.cover*4, i0 = Math.floor(k), fr = k - i0, sm = c.imageSmoothingEnabled; c.imageSmoothingEnabled = false;
+  const lay = (lv, a) => { if (!lv || a <= 0) return; c.globalAlpha = a; c.drawImage(lv, sx/2, sy/2, sw/2, sh/2, dx, dy, dw, dh); };
+  if (i0 >= 1) lay(snow.levels[Math.min(3, i0 - 1)], 1);
+  if (i0 < 4) lay(snow.levels[i0], fr);
+  c.globalAlpha = 1; c.imageSmoothingEnabled = sm;
+}
+
+
+/* =========================================================
    Menü-Ansichten: Projekte, Aufgaben, KI-Agenten, Automationen, Notion-Sync, Einstellungen
    ========================================================= */
 let sheetKind = null, sheetLast = null, sheetItems = [];
@@ -2591,6 +2812,8 @@ function renderSheetAuto(){
     ['Zufallswetter', wxLive.on && wxLive.data ? 'ruht, solange Live-Wetter läuft' : 'wechselt alle 2 bis 4 Minuten nach Zypern-Klima', !(wxLive.on && wxLive.data) && !wx.manual],
     ['Hinweis Wochenrückblick', 'Punkt am Menüeintrag „Rückblick“ ab Freitag, bis du ihn öffnest', true],
     ['Belohnungen', 'Funken beim Abhaken, Feuerwerk bei Meilensteinen und geschafftem Tagesziel', true],
+    ['Festdeko', season ? `${SEASON_LABEL[season]}: Deko im Dorf, an den Häusern und in allen Innenräumen` : seasonPref === 'off' ? 'ausgeschaltet (Einstellungen)' : 'automatisch: Halloween ab 15.10., Weihnachten ab 01.12.', !!season],
+    ['Schneedecke', snow.cover > .01 ? `liegt zu ${Math.round(snow.cover*100)} %, taut langsam (nachts langsamer)` : 'wächst bei Schnee, bleibt liegen und taut langsam; Dorfkinder bauen Schneemänner', snow.cover > .01],
   ];
   const ideas = [
     ['Wochenrückblick als Notion-Seite', 'jeden Freitag automatisch; braucht eine geplante Claude-Sitzung pro Woche'],
@@ -2641,6 +2864,8 @@ function renderSheetSettings(){
     `<div class="fld"><span>Wetter</span><div class="seg" role="group" aria-label="Wetterquelle"><button type="button" data-st-wx="live" aria-pressed="${!wx.manual && wxLive.on}"${wxLive.mcp ? '' : ' disabled'}>Live</button><button type="button" data-st-wx="auto" aria-pressed="${!wx.manual && !wxLive.on}">Zufall</button></div></div>` +
     `<div class="fld"><span>Tageszeit der Welt</span><div class="seg" role="group" aria-label="Tageszeit">${[['auto','Auto'],['day','Tag'],['night','Nacht']].map(([k,l]) => `<button type="button" data-st-tod="${k}" aria-pressed="${todMode === k}">${l}</button>`).join('')}</div></div>` +
     `<div class="fld"><span>Geräusche</span><div class="seg" role="group" aria-label="Geräusche"><button type="button" data-st-snd="1" aria-pressed="${snd.on}">An</button><button type="button" data-st-snd="0" aria-pressed="${!snd.on}">Aus</button></div></div>` +
+    `<div class="fld"><span>Festdeko</span><div class="seg" role="group" aria-label="Festdeko">${[['auto','Auto'],['off','Aus'],['halloween','Halloween'],['xmas','Weihnachten']].map(([k,l]) => `<button type="button" data-st-season="${k}" aria-pressed="${seasonPref === k}">${l}</button>`).join('')}</div><small class="fld-hint">Auto: Halloween 15.10.–02.11., Weihnachten 01.12.–06.01. (Zypern)${season ? ` · gerade: ${SEASON_LABEL[season]}` : ''}</small></div>` +
+    `<div class="fld"><span>Schneedecke</span><div class="btns"><button type="button" class="btn" id="stSnow">${snow.cover > .01 ? `${Math.round(snow.cover*100)} % · wegtauen lassen` : 'Jetzt schneien lassen'}</button></div><small class="fld-hint">Schnee gibt es auch im Wetter-Menü; im Zufallswetter schneit es ab und zu von Dezember bis Februar.</small></div>` +
     `<label class="fld"><span>KI-Figuren beim Öffnen</span><select class="sel" id="stMode"><option value=""${pm ? '' : ' selected'}>Automatisch</option><option value="real"${pm === 'real' ? ' selected' : ''}>Echter Stand</option><option value="demo"${pm === 'demo' ? ' selected' : ''}>Demo</option></select></label>` +
     `</div><p class="note">Weniger Bewegung richtet sich nach der Einstellung deines Geräts (Bewegung reduzieren).</p>` +
     `<div class="btns"><button type="button" class="btn" id="stReset">Einstellungen zurücksetzen</button><button type="button" class="btn" id="stKeys">Tastenkürzel anzeigen</button></div>`;
@@ -2673,7 +2898,9 @@ $('#shBody').addEventListener('click', e => {
   const ss = t.closest('[data-st-snd]'); if (ss){ if ((ss.dataset.stSnd === '1') !== snd.on) $('#sndBtn').click(); renderSheet(); return; }
   if (t.id === 'syncNow'){ refreshLive(); return; }
   if (t.id === 'stKeys'){ openSheet('Tastenkürzel'); return; }
-  if (t.id === 'stReset'){ for (const k of ['atlas-city','atlas-wxsrc','atlas-sound','atlas-tf','atlas-mode','atlas-rv-seen']) { try { localStorage.removeItem(k); } catch {} } toastMsg('Zurückgesetzt. Gilt ab dem nächsten Öffnen.'); return; }
+  const sn = t.closest('[data-st-season]'); if (sn){ seasonPref = sn.dataset.stSeason; store.set('atlas-season', seasonPref); updateSeason(); renderSheet(); toastMsg(season ? `Festdeko: ${SEASON_LABEL[season]}` : seasonPref === 'off' ? 'Festdeko aus.' : 'Festdeko automatisch: gerade keine Festzeit.'); return; }
+  if (t.id === 'stSnow'){ if (snow.cover > .01){ snow.cover = 0; snow.men = snow.men.map(() => 0); snow.builder = null; if (wx.cur === 'schnee'){ wx.manual = null; wx.cur = 'klar'; } toastMsg('Der Schnee ist weggetaut.'); } else { wx.manual = 'schnee'; wx.cur = 'schnee'; applyWeatherSource(); toastMsg('Es schneit. Die Decke wächst in etwa 2–3 Minuten, danach bauen die Dorfkinder Schneemänner.'); } paintWeather(); renderSheet(); return; }
+  if (t.id === 'stReset'){ for (const k of ['atlas-city','atlas-wxsrc','atlas-sound','atlas-tf','atlas-mode','atlas-rv-seen','atlas-season','atlas-snow']) { try { localStorage.removeItem(k); } catch {} } toastMsg('Zurückgesetzt. Gilt ab dem nächsten Öffnen.'); return; }
   // Aufgabenzeilen: gleiche Aktionen wie in der Detailansicht
   const b = t.closest('[data-act]'); if (!b || b.disabled || !canEdit()) return;
   const li = b.closest('.trow'); if (!li) return;
@@ -2700,6 +2927,7 @@ buildLabels();
 new ResizeObserver(resize).observe(stage);
 resize();
 updateClock(); setInterval(updateClock, 15000);
+updateSeason(); setInterval(updateSeason, 60000);
 paintWeather();
 paintRvDot();
 setMode('demo');

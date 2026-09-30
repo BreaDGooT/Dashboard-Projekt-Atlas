@@ -2,7 +2,7 @@
 
 Interaktives, animiertes Projekt-Dashboard für Flos eigene Projekte: eine Pixelwelt, in der jedes Projekt ein Gebäude ist und die KI-Agenten (Claude, Claude Code, ChatGPT, Gemini) sichtbar zu den Projekten laufen, an denen sie arbeiten. Notion bleibt die einzige Datenquelle; das Dashboard liest und schreibt direkt dorthin.
 
-## Stand v1.0 (30.09.2026)
+## Stand v1.1 (30.09.2026)
 
 - **Prototyp:** [`prototype/index.html`](prototype/index.html), eine Datei ohne Build-Schritt. Die Welt basiert auf einer von ChatGPT gemalten Dorf-Karte (`prototype/assets/dorf.webp`), darüber liegt die Animationsebene (Wasser, Licht, Figuren, Tiere, Wetter, Tag/Nacht, Zoom).
 - **Veröffentlicht** als privates Claude-Artifact (an Flos Seitenleiste angepinnt). Nur dort hat es die Notion-Verbindung.
@@ -19,6 +19,8 @@ Interaktives, animiertes Projekt-Dashboard für Flos eigene Projekte: eine Pixel
 | Projekt abschließen | Projektstatus „Erledigt“: Feuerwerk, danach Wimpelketten, Fahne und Funkeln am Gebäude. Baustellen lassen sich dann über „Bauplatz freigeben“ aus dem Dorf nehmen (das Projekt bleibt in Notion). |
 | Menü | Projekte, Aufgaben (Filter nach Status, Projekt, Priorität, Fälligkeit, Heute), Rückblick (Kalenderwoche, erledigt, fällig, Meilensteine), KI-Agenten, Automationen, Notion-Sync, Einstellungen. |
 | Wetter | Live über AccuWeather (Ort wählbar) oder Zufall nach Zypern-Klima; manuell umschaltbar. |
+| Schnee | Im Wetter-Menü wählbar, im Zufallswetter ab und zu von Dezember bis Februar, live nur wenn AccuWeather Schnee meldet. Die Schneedecke wächst in etwa 2–3 Minuten, bleibt liegen (auch nach dem Neuladen) und taut langsam; Dorfkinder bauen Schneemänner. |
+| Festdeko | Automatisch nach Datum (Zypern): Halloween 15.10.–02.11., Weihnachten 01.12.–06.01. Deko im Dorf, Lichterketten an den Häusern, Deko in allen Innenräumen. In den Einstellungen: Auto / Aus / Halloween / Weihnachten. |
 
 ### Tastenkürzel
 
@@ -89,8 +91,8 @@ Wenn Flo lokal mit der Claude-App (Claude Code) weitermachen will:
 | Pfad | Inhalt |
 |---|---|
 | `prototype/index.html` | das komplette Dashboard (HTML, CSS, JavaScript) |
-| `prototype/assets/` | Dorf-Karte, Lichter, Haus-Illustrationen (`haeuser/`), Innenräume (`innen/`) |
-| `prototype/tools/` | Hilfsskripte für die Kartendaten |
+| `prototype/assets/` | Dorf-Karte, Lichter, Haus-Illustrationen (`haeuser/`), Innenräume (`innen/`), Festdeko (`deko/`, gemalt von ChatGPT) |
+| `prototype/tools/` | Hilfsskripte: Kartendaten (`build_mapdata.py`), Deko freistellen (`cut_sprites.py`, braucht numpy und scipy) |
 | `team/` | Skripte und Anleitung für ChatGPT und Gemini |
 | `CLAUDE.md` | Regeln für Claude Code |
 
