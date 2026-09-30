@@ -6,8 +6,8 @@ Claude Code ist der **Dirigent**: Er nimmt Flos Auftrag an, verteilt Teilaufgabe
 |---|---|---|---|
 | Claude Code | Dirigent, Code, Zusammenführung | läuft hier | aktiv |
 | Gemini | Recherche, Texte (Bilder erst mit Abrechnung) | `team/gemini.sh` – Schlüssel als API-Credential (oder `GEMINI_API_KEY`) | aktiv für Text (getestet 30.09.2026) |
-| ChatGPT | Bilder, Zweitmeinung | `team/chatgpt.sh` – Codex CLI mit ChatGPT-Plus-Login (Gerätecode, pro Sitzung) | aktiv für Bilder und Text (getestet 30.09.2026) |
-| Claude (App) | Konzept & Texte im Chat mit Flo | Notion-Konnektor | manuell / One-Klick |
+| ChatGPT | SternenBücher Website (daraus später das Instagram-Profil befüllen), Bilder, Zweitmeinung | `team/chatgpt.sh` – Codex CLI mit ChatGPT-Plus-Login (Gerätecode, pro Sitzung) | aktiv für Bilder und Text (getestet 30.09.2026) |
+| Claude (App) | SternenBücher (das Buch selbst), Konzept & Texte im Chat mit Flo | Notion-Konnektor | manuell / One-Klick |
 
 ## Gemini einrichten (einmalig)
 

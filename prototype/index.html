@@ -126,6 +126,11 @@ a{color:inherit}
 .lbl.mid::before,.lbl.mid::after{display:none}
 .lbl.below{transform:translate(-50%,8px)}
 .lbl.mid{transform:translate(-50%,-50%)}
+.lbl.fin .lbl-name::before{content:"✓ ";color:var(--ok)}
+.lbl.left{transform:translate(calc(-100% - 8px),-50%)}
+.lbl.left:hover{transform:translate(calc(-100% - 10px),-50%)}
+.lbl.left::before,.lbl.left::after{top:50%;left:100%;transform:translateY(-50%);border-top-color:transparent;border-left-color:var(--lb)}
+.lbl.left::after{margin:0 0 0 -2px;border-left-color:var(--lbg)}
 .lbl.mid:hover{transform:translate(-50%,-50%) translateY(-2px)}
 .lbl.plot{--lb:rgba(214,230,220,.4);border-style:dashed;border-color:rgba(214,230,220,.4);background:rgba(8,16,20,.62);padding:3px 8px}
 .lbl.plot .lbl-name{font-size:11px;color:var(--fg-2)}
@@ -322,7 +327,7 @@ a{color:inherit}
 .tf{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .tf .inp{flex:1 1 220px}
 .tf-today{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:12.5px;font-weight:600;color:var(--fg-2)}
-.add.tf-add{grid-template-columns:minmax(0,1fr) auto auto auto;margin-top:0}
+.add.tf-add{grid-template-columns:minmax(0,1fr) auto auto auto auto;margin-top:0}
 .tgroup{margin-top:4px}
 .tgroup + .tgroup{margin-top:14px}
 .linkish{border:0;background:none;padding:0;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
@@ -350,6 +355,8 @@ a{color:inherit}
 .alist li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(9,16,22,.45)}
 .alist b{font-family:var(--f-ui);font-size:14px;display:block}
 .alist small{color:var(--fg-3);font-size:12px}
+.alist.keys li{grid-template-columns:52px minmax(0,1fr)}
+kbd{font-family:var(--f-ui);font-size:13px;font-weight:700;color:var(--fg);text-align:center;padding:3px 8px;border-radius:7px;border:1px solid var(--line-2);border-bottom-width:3px;background:rgba(255,255,255,.04)}
 .adot{width:10px;height:10px;border-radius:50%;background:var(--idle)}
 .adot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
 .adot.idea{background:none;border:1.5px dashed var(--fg-3)}
@@ -360,8 +367,8 @@ a{color:inherit}
 @media (max-width:640px){
   .review{padding:0}
   .review-box{width:100%;max-height:100vh;height:100%;border-radius:0;padding:20px 16px 28px}
-  .add.tf-add{grid-template-columns:minmax(0,1fr) auto}
-  .add.tf-add input[name="t"]{grid-column:1 / -1}
+  .add.tf-add{grid-template-columns:minmax(0,1fr) auto auto}
+  .add.tf-add input[name="t"],.add.tf-add select[name="p"]{grid-column:1 / -1}
   .kgrid{grid-template-columns:1fr}
 }
 
@@ -410,7 +417,8 @@ body.detail-open{overflow:hidden}
 .trow.pending{opacity:.55}
 .trow.pending button{pointer-events:none}
 .trow.ms{grid-template-columns:22px minmax(0,1fr) auto}
-@container (max-width:560px){ .trow:not(.tday):not(.ms){grid-template-columns:22px minmax(0,1fr)} .trow:not(.tday):not(.ms) .tctl{grid-column:2;flex-wrap:wrap} }
+@container (max-width:560px){ .trow:not(.tday):not(.ms){grid-template-columns:22px minmax(0,1fr)} .trow:not(.tday):not(.ms) .tctl{grid-column:2;flex-wrap:wrap;gap:4px}
+  .trow:not(.tday):not(.ms){position:relative} .trow:not(.tday):not(.ms) .ttl{margin-right:26px} .trow:not(.tday):not(.ms) .del{position:absolute;top:3px;right:3px} }
 .whosel{font:inherit;font-family:var(--f-ui);font-size:11px;font-weight:600;color:var(--fg-3);background:rgba(9,16,22,.5);border:1px solid var(--line-2);border-radius:99px;padding:2px 4px;max-width:128px;cursor:pointer}
 .whosel:disabled{cursor:default;opacity:.7}
 .whosel:focus{outline:none;border-color:var(--core)}
@@ -439,20 +447,38 @@ body.detail-open{overflow:hidden}
 .del:hover{color:#f08a7a;border-color:rgba(240,138,122,.4)}
 .del.arm{width:auto;padding:0 8px;color:#fff;background:#c2493a;border-color:#c2493a;font-family:var(--f-ui);font-size:11px;font-weight:700}
 .date{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3);white-space:nowrap}
+.due{border:1px solid var(--line-2);background:rgba(9,16,22,.5);color:var(--fg-2);border-radius:99px;padding:2px 9px;font-family:var(--f-ui);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;display:inline-grid;place-items:center}
+.due:hover{border-color:var(--fg-2);color:var(--fg)}
+.due.none{width:28px;height:28px;padding:0;border-color:transparent;background:none;color:var(--fg-3);opacity:0;transition:opacity .15s}
+.trow:hover .due.none,.due.none:focus-visible{opacity:1}
+.due svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.due.soon{color:var(--warn);border-color:rgba(240,179,90,.45)}
+.due.today{color:#1d1406;background:var(--warn);border-color:var(--warn)}
+.due.late{color:#fff;background:#b8412f;border-color:#b8412f}
+.due:disabled{cursor:default;opacity:.8}
+.trow.is-late{border-color:rgba(240,138,122,.28);background:rgba(194,73,58,.07)}
+.due-in{width:auto;min-width:0;font-size:12px;padding:2px 4px}
+.due-tx{font-weight:700}
+.due-tx.late{color:#f08a7a}
+.due-tx.today,.due-tx.soon{color:var(--warn)}
 .add{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;margin-top:8px}
 .add .btn{margin:0}
 .np{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .np .btn{margin-top:0;align-self:flex-start}
 #dAddM{grid-template-columns:minmax(0,1fr) auto}
+#dAddT{grid-template-columns:auto minmax(0,1fr) auto}
+#dAddT input[name="t"]{grid-column:1 / -1}
 #dAddM input[name="t"]{grid-column:1 / -1}
 .btn.pri{background:rgba(110,231,216,.14);border-color:rgba(110,231,216,.5);color:var(--core)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btns{display:flex;flex-wrap:wrap;gap:8px}
 .btns .btn{margin-top:0}
+.btn.arm{color:#fff;background:#c2493a;border-color:#c2493a}
+.fin-note{font-size:13px;color:var(--ok);padding:9px 12px;border-radius:10px;border:1px solid rgba(98,214,156,.35);background:rgba(98,214,156,.08)}
 .ro{font-size:12px;color:var(--fg-3);padding:8px 10px;border-radius:9px;border:1px dashed var(--line-2)}
 .ro button{font:inherit;color:var(--core);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
 .side-open{margin-top:14px}
-@media (hover:none){.del{opacity:1}}
+@media (hover:none){.del,.due.none{opacity:1}}
 @media (max-width:900px){
   .scene{bottom:auto;height:44vh}
   .scene-cap{right:16px;left:16px;bottom:30px}
@@ -530,7 +556,7 @@ body.detail-open{overflow:hidden}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v0.9 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
+      <small>Hybrid-Prototyp v1.0 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
     </div>
   </aside>
 
@@ -702,7 +728,7 @@ const PROJECTS = [
 ];
 const PLOTS = [
   { id:'plot1', name:'Freier Bauplatz', x:888, y:232 },
-  { id:'plot2', name:'Freier Bauplatz', x:455, y:452 },
+  { id:'plot2', name:'Freier Bauplatz', x:455, y:452, label:'left' }, // Schild links, sonst deckt es „SternenBücher“ und „Digitale Produkte“ zu
   { id:'plot3', name:'Freier Bauplatz', x:1088, y:472 },
 ];
 const P = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
@@ -715,7 +741,7 @@ function placeOnPlot(n, data){
   let pr = P[id];
   if (!pr){ pr = { id, building:'Baustelle', tasks:[], milestones:[], progressFrom:'tasks', dyn:true, slot:n }; PROJECTS.push(pr); P[id] = pr; }
   Object.assign(pr, data);
-  BLD[id] = { box:[plot.x-72, plot.y-64, plot.x+72, plot.y+30], front:[plot.x, plot.y+24], label:[plot.x, plot.y-58, 'above'] };
+  BLD[id] = { box:[plot.x-72, plot.y-64, plot.x+72, plot.y+30], front:[plot.x, plot.y+24], label:plot.label === 'left' ? [plot.x-74, plot.y-22, 'left'] : [plot.x, plot.y-58, 'above'] };
   plot.taken = id; return pr;
 }
 function clearPlots(keep){ for (let i = PROJECTS.length - 1; i >= 0; i--){ const pr = PROJECTS[i]; if (pr.dyn && !keep.has(pr.id)){ PROJECTS.splice(i, 1); delete P[pr.id]; delete BLD[pr.id]; PLOTS[pr.slot-1].taken = null; if (selected === pr.id) selected = 'plot' + pr.slot; } } }
@@ -724,13 +750,21 @@ function clearPlots(keep){ for (let i = PROJECTS.length - 1; i >= 0; i--){ const
 // Der Stand oben ist der Offline-Stand vom 30.09.2026; mit Notion-Verbindung ersetzt ihn applyLive().
 const ST_OF = { done:'Erledigt', todo:'Nicht begonnen', wait:'Nicht begonnen', run:'In Bearbeitung' };
 for (const p of PROJECTS){
-  p.tasks = (p.tasks || []).map(([title, s, prio, who]) => ({ id:null, title, status:ST_OF[s], prio:prio || 'Mittel', who:who || null, today:false, doneAt:'' }));
+  p.tasks = (p.tasks || []).map(([title, s, prio, who]) => ({ id:null, title, status:ST_OF[s], prio:prio || 'Mittel', who:who || null, today:false, doneAt:'', due:'' }));
   p.milestones = (p.milestones || []).map(([title, d]) => ({ id:null, title, status:'Erledigt', date:d.split('.').reverse().join('-') }));
 }
 const isDone = t => t.status === 'Erledigt';
 const stKey = s => s === 'Erledigt' ? 'done' : s === 'In Bearbeitung' ? 'run' : 'todo';
 const ORDER = { run:0, todo:1, done:2 }, PRIO = { Hoch:0, Mittel:1, Niedrig:2 };
-const byOrder = (a,b) => ORDER[stKey(a.status)] - ORDER[stKey(b.status)] || (PRIO[a.prio] ?? 1) - (PRIO[b.prio] ?? 1);
+// Fälligkeit (Notion-Feld „Fällig am“): überfällig und heute fällig rücken nach oben
+const dueDays = t => t.due && !isDone(t) ? Math.round((Date.parse(t.due + 'T12:00:00Z') - Date.parse(cyToday() + 'T12:00:00Z'))/864e5) : null;
+const dueRank = t => { const d = dueDays(t); return d === null || d > 2 ? 3 : d < 0 ? 0 : d === 0 ? 1 : 2; };
+const byOrder = (a,b) => ORDER[stKey(a.status)] - ORDER[stKey(b.status)] || dueRank(a) - dueRank(b) || (PRIO[a.prio] ?? 1) - (PRIO[b.prio] ?? 1) || String(a.due || '9').localeCompare(String(b.due || '9'));
+function dueInfo(t){
+  const d = dueDays(t); if (d === null) return null; const [, m, dd] = t.due.split('-');
+  const date = `${dd}.${m}.`; // short: kompakt für den Chip in der Aufgabenzeile
+  return d < 0 ? { cls:'late', txt:`überfällig · ${date}`, short:'überfällig', date } : d === 0 ? { cls:'today', txt:'heute fällig', short:'heute', date } : d === 1 ? { cls:'soon', txt:'morgen fällig', short:'morgen', date } : { cls:d <= 2 ? 'soon' : '', txt:`fällig ${date}`, short:date, date };
+}
 
 // Gebäude auf der Karte (Bildkoordinaten): Klickfläche, Eingang, Beschriftung
 const BLD = {
@@ -1124,6 +1158,40 @@ function drawSite(c, X, Y, s, t, pr){
   R(-4, 14, 8, 5, '#e2c48a'); R(-.4, 19, .8, 3, '#7a5a36'); R(-3, 15.5, 6, .7, '#7a5a36'); R(-3, 17, 4, .7, '#7a5a36');        // Schild
   if (!reduceMotion && Math.sin(t*5 + pr.slot) > .85){ c.globalCompositeOperation = 'lighter'; for (let i=0;i<5;i++){ const a = rnd()*6.28, d = (2 + rnd()*5)*px; c.fillStyle = '#ffd27a'; c.fillRect(X(x + 16*2.4) + Math.cos(a)*d, Y(y + (topY+3)*2.4) + Math.sin(a)*d, px*.7, px*.7); } c.globalCompositeOperation = 'source-over'; }
 }
+// Abgeschlossene Projekte: Wimpelketten vom Dach, Fahne und Funkeln
+function festiveGeo(pr){
+  if (pr.id === 'atlas') return { top:[CRYSTAL.x, CRYSTAL.y - 62], l:[CRYSTAL.x - 74, CRYSTAL.y + 4], r:[CRYSTAL.x + 74, CRYSTAL.y + 4] };
+  const b = BLD[pr.id] && BLD[pr.id].box; if (!b) return null;
+  const w = b[2]-b[0], h = b[3]-b[1], cx = (b[0]+b[2])/2;
+  return { top:[cx, b[1] + h*.16], l:[b[0] + w*.14, b[1] + h*.5], r:[b[2] - w*.14, b[1] + h*.5] };
+}
+function drawFestive(c, X, Y, s, t, pr){
+  const g = festiveGeo(pr); if (!g) return;
+  const mv = reduceMotion ? 0 : 1, [x0, y0] = g.top;
+  c.lineWidth = Math.max(1, 1.4*s);
+  [g.l, g.r].forEach((end, side) => {
+    const [x1, y1] = end, mx = (x0+x1)/2, my = (y0+y1)/2 + 14;
+    c.strokeStyle = 'rgba(58,40,28,.9)'; c.beginPath(); c.moveTo(X(x0), Y(y0)); c.quadraticCurveTo(X(mx), Y(my), X(x1), Y(y1)); c.stroke();
+    const n = Math.max(4, Math.round(Math.hypot(x1-x0, y1-y0)/14));
+    for (let i=1; i<n; i++){
+      const u = i/n, px = (1-u)*(1-u)*x0 + 2*(1-u)*u*mx + u*u*x1, py = (1-u)*(1-u)*y0 + 2*(1-u)*u*my + u*u*y1, sw = Math.sin(t*2.4 + i*.9 + side)*1.5*mv;
+      c.fillStyle = FW_COL[(i + side*3) % FW_COL.length];
+      c.beginPath(); c.moveTo(X(px - 5), Y(py)); c.lineTo(X(px + 5), Y(py)); c.lineTo(X(px + sw), Y(py + 12)); c.closePath(); c.fill();
+    }
+  });
+  const wv = k => Math.sin(t*4 + k)*2.2*mv, pole = 40;
+  c.fillStyle = '#4e3626'; c.fillRect(X(x0) - Math.max(1, 1.1*s), Y(y0 - pole), Math.max(2, 2.2*s), pole*s);
+  c.fillStyle = pr.group === 'sb' ? '#f4c86a' : '#62d69c';
+  c.beginPath(); c.moveTo(X(x0), Y(y0 - pole)); c.lineTo(X(x0 + 13), Y(y0 - pole + 1 + wv(1))); c.lineTo(X(x0 + 26), Y(y0 - pole + wv(2)));
+  c.lineTo(X(x0 + 26), Y(y0 - pole + 15 + wv(2))); c.lineTo(X(x0 + 13), Y(y0 - pole + 16 + wv(1))); c.lineTo(X(x0), Y(y0 - pole + 15)); c.closePath(); c.fill();
+  c.fillStyle = '#fff6dc'; c.fillRect(X(x0 + 10), Y(y0 - pole + 5 + wv(1)*.6), Math.max(2, 5*s), Math.max(2, 5*s)); // Stern auf der Fahne
+}
+function festiveGlow(t, s){
+  for (const pr of PROJECTS){ if (pr.status !== 'Erledigt') continue; const g = festiveGeo(pr); if (!g) continue;
+    for (let k=0; k<6; k++){ const a = reduceMotion ? .5 : Math.pow(Math.max(0, Math.sin(t*2.6 + k*1.9 + pr.id.length)), 6); if (a < .05) continue;
+      const x = g.l[0] + (g.r[0] - g.l[0])*((k*.37 + .1) % 1), y = g.top[1] - 10 + ((k*23) % 40);
+      glow(WX(x), WY(y), 14*s, '#fff1c9', .9*a); } }
+}
 function drawAngler(t){
   const s = view.s, A0 = ANG, px = A0.px*s;
   const catching = A0.phase==='catch', u = catching ? Math.min(1, A0.t/1.3) : 0;
@@ -1209,6 +1277,7 @@ function render(t){
   for (const p of [...PETS].sort((a,b) => a.y - b.y)) drawPet(p, t);
   drawAngler(t);
   for (const pr of PROJECTS) if (pr.dyn) drawSite(ctx, WX, WY, view.s, t, pr);
+  for (const pr of PROJECTS) if (pr.status === 'Erledigt' && !pr.pending) drawFestive(ctx, WX, WY, view.s, t, pr);
 
   // Beleuchtung
   const rect = [view.ox, view.oy, IW*s, IH*s];
@@ -1225,6 +1294,7 @@ function render(t){
   // Funkmast-Licht
   ctx.globalCompositeOperation = 'lighter';
   if (Math.sin(t*3) > 0) glow(WX(1333), WY(24), 16*s, '#ff5a4a', .5 + .45*lit);
+  festiveGlow(t, s);
 
   // Selektion
   ctx.globalCompositeOperation = 'source-over';
@@ -1349,8 +1419,8 @@ function buildLabels(){
     const el = document.createElement('button');
     const pos = anchorOf(pr.id)[2];
     el.type = 'button';
-    el.className = 'lbl ' + (pr.id==='atlas' ? 'core' : pr.plot ? 'plot' : pr.group==='sb' ? 'sb' : 'other') + (pos==='below' ? ' below' : pos==='center' ? ' mid' : '');
-    el.dataset.id = pr.id;
+    el.className = 'lbl ' + (pr.id==='atlas' ? 'core' : pr.plot ? 'plot' : pr.group==='sb' ? 'sb' : 'other') + (pos==='below' ? ' below' : pos==='center' ? ' mid' : pos==='left' ? ' left' : '');
+    el.dataset.id = pr.id; if (pr.status === 'Erledigt') el.classList.add('fin');
     const pg = pr.plot ? null : progressOf(pr);
     el.innerHTML = (pr.plot ? '<span class="lbl-plus" aria-hidden="true">+</span>' : '') + `<span class="lbl-name">${esc(pr.name)}</span>` +
       (pr.plot ? '' : pg !== null ? `<span class="lbl-row"><span class="bar"><i style="width:${pg}%"></i></span>${pg}%</span>` : `<span class="lbl-state">${esc(pr.status)}</span>`) +
@@ -1429,7 +1499,7 @@ function renderProject(){
   h += `<div class="kpis"><div class="kpi"><b>${done}/${pr.tasks.length}</b><span>Aufgaben erledigt</span></div><div class="kpi"><b>${pr.tasks.filter(t => t.status==='In Bearbeitung').length}</b><span>in Bearbeitung</span></div><div class="kpi"><b>${open.filter(t => t.prio==='Hoch').length}</b><span>offen, Prio hoch</span></div></div>`;
   const next = [...open].sort(byOrder).slice(0, 4);
   h += `<h3>Nächste Aufgaben</h3>` + (next.length
-    ? `<ul class="tasks">` + next.map(t => `<li class="${stKey(t.status)}"><span class="ic"></span><span class="tt">${t.who && A[t.who] ? `<span class="who" style="background:${A[t.who].color}" title="${esc(A[t.who].name)}"></span>` : ''}${esc(t.title)}</span><span class="tm ${t.prio==='Hoch'?'hi':''}">${t.status==='In Bearbeitung' ? 'in Arbeit' : esc(t.prio)}</span></li>`).join('') + `</ul>` + (open.length > 4 ? `<p class="note">+ ${open.length - 4} weitere in der Detailansicht</p>` : '')
+    ? `<ul class="tasks">` + next.map(t => `<li class="${stKey(t.status)}"><span class="ic"></span><span class="tt">${t.who && A[t.who] ? `<span class="who" style="background:${A[t.who].color}" title="${esc(A[t.who].name)}"></span>` : ''}${esc(t.title)}</span>${(di => di ? `<span class="tm due-tx ${di.cls}">${di.txt}</span>` : `<span class="tm ${t.prio==='Hoch'?'hi':''}">${t.status==='In Bearbeitung' ? 'in Arbeit' : esc(t.prio)}</span>`)(dueInfo(t))}</li>`).join('') + `</ul>` + (open.length > 4 ? `<p class="note">+ ${open.length - 4} weitere in der Detailansicht</p>` : '')
     : `<div class="empty">${pr.tasks.length ? 'Alles erledigt.' : 'Noch keine Aufgaben. In der Detailansicht kannst du direkt welche anlegen.'}</div>`);
   const here = headingTo(pr.id);
   h += `<h3>KIs an diesem Projekt</h3>` + (here.length ? `<div class="here">${here.map(id => `<span><i style="background:${A[id].color}"></i>${esc(A[id].name)} · ${esc(st[id].status==='walk' ? 'unterwegs' : st[id].task)}</span>`).join('')}</div>` : `<div class="empty">Gerade arbeitet keine KI hier.</div>`);
@@ -1573,7 +1643,7 @@ function refreshLive(){
   return loading;
 }
 function applyLive(projRows, taskRows, msRows){
-  const keep = new Set();
+  const keep = new Set(), prevSt = Object.fromEntries(PROJECTS.map(p => [p.id, p.status]));
   for (const r of projRows){ const m = /Bauplatz (\d)/.exec(r.Bauplatz || ''), nid = idOf(r.url); if (!m || PROJECTS.some(p => !p.dyn && p.notion === nid)) continue;
     const n = +m[1]; if (!PLOTS[n-1] || keep.has('bp' + n)) continue;
     placeOnPlot(n, { name:plain(r.Projektname) || 'Neues Projekt', notion:nid, group:r.Bereich === 'SternenBücher' ? 'sb' : 'other', status:r.Status || 'Nicht begonnen' }); keep.add('bp' + n); }
@@ -1584,9 +1654,12 @@ function applyLive(projRows, taskRows, msRows){
     if (r.Status) p.status = r.Status;
     p.desc = plain(r.Beschreibung);
     p.progress = typeof r['Fortschritt Prozent'] === 'number' ? r['Fortschritt Prozent'] : null; }
+  for (const p of PROJECTS){ // Projekt in Notion abgeschlossen? Dann Feuerwerk über dem Gebäude
+    if (p.status !== 'Erledigt') firedProj.delete(p.id);
+    else if (live.ok && prevSt[p.id] && prevSt[p.id] !== 'Erledigt' && !firedProj.has(p.id)){ firedProj.add(p.id); fireworksWorld(p.id); } }
   for (const p of PROJECTS){ p.tasks = []; p.milestones = []; }
   for (const r of taskRows) for (const pid of rel(r.Projekt)){ const p = byId[pid]; if (!p) continue;
-    p.tasks.push({ id:idOf(r.url), title:plain(r.Titel) || '(ohne Titel)', status:r.Status || 'Nicht begonnen', prio:r['Priorität'] || 'Mittel', who:KI_OF[rel(r['Zuständige KI'])[0]] || null, today:r.Heute === '__YES__' || r.Heute === true, doneAt:r['date:Erledigt am:start'] || '' }); }
+    p.tasks.push({ id:idOf(r.url), title:plain(r.Titel) || '(ohne Titel)', status:r.Status || 'Nicht begonnen', prio:r['Priorität'] || 'Mittel', who:KI_OF[rel(r['Zuständige KI'])[0]] || null, today:r.Heute === '__YES__' || r.Heute === true, doneAt:r['date:Erledigt am:start'] || '', due:r['date:Fällig am:start'] || '' }); }
   const firstLoad = !live.ok;
   for (const r of msRows) for (const pid of rel(r.Projekt)){ const p = byId[pid]; if (!p) continue;
     const mid = idOf(r.url); if (!firstLoad && r.Status === 'Erledigt' && prevMs[mid] && prevMs[mid] !== 'Erledigt' && !firedMs.has(mid)){ firedMs.add(mid); fireworksWorld(p.id); } prevMs[mid] = r.Status;
@@ -1614,11 +1687,14 @@ const pageUrl = id => NOTION + id;
 const updProps = (id, props) => callNotion('notion-update-page', { page_id:id, command:'update_properties', properties:props, allow_async:false });
 const toTrash = id => callNotion('notion-move-pages', { page_or_database_ids:[id], new_parent:{ type:'page_id', page_id:TRASH_PAGE } });
 function setField(item, key, val, label, notionProps){ const prev = item[key]; item[key] = val; write(label, () => updProps(item.id, notionProps), () => { item[key] = prev; }); }
+function setDue(item, v){ setField(item, 'due', v, v ? 'Fälligkeit' : 'Fälligkeit entfernen', v ? { 'date:Fällig am:start':v, 'date:Fällig am:is_datetime':0 } : { 'date:Fällig am:start':null }); }
 function removeItem(list, item, label){ const i = list.indexOf(item); if (i < 0) return; list.splice(i, 1); write(label, () => toTrash(item.id), () => list.splice(Math.min(i, list.length), 0, item)); }
-function addTask(pr, title, prio){
-  const t = { id:null, title, status:'Nicht begonnen', prio, who:null, today:false, doneAt:'', pending:true }; pr.tasks.push(t);
+function addTask(pr, title, prio, due){
+  const t = { id:null, title, status:'Nicht begonnen', prio, who:null, today:false, doneAt:'', due:due || '', pending:true }; pr.tasks.push(t);
+  const props = { Titel:title, Status:'Nicht begonnen', 'Priorität':prio, Projekt:[pageUrl(pr.notion)] };
+  if (due){ props['date:Fällig am:start'] = due; props['date:Fällig am:is_datetime'] = 0; }
   write('Aufgabe anlegen', async () => {
-    const r = await callNotion('notion-create-pages', { parent:{ type:'data_source_id', data_source_id:NOTION_DS.tasks }, pages:[{ properties:{ Titel:title, Status:'Nicht begonnen', 'Priorität':prio, Projekt:[pageUrl(pr.notion)] } }] });
+    const r = await callNotion('notion-create-pages', { parent:{ type:'data_source_id', data_source_id:NOTION_DS.tasks }, pages:[{ properties:props }] });
     t.id = idOf(r && r.pages && r.pages[0] && r.pages[0].id); t.pending = false;
     if (!t.id) throw { code:'upstream_error', message:'keine Seiten-ID erhalten' };
   }, () => { const i = pr.tasks.indexOf(t); if (i >= 0) pr.tasks.splice(i, 1); });
@@ -1854,7 +1930,7 @@ function renderScene(t){
   if (!reduceMotion && sp.interior) for (const m of motes){ const x = sp.sw*(.2 + m.u*.6) + Math.sin(t*m.sp + m.ph)*sp.sw*.01, y = sp.sh*(.25 + ((m.v + t*.012*m.sp) % .6)), a = (Math.sin(t*1.5 + m.ph)*.5 + .5); sGlow(X(x), Y(y), 3 + sp.sw*.002*s, '#fff1c9', .22*a); }
   sctx.globalCompositeOperation = 'source-over';
   for (const q of sceneSmoke){ const a = clamp(q.life,0,1)*.38; sctx.fillStyle = `rgba(228,231,235,${a})`; const sz = Math.max(2, q.size*s); sctx.fillRect(X(q.x) - sz/2, Y(q.y) - sz/2, sz, sz); }
-  if (!sp.art) for (const pr of PROJECTS) if (pr.dyn) drawSite(sctx, X, Y, s, t, pr);
+  if (!sp.art) for (const pr of PROJECTS){ if (pr.dyn) drawSite(sctx, X, Y, s, t, pr); if (pr.status === 'Erledigt' && !pr.pending && pr.id !== 'atlas') drawFestive(sctx, X, Y, s, t, pr); }
   drawInterior(t, X, Y, s);
   drawFw(sctx, fwScene, X, Y, s, sGlow, 3.2);
   // Vignette + Verlauf für die Beschriftung
@@ -1941,7 +2017,7 @@ function renderDetail(keep){
   const info = $('#info');
   const active = document.activeElement && info.contains(document.activeElement) ? document.activeElement.id : null;
   if (keep && (active === 'dDesc' || document.querySelector('.ttl-in'))) { renderDetailLists(); return; } // nicht mitten im Tippen neu aufbauen
-  const draftT = $('#dAddT') ? [$('#dAddT').elements.t.value, $('#dAddT').elements.p.value] : null, draftM = $('#dAddM') ? [$('#dAddM').elements.t.value, $('#dAddM').elements.d.value] : null;
+  const draftT = $('#dAddT') ? [$('#dAddT').elements.t.value, $('#dAddT').elements.p.value, $('#dAddT').elements.d.value] : null, draftM = $('#dAddM') ? [$('#dAddM').elements.t.value, $('#dAddM').elements.d.value] : null;
   const ed = canEdit(), dis = ed ? '' : ' disabled';
   const grp = pr.id==='atlas' ? 'Dashboard-Kern' : pr.group==='sb' ? 'SternenBücher-Bereich' : 'Weiteres Projekt';
   let h = `<div><div class="eyebrow">${esc(pr.building)} · ${grp}</div><h2 id="dTitle">${esc(pr.name)}</h2><div class="d-row" style="margin-top:8px"><span class="sync" data-sync></span></div></div>`;
@@ -1958,12 +2034,14 @@ function renderDetail(keep){
       return `<div class="zs ${q.some(v => v>0)?'on':''}" title="${esc(n)}: Story ${lv[q[0]]}, Charakter ${lv[q[1]]}, Illustration ${lv[q[2]]}, Layout ${lv[q[3]]}"><span class="g">${g}︎</span><span class="d">${q.map(v => `<i class="${v===2?'done':v===1?'wip':''}"></i>`).join('')}</span></div>`; }).join('') +
       `</div><div class="legend"><span>Punkte: Story · Charakter · Illustration · Layout</span><span><i style="background:var(--ok)"></i>fertig</span><span><i style="background:var(--star)"></i>in Arbeit</span></div></section>`;
   }
-  h += `<section><h3>Aufgaben <small id="dTc"></small></h3><ul class="tlist" id="dTasks"></ul>` + (ed ? `<form class="add" id="dAddT"><input class="inp" name="t" placeholder="Neue Aufgabe …" maxlength="200" required aria-label="Neue Aufgabe"><select class="sel" name="p" aria-label="Priorität"><option>Hoch</option><option selected>Mittel</option><option>Niedrig</option></select><button class="btn pri" type="submit">Hinzufügen</button></form>` : '') + `</section>`;
+  h += `<section><h3>Aufgaben <small id="dTc"></small></h3><ul class="tlist" id="dTasks"></ul>` + (ed ? `<form class="add" id="dAddT"><input class="inp" name="t" placeholder="Neue Aufgabe …" maxlength="200" required aria-label="Neue Aufgabe"><select class="sel" name="p" aria-label="Priorität"><option>Hoch</option><option selected>Mittel</option><option>Niedrig</option></select><input class="inp" name="d" type="date" aria-label="Fällig am (optional)" title="Fällig am (optional)"><button class="btn pri" type="submit">Hinzufügen</button></form>` : '') + `</section>`;
   h += `<section><h3>Meilensteine <small id="dMc"></small></h3><ul class="tlist" id="dMs"></ul>` + (ed ? `<form class="add" id="dAddM"><input class="inp" name="t" placeholder="Neuer Meilenstein …" maxlength="200" required aria-label="Neuer Meilenstein"><input class="inp" name="d" type="date" aria-label="Zieldatum"><button class="btn pri" type="submit">Hinzufügen</button></form>` : '') + `</section>`;
   h += `<section><h3>KIs an diesem Projekt</h3><div id="dHere"></div></section>`;
-  h += `<div class="btns"><a class="btn" href="${NOTION + pr.notion}" target="_blank" rel="noopener">In Notion öffnen <span aria-hidden="true">↗</span></a></div>`;
+  if (pr.dyn && pr.status === 'Erledigt') h += `<div class="fin-note">Abgeschlossen. Du kannst den Bauplatz jetzt für ein neues Projekt freigeben.</div>`;
+  h += `<div class="btns"><a class="btn" href="${NOTION + pr.notion}" target="_blank" rel="noopener">In Notion öffnen <span aria-hidden="true">↗</span></a>` +
+    (pr.dyn && ed ? `<button type="button" class="btn" data-act="free" title="Nimmt das Projekt aus dem Dorf. In Notion bleibt es mit allen Aufgaben erhalten.">Bauplatz ${pr.slot} freigeben</button>` : '') + `</div>`;
   info.innerHTML = h;
-  if (draftT && $('#dAddT')){ $('#dAddT').elements.t.value = draftT[0]; $('#dAddT').elements.p.value = draftT[1]; }
+  if (draftT && $('#dAddT')){ $('#dAddT').elements.t.value = draftT[0]; $('#dAddT').elements.p.value = draftT[1]; $('#dAddT').elements.d.value = draftT[2]; }
   if (draftM && $('#dAddM')){ $('#dAddM').elements.t.value = draftM[0]; $('#dAddM').elements.d.value = draftM[1]; }
   if (active && document.getElementById(active)) document.getElementById(active).focus();
   paintSync(); renderDetailLists();
@@ -1973,10 +2051,13 @@ function itemRow(t, i, kind){
   const who = kind !== 'task' && t.who && A[t.who] ? `<span class="who" style="background:${A[t.who].color}" title="${esc(A[t.who].name)}"></span>` : '';
   const LBL = { todo:'Offen', run:'In Arbeit', done:'Erledigt' };
   const whoSel = `<select class="whosel" data-who aria-label="${esc(t.title)}: zuständige KI" title="Zuständige KI"${dis}${t.who && A[t.who] ? ` style="color:${A[t.who].color};border-color:${rgba(A[t.who].color,.5)}"` : ''}><option value="">KI –</option>${AGENTS.map(a => `<option value="${a.id}"${t.who === a.id ? ' selected' : ''}>${esc(a.name)}</option>`).join('')}</select>`;
-  return `<li class="trow st-${k}${kind==='ms' ? ' ms' : ''}${t.pending ? ' pending' : ''}" data-k="${kind}" data-i="${i}">` +
+  const di = kind === 'task' ? dueInfo(t) : null;
+  const due = kind !== 'task' ? '' : di ? `<button type="button" class="due ${di.cls}" data-act="due" title="Fällig am ${di.date} · klicken zum Ändern" aria-label="${esc(t.title)}: ${di.txt}, ändern"${dis}>${di.short}</button>`
+    : !off && !isDone(t) ? `<button type="button" class="due none" data-act="due" title="Fälligkeit setzen" aria-label="${esc(t.title)}: Fälligkeit setzen">${CAL_SVG}</button>` : '';
+  return `<li class="trow st-${k}${kind==='ms' ? ' ms' : ''}${di && di.cls === 'late' ? ' is-late' : ''}${t.pending ? ' pending' : ''}" data-k="${kind}" data-i="${i}">` +
     `<button type="button" class="chk" data-act="toggle" aria-pressed="${k==='done'}" aria-label="${esc(t.title)}: ${k==='done' ? 'wieder öffnen' : 'als erledigt markieren'}"${dis}></button>` +
     `<span class="ttl" data-act="rename"${off ? '' : ' tabindex="0" role="button" title="Klicken zum Umbenennen"'}>${who}${esc(t.title)}</span>` +
-    `<span class="tctl">` + (kind==='task' ? whoSel + `<button type="button" class="pill st s-${k}" data-act="cycle" title="Status wechseln"${dis}>${LBL[k]}</button><button type="button" class="pill p-${esc(t.prio)}" data-act="prio" title="Priorität wechseln"${dis}>${esc(t.prio)}</button><button type="button" class="star${t.today ? ' on' : ''}" data-act="today" aria-pressed="${!!t.today}" aria-label="${esc(t.title)}: für heute vormerken" title="${t.today ? 'Aus „Heute“ entfernen' : 'Für heute vormerken'}"${dis}>${STAR_SVG}</button>`
+    `<span class="tctl">` + (kind==='task' ? due + whoSel + `<button type="button" class="pill st s-${k}" data-act="cycle" title="Status wechseln"${dis}>${LBL[k]}</button><button type="button" class="pill p-${esc(t.prio)}" data-act="prio" title="Priorität wechseln"${dis}>${esc(t.prio)}</button><button type="button" class="star${t.today ? ' on' : ''}" data-act="today" aria-pressed="${!!t.today}" aria-label="${esc(t.title)}: für heute vormerken" title="${t.today ? 'Aus „Heute“ entfernen' : 'Für heute vormerken'}"${dis}>${STAR_SVG}</button>`
                    : `<span class="date">${t.date ? fmtDate(t.date) : 'ohne Datum'}</span>`) +
     `<button type="button" class="del" data-act="del" aria-label="${esc(t.title)} entfernen" title="Entfernen – landet im Notion-Papierkorb"${dis}>${TRASH_SVG}</button></span></li>`;
 }
@@ -2002,6 +2083,19 @@ function renderDetailHere(){
   const html = here.length ? `<div class="here">${here.map(id => `<span><i style="background:${A[id].color}"></i>${esc(A[id].name)} · ${esc(st[id].status==='walk' ? 'unterwegs' : st[id].task)}</span>`).join('')}</div>` : `<div class="empty">Gerade arbeitet keine KI hier.${mode==='demo' ? ' (Demo-Modus)' : ''}</div>`;
   if (el.innerHTML !== html) el.innerHTML = html;
 }
+const CAL_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>';
+// Fälligkeit bearbeiten: Datumsfeld an Stelle des Chips; leer = Fälligkeit entfernen
+function startDue(btn, item){
+  const input = document.createElement('input');
+  input.type = 'date'; input.className = 'ttl-in due-in'; input.value = item.due || ''; input.setAttribute('aria-label', `${item.title}: fällig am (leer lassen = ohne Fälligkeit)`);
+  btn.replaceWith(input); input.focus(); try { input.showPicker(); } catch {}
+  let done = false, tm = 0;
+  const finish = save => { if (done) return; done = true; clearTimeout(tm); const v = input.value; input.remove();
+    if (save && v !== (item.due || '')) setDue(item, v); else { renderDetailLists(); refreshSheet(); } };
+  input.addEventListener('change', () => { clearTimeout(tm); tm = setTimeout(() => finish(true), 900); });
+  input.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); finish(true); } else if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); finish(false); } });
+  input.addEventListener('blur', () => finish(true));
+}
 function startRename(li, item, kind){
   const span = li.querySelector('.ttl'), input = document.createElement('input');
   input.className = 'ttl-in'; input.value = item.title; input.maxLength = 200; input.setAttribute('aria-label', kind==='task' ? 'Aufgabe umbenennen' : 'Meilenstein umbenennen');
@@ -2015,6 +2109,11 @@ function startRename(li, item, kind){
 $('#info').addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
   if (b.dataset.act === 'reconnect'){ live.denied = false; refreshLive(); return; }
+  if (b.dataset.act === 'free'){
+    if (!canEdit()) return;
+    if (!b.classList.contains('arm')){ b.classList.add('arm'); const txt = b.textContent; b.textContent = 'Wirklich freigeben? Nochmal klicken'; setTimeout(() => { if (b.isConnected){ b.classList.remove('arm'); b.textContent = txt; } }, 4000); return; }
+    releasePlot(P[detailId]); return;
+  }
   const li = b.closest('.trow'); if (!li || !canEdit()) return;
   const pr = P[detailId], kind = li.dataset.k, list = kind==='task' ? pr.tasks : pr.milestones, item = (kind==='task' ? shownTasks : shownMs)[+li.dataset.i];
   if (!item || !item.id) return;
@@ -2022,6 +2121,7 @@ $('#info').addEventListener('click', e => {
   if (act === 'toggle'){ const v = isDone(item) ? 'Nicht begonnen' : 'Erledigt'; setStatus(item, v, v==='Erledigt' ? 'Abhaken' : 'Wieder öffnen', b); }
   else if (act === 'cycle'){ const v = { 'Nicht begonnen':'In Bearbeitung', 'In Bearbeitung':'Erledigt', 'Erledigt':'Nicht begonnen' }[item.status] || 'Nicht begonnen'; setStatus(item, v, 'Status', b); }
   else if (act === 'today') setToday(item, !item.today);
+  else if (act === 'due') startDue(b, item);
   else if (act === 'prio'){ const v = { Hoch:'Mittel', Mittel:'Niedrig', Niedrig:'Hoch' }[item.prio] || 'Mittel'; setField(item, 'prio', v, 'Priorität', { 'Priorität':v }); }
   else if (act === 'rename') startRename(li, item, kind);
   else if (act === 'del'){
@@ -2029,11 +2129,21 @@ $('#info').addEventListener('click', e => {
     removeItem(list, item, 'Entfernen');
   }
 });
+// Bauplatz freigeben: Notion-Feld „Bauplatz“ leeren; das Projekt bleibt in Notion, verschwindet aber aus dem Dorf
+function releasePlot(pr){
+  if (!pr || !pr.dyn || !pr.notion) return;
+  const slot = pr.slot, nid = pr.notion, name = pr.name;
+  closeDetail();
+  clearPlots(new Set(PROJECTS.filter(p => p.dyn && p !== pr).map(p => p.id))); delete sitBuild[slot];
+  buildLabels(); placeLabels(); select('plot' + slot); changed();
+  write('Bauplatz freigeben', () => updProps(nid, { Bauplatz:null }), null) // bei Fehler holt das Neuladen den alten Stand zurück
+    .then(() => { if (!PROJECTS.some(p => p.notion === nid)) toastMsg(`Bauplatz ${slot} ist wieder frei. „${name}“ bleibt in Notion erhalten.`); });
+}
 $('#info').addEventListener('keydown', e => { const t = e.target.closest && e.target.closest('.ttl[tabindex]'); if (t && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); t.click(); } });
 $('#info').addEventListener('submit', e => {
   e.preventDefault(); if (!canEdit()) return;
   const f = e.target, pr = P[detailId], title = f.elements.t.value.trim(); if (!title) return;
-  if (f.id === 'dAddT') addTask(pr, title, f.elements.p.value); else addMilestone(pr, title, f.elements.d.value);
+  if (f.id === 'dAddT') addTask(pr, title, f.elements.p.value, f.elements.d.value); else addMilestone(pr, title, f.elements.d.value);
   f.elements.t.value = ''; if (f.elements.d) f.elements.d.value = ''; f.elements.t.focus();
 });
 // Zuständige KI setzen (Notion-Feld „Zuständige KI“). Im echten Stand läuft die KI zu Aufgaben „In Bearbeitung“.
@@ -2047,7 +2157,7 @@ function setWho(item, id){
 $('#info').addEventListener('change', e => {
   if (e.target.matches('[data-who]')){ const li = e.target.closest('.trow'); if (canEdit() && li) setWho(shownTasks[+li.dataset.i], e.target.value); return; }
   if (!canEdit()) return; const pr = P[detailId], el = e.target;
-  if (el.id === 'dStatus' && el.value !== pr.status){ const prev = pr.status; pr.status = el.value; buildLabels(); placeLabels(); write('Projektstatus', () => updProps(pr.notion, { Status:pr.status }), () => { pr.status = prev; buildLabels(); placeLabels(); if (detailId) renderDetail(); }); }
+  if (el.id === 'dStatus' && el.value !== pr.status){ const prev = pr.status; pr.status = el.value; buildLabels(); placeLabels(); if (pr.status === 'Erledigt') celebrateProject(pr); else firedProj.delete(pr.id); renderDetail(true); write('Projektstatus', () => updProps(pr.notion, { Status:pr.status }), () => { pr.status = prev; buildLabels(); placeLabels(); if (detailId) renderDetail(); }); }
   if (el.id === 'dDesc' && el.value.trim() !== (pr.desc || '')){ const prev = pr.desc, v = el.value.trim(); pr.desc = v; write('Beschreibung', () => updProps(pr.notion, { Beschreibung:v }), () => { pr.desc = prev; if (detailId) renderDetail(); }); }
   if (el.id === 'dProg'){ const raw = el.value.trim(), v = raw === '' ? null : clamp(Math.round(+raw), 0, 100); if (raw !== '' && !Number.isFinite(+raw)) { el.value = pr.progress ?? ''; return; }
     if (v !== pr.progress){ const prev = pr.progress; pr.progress = v; el.value = v ?? ''; buildLabels(); placeLabels(); write('Fortschritt', () => updProps(pr.notion, { 'Fortschritt Prozent':v }), () => { pr.progress = prev; buildLabels(); placeLabels(); if (detailId) renderDetail(); }); } }
@@ -2080,7 +2190,7 @@ function toastMsg(txt){ toast.textContent = txt; toast.classList.add('show'); cl
 /* =========================================================
    Zeit & Sonne (Zypern): echte Sonnenauf- und -untergangszeiten
    ========================================================= */
-const cyToday = () => new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'Asia/Nicosia'}).format(new Date());
+const cyFmt = new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'Asia/Nicosia'}), cyToday = () => cyFmt.format(new Date());
 const addDays = (iso, n) => new Date(Date.parse(iso + 'T12:00:00Z') + n*864e5).toISOString().slice(0,10);
 function tzOffsetHours(tz, d){ const loc = new Date(d.toLocaleString('en-US',{timeZone:tz})), utc = new Date(d.toLocaleString('en-US',{timeZone:'UTC'})); return (loc - utc)/36e5; }
 function sunTimes(date, lat = 34.68, lon = 33.04){ // NOAA-Näherung, Ergebnis in zyprischer Ortszeit (Stunden)
@@ -2204,17 +2314,17 @@ function renderToday(){
   const all = PROJECTS.flatMap(p => p.tasks.map(t => [t, p]));
   const flagged = all.filter(([t]) => t.today).sort((a,b) => (isDone(a[0]) - isDone(b[0])) || byOrder(a[0], b[0]));
   const free = Math.max(0, 3 - flagged.length);
-  const sugg = all.filter(([t]) => !t.today && !isDone(t)).sort((a,b) => byOrder(a[0], b[0])).slice(0, free);
+  const sugg = all.filter(([t]) => !t.today && !isDone(t)).sort((a,b) => dueRank(a[0]) - dueRank(b[0]) || byOrder(a[0], b[0])).slice(0, free);
   todayItems = [...flagged, ...sugg];
   const done = flagged.filter(([t]) => isDone(t)).length, ed = canEdit(), dis = ed ? '' : ' disabled';
   const date = new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',timeZone:'Asia/Nicosia'}).format(new Date());
   let h = `<h3>Heute <small>${esc(date)}${flagged.length ? ` · ${done} von ${flagged.length} geschafft` : ''}</small></h3>`;
   if (flagged.length && done === flagged.length) h += `<div class="goal">Tagesziel geschafft. Stark!</div>`;
   h += `<ul class="tlist">` + todayItems.map(([t, p], i) => {
-    const pin = i < flagged.length, k = stKey(t.status);
+    const pin = i < flagged.length, k = stKey(t.status), di = dueInfo(t);
     return `<li class="trow tday st-${k}${pin ? '' : ' sugg'}${t.pending ? ' pending' : ''}" data-ti="${i}">` +
       (pin ? `<button type="button" class="chk" data-tact="toggle" aria-pressed="${k==='done'}" aria-label="${esc(t.title)}: ${k==='done' ? 'wieder öffnen' : 'als erledigt markieren'}"${dis || (t.id ? '' : ' disabled')}></button>` : `<span class="sugg-ic" aria-hidden="true">${STAR_SVG}</span>`) +
-      `<span class="ttl">${esc(t.title)}<small class="pj ${p.group==='sb' ? 'sb' : ''}">${pin ? '' : 'Vorschlag · '}${esc(p.name)}</small></span>` +
+      `<span class="ttl">${esc(t.title)}<small class="pj ${p.group==='sb' ? 'sb' : ''}">${pin ? '' : 'Vorschlag · '}${di ? `<b class="due-tx ${di.cls}">${di.txt}</b> · ` : ''}${esc(p.name)}</small></span>` +
       (pin ? `<button type="button" class="pill" data-tact="unpin" title="Aus „Heute“ entfernen" aria-label="${esc(t.title)} aus Heute entfernen"${dis}>×</button>` : `<button type="button" class="pill" data-tact="pin" title="Für heute vormerken"${dis}>+ Heute</button>`) + `</li>`;
   }).join('') + `</ul>`;
   if (!todayItems.length) h += `<div class="empty">Keine offenen Aufgaben. Genieß den Tag.</div>`;
@@ -2271,6 +2381,12 @@ function drawFw(c, list, X, Y, s, glowFn, k = 1){
     else { const a = Math.max(0, f.life); glowFn(X(f.x), Y(f.y), ((3 + 4*a)*s + 1)*k, f.col, a); } }
   c.globalCompositeOperation = 'source-over';
 }
+const firedProj = new Set();
+function celebrateProject(pr){
+  firedProj.add(pr.id); sfxChime();
+  if (detailId === pr.id){ fireworksScene(); pendingFw.push(pr.id); } else fireworksWorld(pr.id);
+  toastMsg(`Projekt abgeschlossen: ${pr.name}. Glückwunsch!${pr.dyn ? ' Den Bauplatz kannst du in der Detailansicht freigeben.' : ''}`);
+}
 function reward(item, el){
   const p = projOf(item), color = p && p.group === 'sb' ? '#f4c86a' : '#62d69c';
   burstAt(el, color); sfxChime();
@@ -2300,11 +2416,13 @@ function renderReview(){
   const doneWeek = rows.filter(([t]) => isDone(t) && t.doneAt && t.doneAt >= a && t.doneAt <= b).sort((x,y) => x[0].doneAt.localeCompare(y[0].doneAt));
   const noDate = rows.filter(([t]) => isDone(t) && !t.doneAt).length;
   const running = rows.filter(([t]) => t.status === 'In Bearbeitung'), high = rows.filter(([t]) => !isDone(t) && t.prio === 'Hoch');
+  const overdue = rows.filter(([t]) => dueRank(t) === 0).sort((x,y) => x[0].due.localeCompare(y[0].due)), dueSoon = rows.filter(([t]) => { const d = dueDays(t); return d !== null && d >= 0 && d <= 7; }).sort((x,y) => x[0].due.localeCompare(y[0].due));
   const soon = ms.filter(([m]) => !isDone(m) && m.date && m.date >= today && m.date <= addDays(today, 14)), late = ms.filter(([m]) => !isDone(m) && m.date && m.date < today);
   let h = `<div class="eyebrow">Wochenrückblick${cur ? ' · diese Woche' : ''}</div><div class="rv-head"><button type="button" class="pill" data-rv="-1" aria-label="Vorherige Woche">‹</button><h2 id="rvTitle">KW ${isoWeek(a)} · ${dm(a)}–${dm(b)}${b.slice(0,4)}</h2><button type="button" class="pill" data-rv="1" aria-label="Nächste Woche"${cur ? ' disabled' : ''}>›</button></div>`;
   h += `<p class="note" style="margin:0">${live.ok ? 'Live aus Notion.' : 'Offline-Stand vom 30.09.2026.'} „Erledigt am“ wird beim Abhaken im Dashboard gesetzt.</p>`;
   h += `<div class="kpis rv-k"><div class="kpi"><b>${doneWeek.length}</b><span>erledigt in dieser Woche</span></div><div class="kpi"><b>${running.length}</b><span>in Bearbeitung${cur ? '' : ' (heute)'}</span></div><div class="kpi"><b>${high.length}</b><span>offen, Prio hoch</span></div><div class="kpi"><b>${soon.length}</b><span>Meilensteine in 14 Tagen</span></div></div>`;
-  h += `<section><h3>Erledigt</h3>${rvList(doneWeek, t => dm(t.doneAt))}${noDate ? `<p class="note">${noDate} erledigte Aufgaben von früher haben noch kein Erledigt-Datum und fehlen deshalb hier.</p>` : ''}</section>`;
+  h += `<section><h3>Erledigt</h3>${rvList(doneWeek, t => dm(t.doneAt))}${noDate ? `<p class="note">${noDate === 1 ? 'Eine erledigte Aufgabe von früher hat' : noDate + ' erledigte Aufgaben von früher haben'} noch kein Erledigt-Datum und ${noDate === 1 ? 'fehlt' : 'fehlen'} deshalb hier.</p>` : ''}</section>`;
+  h += `<section><h3>Fällige Aufgaben <small>Stand heute</small></h3>${overdue.length ? `<p class="note warn">Überfällig</p>${rvList(overdue, t => dm(t.due))}` : ''}${dueSoon.length ? rvList(dueSoon, t => dueDays(t) === 0 ? 'heute' : dm(t.due)) : overdue.length ? '' : '<div class="empty">In den nächsten 7 Tagen ist keine Aufgabe fällig. Fälligkeiten setzt du über das Kalender-Symbol an jeder Aufgabe.</div>'}</section>`;
   h += `<section><h3>Läuft gerade</h3>${rvList(running)}</section>`;
   h += `<section><h3>Offen mit Priorität Hoch</h3>${rvList(high)}</section>`;
   h += `<section><h3>Meilensteine</h3>${late.length ? `<p class="note warn">Überfällig</p>${rvList(late, m => dm(m.date))}` : ''}${soon.length ? rvList(soon, m => dm(m.date)) : late.length ? '' : '<div class="empty">In den nächsten 14 Tagen ist kein Meilenstein fällig.</div>'}</section>`;
@@ -2368,8 +2486,8 @@ const prevMs = {};
    Menü-Ansichten: Projekte, Aufgaben, KI-Agenten, Automationen, Notion-Sync, Einstellungen
    ========================================================= */
 let sheetKind = null, sheetLast = null, sheetItems = [];
-const SHEETS = { 'Projekte':renderSheetProjects, 'Aufgaben':renderSheetTasks, 'KI-Agenten':renderSheetAgents, 'Automationen':renderSheetAuto, 'Notion-Sync':renderSheetSync, 'Einstellungen':renderSheetSettings };
-const taskFilter = Object.assign({ q:'', st:'offen', proj:'', prio:'', today:false }, (() => { try { return JSON.parse(store.get('atlas-tf') || '{}'); } catch { return {}; } })());
+const SHEETS = { 'Projekte':renderSheetProjects, 'Aufgaben':renderSheetTasks, 'KI-Agenten':renderSheetAgents, 'Automationen':renderSheetAuto, 'Notion-Sync':renderSheetSync, 'Einstellungen':renderSheetSettings, 'Tastenkürzel':renderSheetKeys };
+const taskFilter = Object.assign({ q:'', st:'offen', proj:'', prio:'', due:'', today:false }, (() => { try { return JSON.parse(store.get('atlas-tf') || '{}'); } catch { return {}; } })());
 const KI_PAGE = Object.fromEntries(Object.entries(KI_OF).map(([pid, id]) => [id, pid]));
 const DASH_PAGE = '3dcf5a8714b381ea9fb4cb0810a51f7e', HUB_PAGE = '3ebf5a8714b381a68331f37170907e4c';
 function navCurrent(k){ document.querySelectorAll('[data-nav]').forEach(b => b.dataset.nav === k ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')); }
@@ -2405,7 +2523,7 @@ function renderSheetProjects(){
     h += `<button type="button" class="pcard" data-proj="${pr.id}"><img src="${thumbOf(pr.id)}" alt="" width="320" height="190"><span class="pc-b">` +
       `<span class="eyebrow">${esc(pr.building)}</span><b>${esc(pr.name)}</b><span class="chips"><span class="chip ${statusClass(pr.status)}">${esc(pr.status)}</span>${pr.group === 'sb' ? '<span class="chip grp-sb">SternenBücher</span>' : ''}</span>` +
       (pg !== null ? `<span class="meter" style="margin-top:0"><span class="bar ${pr.group==='sb'?'sb':''}"><i style="width:${pg}%"></i></span><small>${pg} % Fortschritt</small></span>` : '') +
-      `<small class="pc-meta">${open.length} offen · ${open.filter(t => t.prio === 'Hoch').length} hoch · ${msOpen} ${msOpen === 1 ? 'Meilenstein' : 'Meilensteine'} offen</small>` +
+      `<small class="pc-meta">${open.length} offen · ${open.filter(t => t.prio === 'Hoch').length} hoch · ${msOpen} ${msOpen === 1 ? 'Meilenstein' : 'Meilensteine'} offen${(n => n ? ` · <b class="due-tx late">${n} überfällig</b>` : '')(open.filter(t => dueRank(t) === 0).length)}</small>` +
       (here.length ? `<span class="here-dots">${here.map(a => `<i style="background:${A[a].color}" title="${esc(A[a].name)}"></i>`).join('')}<small>${here.map(a => esc(A[a].name)).join(', ')}</small></span>` : '') + `</span></button>`;
   }
   $('#shBody').innerHTML = h + `</div>`;
@@ -2420,8 +2538,9 @@ function renderSheetTasks(){
     `<div class="seg" role="group" aria-label="Status">${[['offen','Offen'],['run','In Arbeit'],['done','Erledigt'],['alle','Alle']].map(([k,l]) => `<button type="button" data-tf-st="${k}" aria-pressed="${f.st === k}">${l}</button>`).join('')}</div>` +
     `<select class="sel" id="tfProj" aria-label="Projekt"><option value="">Alle Projekte</option>${PROJECTS.map(p => `<option value="${p.id}"${f.proj === p.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</select>` +
     `<select class="sel" id="tfPrio" aria-label="Priorität"><option value="">Jede Priorität</option>${['Hoch','Mittel','Niedrig'].map(x => `<option${f.prio === x ? ' selected' : ''}>${x}</option>`).join('')}</select>` +
+    `<select class="sel" id="tfDue" aria-label="Fälligkeit">${[['','Jede Fälligkeit'],['late','Überfällig'],['week','Fällig in 7 Tagen'],['set','Mit Fälligkeit']].map(([k,l]) => `<option value="${k}"${f.due === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` +
     `<label class="tf-today"><input type="checkbox" id="tfToday"${f.today ? ' checked' : ''}> nur Heute</label></div>` +
-    (ed ? `<form class="add tf-add" id="tfAdd"><input class="inp" name="t" placeholder="Neue Aufgabe …" maxlength="200" required aria-label="Neue Aufgabe"><select class="sel" name="p" aria-label="Projekt">${PROJECTS.map(p => `<option value="${p.id}"${(f.proj || 'atlas') === p.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</select><select class="sel" name="r" aria-label="Priorität"><option>Hoch</option><option selected>Mittel</option><option>Niedrig</option></select><button class="btn pri" type="submit">Hinzufügen</button></form>`
+    (ed ? `<form class="add tf-add" id="tfAdd"><input class="inp" name="t" placeholder="Neue Aufgabe …" maxlength="200" required aria-label="Neue Aufgabe"><select class="sel" name="p" aria-label="Projekt">${PROJECTS.map(p => `<option value="${p.id}"${(f.proj || 'atlas') === p.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</select><select class="sel" name="r" aria-label="Priorität"><option>Hoch</option><option selected>Mittel</option><option>Niedrig</option></select><input class="inp" name="d" type="date" aria-label="Fällig am (optional)" title="Fällig am (optional)"><button class="btn pri" type="submit">Hinzufügen</button></form>`
         : `<div class="ro">Nur Ansicht: Bearbeiten klappt, wenn du das Dashboard in Claude öffnest und Notion erlaubst.</div>`) +
     `<p class="note" id="tfCount" aria-live="polite"></p><div id="tfList"></div>`;
   renderTaskList();
@@ -2429,7 +2548,7 @@ function renderSheetTasks(){
 function renderTaskList(){
   const el = $('#tfList'); if (!el || document.querySelector('#sheet .ttl-in')) return;
   const f = taskFilter, q = f.q.trim().toLowerCase();
-  const rows = PROJECTS.flatMap(p => p.tasks.map(t => [t, p])).filter(([t, p]) => (!f.proj || p.id === f.proj) && (!f.prio || t.prio === f.prio) && (!f.today || t.today) && (!q || t.title.toLowerCase().includes(q)) && (f.st === 'alle' || (f.st === 'offen' ? !isDone(t) : stKey(t.status) === f.st)));
+  const rows = PROJECTS.flatMap(p => p.tasks.map(t => [t, p])).filter(([t, p]) => (!f.proj || p.id === f.proj) && (!f.prio || t.prio === f.prio) && (!f.today || t.today) && (!f.due || (f.due === 'set' ? !!t.due : f.due === 'late' ? dueDays(t) !== null && dueDays(t) < 0 : dueDays(t) !== null && dueDays(t) <= 7)) && (!q || t.title.toLowerCase().includes(q)) && (f.st === 'alle' || (f.st === 'offen' ? !isDone(t) : stKey(t.status) === f.st)));
   sheetItems = rows;
   const groups = PROJECTS.map(p => [p, rows.filter(r => r[1] === p).sort((a,b) => byOrder(a[0], b[0]))]).filter(g => g[1].length);
   $('#tfCount').textContent = `${rows.length} ${rows.length === 1 ? 'Aufgabe' : 'Aufgaben'}${f.st === 'offen' ? ' offen' : ''}`;
@@ -2495,6 +2614,24 @@ function renderSheetSync(){
   paintSync();
 }
 
+// ---------- Tastenkürzel ----------
+const KEYS = [['/','Suchen: im Dorf, in „Aufgaben“ in der Aufgabenliste'], ['P','Projekte'], ['A','Aufgaben'], ['R','Wochenrückblick'], ['K','KI-Agenten'], ['N','Notion-Sync'], ['E','Einstellungen'], ['Esc','Offene Ansicht schließen'], ['?','Diese Hilfe']];
+const KEY_VIEW = { p:'Projekte', a:'Aufgaben', k:'KI-Agenten', n:'Notion-Sync', e:'Einstellungen', '?':'Tastenkürzel' };
+function renderSheetKeys(){
+  $('#shBody').innerHTML = head('Hilfe', 'Tastenkürzel', 'Funktionieren überall, solange du nicht gerade in ein Feld tippst.') +
+    `<ul class="alist keys">${KEYS.map(([k, l]) => `<li><kbd>${esc(k)}</kbd><b>${esc(l)}</b></li>`).join('')}</ul>`;
+}
+function closeViews(keep){ if (detailId) closeDetail(); if (keep !== 'review' && !$('#review').hidden) closeReview(); if (keep !== 'sheet' && sheetKind) closeSheet(); }
+document.addEventListener('keydown', e => {
+  if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+  const t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+  const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  if (k === '/'){ e.preventDefault(); if (sheetKind === 'Aufgaben' && $('#tfQ')){ $('#tfQ').focus(); return; } closeViews(); $('#q').focus(); $('#q').select(); return; }
+  if (k === 'r'){ e.preventDefault(); closeViews('review'); if ($('#review').hidden) openReview(); return; }
+  if (!KEY_VIEW[k]) return;
+  e.preventDefault(); closeViews('sheet'); openSheet(KEY_VIEW[k]);
+});
+
 // ---------- Einstellungen ----------
 function renderSheetSettings(){
   const pm = store.get('atlas-mode') || '';
@@ -2506,13 +2643,14 @@ function renderSheetSettings(){
     `<div class="fld"><span>Geräusche</span><div class="seg" role="group" aria-label="Geräusche"><button type="button" data-st-snd="1" aria-pressed="${snd.on}">An</button><button type="button" data-st-snd="0" aria-pressed="${!snd.on}">Aus</button></div></div>` +
     `<label class="fld"><span>KI-Figuren beim Öffnen</span><select class="sel" id="stMode"><option value=""${pm ? '' : ' selected'}>Automatisch</option><option value="real"${pm === 'real' ? ' selected' : ''}>Echter Stand</option><option value="demo"${pm === 'demo' ? ' selected' : ''}>Demo</option></select></label>` +
     `</div><p class="note">Weniger Bewegung richtet sich nach der Einstellung deines Geräts (Bewegung reduzieren).</p>` +
-    `<div class="btns"><button type="button" class="btn" id="stReset">Einstellungen zurücksetzen</button></div>`;
+    `<div class="btns"><button type="button" class="btn" id="stReset">Einstellungen zurücksetzen</button><button type="button" class="btn" id="stKeys">Tastenkürzel anzeigen</button></div>`;
 }
 $('#shBody').addEventListener('change', e => {
   const el = e.target;
   if (el.matches('[data-who]')){ const li = el.closest('.trow'), pair = li && sheetItems[+li.dataset.i]; if (canEdit() && pair) setWho(pair[0], el.value); return; }
   if (el.id === 'tfProj'){ taskFilter.proj = el.value; saveFilter(); renderTaskList(); if ($('#tfAdd')) $('#tfAdd').elements.p.value = el.value || 'atlas'; }
   else if (el.id === 'tfPrio'){ taskFilter.prio = el.value; saveFilter(); renderTaskList(); }
+  else if (el.id === 'tfDue'){ taskFilter.due = el.value; saveFilter(); renderTaskList(); }
   else if (el.id === 'tfToday'){ taskFilter.today = el.checked; saveFilter(); renderTaskList(); }
   else if (el.id === 'stCity'){ $('#wxCity').value = el.value; $('#wxCity').dispatchEvent(new Event('change')); }
   else if (el.id === 'stMode'){ store.set('atlas-mode', el.value); if (el.value){ modePicked = true; setMode(el.value); } toastMsg('Gespeichert.'); }
@@ -2522,7 +2660,7 @@ $('#shBody').addEventListener('input', e => { if (e.target.id === 'tfQ'){ taskFi
 $('#shBody').addEventListener('submit', e => {
   e.preventDefault(); if (e.target.id !== 'tfAdd' || !canEdit()) return;
   const f = e.target, title = f.elements.t.value.trim(); if (!title) return;
-  addTask(P[f.elements.p.value] || P.atlas, title, f.elements.r.value); f.elements.t.value = ''; f.elements.t.focus(); renderTaskList();
+  addTask(P[f.elements.p.value] || P.atlas, title, f.elements.r.value, f.elements.d.value); f.elements.t.value = ''; f.elements.d.value = ''; f.elements.t.focus(); renderTaskList();
 });
 $('#shBody').addEventListener('click', e => {
   const t = e.target;
@@ -2534,6 +2672,7 @@ $('#shBody').addEventListener('click', e => {
   const sd = t.closest('[data-st-tod]'); if (sd){ document.querySelector(`[data-tod="${sd.dataset.stTod}"]`).click(); renderSheet(); return; }
   const ss = t.closest('[data-st-snd]'); if (ss){ if ((ss.dataset.stSnd === '1') !== snd.on) $('#sndBtn').click(); renderSheet(); return; }
   if (t.id === 'syncNow'){ refreshLive(); return; }
+  if (t.id === 'stKeys'){ openSheet('Tastenkürzel'); return; }
   if (t.id === 'stReset'){ for (const k of ['atlas-city','atlas-wxsrc','atlas-sound','atlas-tf','atlas-mode','atlas-rv-seen']) { try { localStorage.removeItem(k); } catch {} } toastMsg('Zurückgesetzt. Gilt ab dem nächsten Öffnen.'); return; }
   // Aufgabenzeilen: gleiche Aktionen wie in der Detailansicht
   const b = t.closest('[data-act]'); if (!b || b.disabled || !canEdit()) return;
@@ -2545,6 +2684,7 @@ $('#shBody').addEventListener('click', e => {
   else if (act === 'cycle'){ const v = { 'Nicht begonnen':'In Bearbeitung', 'In Bearbeitung':'Erledigt', 'Erledigt':'Nicht begonnen' }[item.status] || 'Nicht begonnen'; setStatus(item, v, 'Status', b); }
   else if (act === 'prio'){ const v = { Hoch:'Mittel', Mittel:'Niedrig', Niedrig:'Hoch' }[item.prio] || 'Mittel'; setField(item, 'prio', v, 'Priorität', { 'Priorität':v }); }
   else if (act === 'today') setToday(item, !item.today);
+  else if (act === 'due') startDue(b, item);
   else if (act === 'rename') startRename(li, item, 'task');
   else if (act === 'del'){
     if (!b.classList.contains('arm')){ b.classList.add('arm'); b.textContent = 'Entfernen?'; setTimeout(() => { if (b.isConnected){ b.classList.remove('arm'); b.innerHTML = TRASH_SVG; } }, 3500); return; }
