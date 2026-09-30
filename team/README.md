@@ -5,7 +5,7 @@ Claude Code ist der **Dirigent**: Er nimmt Flos Auftrag an, verteilt Teilaufgabe
 | Mitglied | Rolle | Anbindung | Stand |
 |---|---|---|---|
 | Claude Code | Dirigent, Code, Zusammenführung | läuft hier | aktiv |
-| Gemini | Recherche, Texte, Bilder | `team/gemini.sh` – Schlüssel als API-Credential (oder `GEMINI_API_KEY`) | bereit, wartet auf Schlüssel |
+| Gemini | Recherche, Texte (Bilder erst mit Abrechnung) | `team/gemini.sh` – Schlüssel als API-Credential (oder `GEMINI_API_KEY`) | aktiv für Text (getestet 30.09.2026) |
 | ChatGPT | Zweitmeinung, Bilder, Codex-Aufgaben | Codex CLI (ChatGPT-Plus-Login) oder OpenAI-API | geplant – Netzwerkfreigabe für `api.openai.com` und `auth.openai.com` nötig |
 | Claude (App) | Konzept & Texte im Chat mit Flo | Notion-Konnektor | manuell / One-Klick |
 
@@ -23,6 +23,14 @@ Claude Code ist der **Dirigent**: Er nimmt Flos Auftrag an, verteilt Teilaufgabe
 ./team/gemini.sh text  "Recherchiere …"
 ./team/gemini.sh image "Pixel-Art Dorf …" assets/karte.png
 ```
+
+Das Skript nimmt das neueste passende Flash-Modell. Ist es überlastet (503), abgeschaltet (404) oder das Kontingent erschöpft (429), versucht es automatisch die nächsten zwei.
+
+## Teststand (30.09.2026)
+
+- Schlüssel kommt über das API-Credential an, Modellliste abrufbar.
+- **Text:** funktioniert im Free Tier. `gemini-3.8-flash` und `gemini-3.7-flash` meldeten beim Test 503 (Überlast), `gemini-3.6-flash` antwortete.
+- **Bilder:** im Free Tier gesperrt (Google meldet Limit 0 für alle Bildmodelle). Erst nutzbar, wenn im Google-AI-Studio-Projekt die Abrechnung aktiviert ist.
 
 ## Regeln
 
