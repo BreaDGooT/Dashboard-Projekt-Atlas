@@ -411,7 +411,7 @@ body.detail-open{overflow:hidden}
 .trow.pending button{pointer-events:none}
 .trow.ms{grid-template-columns:22px minmax(0,1fr) auto}
 @container (max-width:560px){ .trow:not(.tday):not(.ms){grid-template-columns:22px minmax(0,1fr)} .trow:not(.tday):not(.ms) .tctl{grid-column:2;flex-wrap:wrap} }
-.whosel{font:inherit;font-family:var(--f-ui);font-size:11px;font-weight:600;color:var(--fg-3);background:rgba(9,16,22,.5);border:1px solid var(--line-2);border-radius:99px;padding:2px 4px;max-width:92px;cursor:pointer}
+.whosel{font:inherit;font-family:var(--f-ui);font-size:11px;font-weight:600;color:var(--fg-3);background:rgba(9,16,22,.5);border:1px solid var(--line-2);border-radius:99px;padding:2px 4px;max-width:128px;cursor:pointer}
 .whosel:disabled{cursor:default;opacity:.7}
 .whosel:focus{outline:none;border-color:var(--core)}
 .chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--fg-3);background:none;cursor:pointer;display:grid;place-items:center;padding:0}
@@ -485,6 +485,9 @@ body.detail-open{overflow:hidden}
   .hud-core .t{display:none}
 }
 @media (max-width:560px){
+  .top-right .ctl:has([data-tod]){display:none}
+  .top-right{gap:8px}
+  .clock b{font-size:18px}
   .hello h2{font-size:18px}
   .hud-stat{min-width:44px}
   .hud-stat b{font-size:16px}
@@ -527,7 +530,7 @@ body.detail-open{overflow:hidden}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v0.8 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
+      <small>Hybrid-Prototyp v0.9 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
     </div>
   </aside>
 
@@ -764,10 +767,10 @@ const AGENTS = [
 ];
 const A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
 const DEMO = {
-  claude:[['sb','Aszendenten-Textvarianten entwerfen'],['mkt','Content-Plan für Social Media skizzieren'],['seo','Keyword-Ideen ordnen'],['atlas','UI-Texte für die Panels schreiben'],['etsy','Listing-Texte formulieren']],
-  code:[['atlas','MVP: Notion-Anbindung bauen'],['sbweb','Website-Grundgerüst aufsetzen'],['digi','Download-Seite prototypen'],['sbshop','Shop-Anbindung vorbereiten']],
-  gpt:[['sbshop','Produktfoto-Konzept erstellen'],['etsy','Mockups für Listings entwerfen'],['mkt','Post-Grafiken entwerfen'],['atlas','Konzeptbilder für Häuser erstellen'],['drop','Produktideen sammeln']],
-  gem:[['sb','Szene 9: Sternmuster korrigieren'],['sb','Szene 10 illustrieren'],['seo','Wettbewerber recherchieren'],['drop','Lieferanten vergleichen'],['atlas','Prototyp mit Moodboard abgleichen']],
+  claude:[['sb','Aszendenten-Textvarianten entwerfen'],['sb','Szene 10 ausarbeiten'],['mkt','Content-Plan skizzieren'],['atlas','UI-Texte für die Panels schreiben'],['etsy','Listing-Texte formulieren']],
+  code:[['atlas','MVP: Notion-Anbindung bauen'],['digi','Download-Seite prototypen'],['sbshop','Shop-Anbindung vorbereiten'],['atlas','Dashboard prüfen']],
+  gpt:[['sbweb','Website-Aufbau entwerfen'],['sbweb','Startseiten-Texte schreiben'],['etsy','Mockups für Listings entwerfen'],['atlas','Konzeptbilder für Häuser erstellen']],
+  gem:[['seo','Wettbewerber recherchieren'],['drop','Lieferanten vergleichen'],['atlas','Prototyp mit Moodboard abgleichen'],['mkt','Trends recherchieren']],
 };
 
 /* =========================================================
@@ -893,12 +896,10 @@ const SMOKE_SRC = [[1233,66],[773,616]];
 let mode = 'demo', demoTimer = 0, lastPick = null;
 function applyReal(){
   if (live.ok && liveKI) return applyRealLive();
-  assign('code','atlas','work','Gebäude-Illustrationen in die Panels einbauen');
-  assign('gpt','atlas','work','Stiltest: Gebäude-Illustrationen');
-  for (const id of ['claude','gem']) assign(id,'home','unknown','');
+  for (const a of AGENTS) assign(a.id, 'home', 'unknown', ''); // ohne Notion-Verbindung kein verlässlicher Stand
 }
 function demoKick(){
-  const seq = [['code','atlas','MVP: Notion-Anbindung bauen'],['gem','sb','Szene 9: Sternmuster korrigieren'],['claude','sb','Aszendenten-Textvarianten entwerfen'],['gpt','etsy','Mockups für Listings entwerfen']];
+  const seq = [['code','atlas','MVP: Notion-Anbindung bauen'],['gem','seo','Wettbewerber recherchieren'],['claude','sb','Aszendenten-Textvarianten entwerfen'],['gpt','sbweb','Website-Aufbau entwerfen']];
   seq.forEach(([id,bid,task],k) => setTimeout(() => { if (mode==='demo') assign(id,bid,'work',task); }, reduceMotion ? 0 : 500 + k*1400));
 }
 function demoTick(dt){
@@ -918,7 +919,7 @@ function setMode(m){
   $('#modeBadge').classList.toggle('live', m==='real');
   $('#modeText').textContent = m==='demo'
     ? 'Demo: KI-Aktivität ist simuliert · Projekte & Aufgaben sind echte Notion-Daten'
-    : live.ok && liveKI ? `Echter Stand aus Notion „KI-Agenten“ · ${hhmm(live.at)}` : 'Echter Stand: Offline-Stand vom 30.09.2026';
+    : live.ok && liveKI ? `Echter Stand aus Notion „KI-Agenten“ · ${hhmm(live.at)}` : 'Echter Stand: ohne Notion-Verbindung nicht verfügbar';
   if (m==='real') applyReal(); else { demoTimer = 7; demoKick(); }
 }
 
@@ -1284,7 +1285,7 @@ function render(t){
   for (const a of order){ const s2 = st[a.id]; const key = s2.route.length ? a.id : s2.target; (groups[key] ||= []).push(a.id); }
   for (const key in groups){
     const baseY = Math.min(...groups[key].map(g => heads[g].y));
-    groups[key].filter(id => st[id].status !== 'off').forEach((id, k) => { const a = A[id], s2 = st[id]; tag(heads[id].x, baseY - k*19*dpr, s2.status==='unknown' ? a.name + ' · keine Meldung' : s2.status==='off' ? a.name + ' · offline' : a.name, a.color, s2.status==='work', t); });
+    groups[key].filter(id => st[id].status !== 'off' && (st[id].status === 'work' || st[id].status === 'walk' || hoverAgent === id || view.s >= fitS*1.3)).forEach((id, k) => { const a = A[id], s2 = st[id]; tag(heads[id].x, baseY - k*19*dpr, s2.status==='unknown' ? a.name + ' · keine Meldung' : s2.status==='off' ? a.name + ' · offline' : a.name, a.color, s2.status==='work', t); });
   }
 }
 
@@ -1393,7 +1394,7 @@ function renderAgents(){
   }).join('');
   $('#agentNote').textContent = mode==='demo'
     ? 'Demo-Modus: Wer wo arbeitet, ist simuliert, damit du die Bewegung siehst. Die Aufgaben stammen aus deinem Notion.'
-    : live.ok && liveKI ? 'Echter Stand: Eine KI arbeitet, wenn sie in „KI-Agenten“ auf „Arbeitet“ steht oder eine ihr zugewiesene Aufgabe „In Bearbeitung“ ist. Das Dorf aktualisiert sich alle 2 Minuten.' : 'Echter Stand: Offline-Stand vom 30.09.2026. Mit Notion-Verbindung kommt er live aus der Datenbank „KI-Agenten“.';
+    : live.ok && liveKI ? 'Echter Stand: Eine KI arbeitet, wenn sie in „KI-Agenten“ auf „Arbeitet“ steht oder eine ihr zugewiesene Aufgabe „In Bearbeitung“ ist. Das Dorf aktualisiert sich alle 2 Minuten.' : 'Ohne Notion-Verbindung ist der echte KI-Stand nicht bekannt. Öffne das Dashboard in Claude, dann kommt er live aus „KI-Agenten“.';
 }
 function renderSummary(){
   const all = PROJECTS.flatMap(p => p.tasks), done = all.filter(isDone).length;
@@ -1517,6 +1518,7 @@ const TRASH_PAGE = '3ebf5a8714b3811a80f8ff4d7426137c'; // „Papierkorb (aus dem
 const KI_OF = { '3ebf5a8714b381e3b511cc98927a6fe7':'gpt', '3ebf5a8714b381538de1d42c6ea5acb2':'gem', '3ebf5a8714b381768e8afd7db893a1b2':'claude', '3ebf5a8714b381f98616cf33b0166b43':'code' };
 const DENIED = ['not_in_manifest','consent_required','not_granted','needs_reauth','server_not_connected','selection_required','blocked_by_policy','approval_required','capability_disabled','capability_removed'];
 const live = { mcp:null, ok:false, denied:false, state:'off', msg:'', at:null, busy:0 };
+const plain = v => String(v || '').replace(/\[([^\]]+)\]\((?:https?|mailto):[^)]*\)/g, '$1').replace(/\*\*([^*]+)\*\*/g, '$1').trim();
 const idOf = u => { const m = /[0-9a-f]{32}/.exec(String(u || '').replace(/-/g, '')); return m ? m[0] : null; };
 const rel = v => { try { const a = typeof v === 'string' ? JSON.parse(v || '[]') : v; return Array.isArray(a) ? a.map(idOf).filter(Boolean) : []; } catch { return []; } };
 const canEdit = () => !!(live.mcp && live.ok && !live.denied);
@@ -1574,21 +1576,21 @@ function applyLive(projRows, taskRows, msRows){
   const keep = new Set();
   for (const r of projRows){ const m = /Bauplatz (\d)/.exec(r.Bauplatz || ''), nid = idOf(r.url); if (!m || PROJECTS.some(p => !p.dyn && p.notion === nid)) continue;
     const n = +m[1]; if (!PLOTS[n-1] || keep.has('bp' + n)) continue;
-    placeOnPlot(n, { name:r.Projektname || 'Neues Projekt', notion:nid, group:r.Bereich === 'SternenBücher' ? 'sb' : 'other', status:r.Status || 'Nicht begonnen' }); keep.add('bp' + n); }
+    placeOnPlot(n, { name:plain(r.Projektname) || 'Neues Projekt', notion:nid, group:r.Bereich === 'SternenBücher' ? 'sb' : 'other', status:r.Status || 'Nicht begonnen' }); keep.add('bp' + n); }
   clearPlots(keep);
   const byId = {}; for (const p of PROJECTS) if (p.notion) byId[p.notion] = p;
   for (const r of projRows){ const p = byId[idOf(r.url)]; if (!p) continue; // nur Projekte, die im Dorf ein Gebäude haben
-    if (r.Projektname) p.name = r.Projektname;
+    if (r.Projektname) p.name = plain(r.Projektname);
     if (r.Status) p.status = r.Status;
-    p.desc = r.Beschreibung || '';
+    p.desc = plain(r.Beschreibung);
     p.progress = typeof r['Fortschritt Prozent'] === 'number' ? r['Fortschritt Prozent'] : null; }
   for (const p of PROJECTS){ p.tasks = []; p.milestones = []; }
   for (const r of taskRows) for (const pid of rel(r.Projekt)){ const p = byId[pid]; if (!p) continue;
-    p.tasks.push({ id:idOf(r.url), title:r.Titel || '(ohne Titel)', status:r.Status || 'Nicht begonnen', prio:r['Priorität'] || 'Mittel', who:KI_OF[rel(r['Zuständige KI'])[0]] || null, today:r.Heute === '__YES__' || r.Heute === true, doneAt:r['date:Erledigt am:start'] || '' }); }
+    p.tasks.push({ id:idOf(r.url), title:plain(r.Titel) || '(ohne Titel)', status:r.Status || 'Nicht begonnen', prio:r['Priorität'] || 'Mittel', who:KI_OF[rel(r['Zuständige KI'])[0]] || null, today:r.Heute === '__YES__' || r.Heute === true, doneAt:r['date:Erledigt am:start'] || '' }); }
   const firstLoad = !live.ok;
   for (const r of msRows) for (const pid of rel(r.Projekt)){ const p = byId[pid]; if (!p) continue;
     const mid = idOf(r.url); if (!firstLoad && r.Status === 'Erledigt' && prevMs[mid] && prevMs[mid] !== 'Erledigt' && !firedMs.has(mid)){ firedMs.add(mid); fireworksWorld(p.id); } prevMs[mid] = r.Status;
-    p.milestones.push({ id:idOf(r.url), title:r.Titel || '(ohne Titel)', status:r.Status || 'Nicht begonnen', date:r['date:Zieldatum:start'] || '' }); }
+    p.milestones.push({ id:idOf(r.url), title:plain(r.Titel) || '(ohne Titel)', status:r.Status || 'Nicht begonnen', date:r['date:Zieldatum:start'] || '' }); }
   buildLabels(); placeLabels(); changed();
   if (detailId) renderDetail(true);
   refreshSheet();
@@ -2177,7 +2179,7 @@ $('#wxMenu').addEventListener('keydown', e => {
 let liveKI = null, modePicked = false;
 function applyKI(rows){
   liveKI = {};
-  for (const r of rows){ const id = KI_OF[idOf(r.url)]; if (!id) continue; liveKI[id] = { status:r.Status || 'Offline', task:r['Aktuelle Tätigkeit'] || '', projects:rel(r['Arbeitet an']) }; }
+  for (const r of rows){ const id = KI_OF[idOf(r.url)]; if (!id) continue; liveKI[id] = { status:r.Status || 'Offline', task:plain(r['Aktuelle Tätigkeit']), projects:rel(r['Arbeitet an']), role:plain(r['Rolle im Projekt']) }; if (liveKI[id].role) A[id].role = liveKI[id].role; }
 }
 function applyRealLive(){
   for (const a of AGENTS){
