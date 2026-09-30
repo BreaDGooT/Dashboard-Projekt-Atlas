@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <title>Project Atlas</title>
-<meta name="description" content="Hybrid-Prototyp v0.4 – animiertes Pixel-Dorf mit Innenräumen, Wetter und Notion-Bearbeitung für Flos Projekte und KI-Team.">
+<meta name="description" content="Hybrid-Prototyp v0.5 – animiertes Pixel-Dorf mit Innenräumen, Tagesziel, Wochenrückblick, Wetter und Notion-Bearbeitung für Flos Projekte und KI-Team.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Figtree:wght@400;500;600;700&family=Pixelify+Sans:wght@500;600;700&display=swap" rel="stylesheet">
@@ -81,7 +81,7 @@ a{color:inherit}
 .side-foot small{color:var(--fg-3);font-size:11.5px;line-height:1.4}
 
 /* ---------- Kopfzeile ---------- */
-.top{grid-column:2 / span 2;display:flex;align-items:center;gap:16px;padding:12px 16px;flex-wrap:wrap}
+.top{grid-column:2 / span 2;display:flex;align-items:center;gap:16px;padding:12px 16px;flex-wrap:wrap;position:relative;z-index:6}
 .hello{display:flex;flex-direction:column;min-width:0}
 .hello h2{margin:0;font-family:var(--f-ui);font-weight:700;font-size:21px;line-height:1.15;text-wrap:balance}
 .hello p{margin:0;color:var(--fg-2);font-size:13px}
@@ -252,6 +252,45 @@ a{color:inherit}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 
+/* ---------- Heute, Wetter-Menü, Ton, Rückblick, Belohnungen ---------- */
+.today h3{margin-bottom:6px}
+.today .tlist{gap:2px}
+.trow.tday{grid-template-columns:22px minmax(0,1fr) auto}
+.trow.tday .ttl{cursor:default}
+.trow.tday .ttl:hover{background:none}
+.ttl small.pj,.tt small.pj{display:block;font-family:var(--f-ui);font-size:11px;font-weight:600;color:var(--fg-3);margin-top:1px}
+.ttl small.pj.sb,.tt small.pj.sb{color:#caa45a}
+.trow.sugg .ttl{color:var(--fg-2)}
+.sugg-ic{display:grid;place-items:center;color:var(--fg-3)}
+.sugg-ic svg,.star svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round}
+.goal{padding:8px 10px;border-radius:9px;background:rgba(98,214,156,.12);border:1px solid rgba(98,214,156,.4);color:var(--ok);font-family:var(--f-ui);font-weight:700;font-size:13px}
+.star{width:28px;height:28px;border-radius:7px;border:1px solid transparent;background:none;color:var(--fg-3);cursor:pointer;display:grid;place-items:center;padding:0}
+.star:hover{color:var(--star);border-color:rgba(244,200,106,.4)}
+.star.on{color:var(--star)} .star.on svg{fill:var(--star)}
+.burst{position:fixed;z-index:40;width:7px;height:7px;border-radius:2px;pointer-events:none}
+.wxwrap{position:relative}
+.wxmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:30;min-width:230px;display:flex;flex-direction:column;gap:2px;padding:8px;border-radius:12px;background:rgba(12,21,28,.96);border:1px solid var(--line-2);box-shadow:0 14px 36px rgba(0,0,0,.5)}
+.wxmenu[hidden]{display:none}
+.wxsun{margin:2px 6px 6px;font-size:11.5px;color:var(--fg-3);line-height:1.35}
+.wxmenu button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:7px 10px 7px 28px;border:0;border-radius:8px;background:none;color:var(--fg-2);font-family:var(--f-ui);font-weight:600;font-size:13px;cursor:pointer;text-align:left;position:relative}
+.wxmenu button small{font-size:11px;color:var(--fg-3);font-weight:500}
+.wxmenu button:hover,.wxmenu button:focus-visible{background:var(--glass-3);color:var(--fg)}
+.wxmenu button[aria-checked="true"]{color:var(--fg)}
+.wxmenu button[aria-checked="true"]::before{content:"";position:absolute;left:11px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--core)}
+#sndBtn .w{opacity:.25} #sndBtn.on .w{opacity:1} #sndBtn.on .wx-ic{color:var(--core)}
+.nav .dot{margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--star);box-shadow:0 0 8px var(--star)}
+.review{position:fixed;inset:0;z-index:25;display:grid;place-items:center;padding:24px 16px;background:rgba(4,9,12,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.review[hidden]{display:none}
+.review-box{position:relative;width:min(760px,100%);max-height:calc(100vh - 48px);overflow:auto;padding:24px;display:flex;flex-direction:column;gap:18px}
+.review-box .d-close{top:16px;right:16px}
+.rv-head{display:flex;align-items:center;gap:10px;padding-right:44px}
+.rv-head h2{margin:0;font-family:var(--f-pixel);font-weight:700;font-size:26px;line-height:1.1;text-wrap:balance}
+.rv-k{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:0}
+.review h3{margin:0 0 8px;font-family:var(--f-ui);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-2)}
+.note.warn{color:#f08a7a;margin:0 0 4px}
+.agent .s.off{color:var(--fg-3)}
+@media (max-width:560px){ .rv-k{grid-template-columns:repeat(2,minmax(0,1fr))} .rv-head h2{font-size:21px} }
+
 /* ---------- Detailansicht ---------- */
 .app{transition:filter .35s ease, transform .35s ease}
 body.detail-open .app{filter:blur(9px) saturate(.7) brightness(.62);transform:scale(.985);pointer-events:none;user-select:none}
@@ -290,7 +329,7 @@ body.detail-open{overflow:hidden}
 .sel{padding-right:6px}
 .grid2{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:end}
 .tlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
-.trow{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto 28px;gap:8px;align-items:center;padding:6px 6px;border-radius:9px;border:1px solid transparent;transition:background .15s,opacity .2s}
+.trow{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto 28px 28px;gap:8px;align-items:center;padding:6px 6px;border-radius:9px;border:1px solid transparent;transition:background .15s,opacity .2s}
 .trow:hover{background:rgba(255,255,255,.035);border-color:var(--line)}
 .trow.pending{opacity:.55}
 .trow.pending button{pointer-events:none}
@@ -322,6 +361,8 @@ body.detail-open{overflow:hidden}
 .date{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3);white-space:nowrap}
 .add{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;margin-top:8px}
 .add .btn{margin:0}
+#dAddM{grid-template-columns:minmax(0,1fr) auto}
+#dAddM input[name="t"]{grid-column:1 / -1}
 .btn.pri{background:rgba(110,231,216,.14);border-color:rgba(110,231,216,.5);color:var(--core)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btns{display:flex;flex-wrap:wrap;gap:8px}
@@ -336,7 +377,7 @@ body.detail-open{overflow:hidden}
   .info{top:calc(44vh - 18px);left:0;right:0;bottom:0;width:auto;border-radius:18px 18px 0 0;padding:18px 16px 28px;transform:translateY(30px)}
   .d-close{top:14px;right:14px}
   .info h2{font-size:25px}
-  .trow{grid-template-columns:22px minmax(0,1fr) auto 28px}
+  .trow{grid-template-columns:22px minmax(0,1fr) auto 28px 28px}
   .trow .pill.st{display:none}
 }
 
@@ -392,6 +433,7 @@ body.detail-open{overflow:hidden}
       <button type="button" aria-current="page" data-nav="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Übersicht</span></button>
       <button type="button" data-nav="Projekte"><svg viewBox="0 0 24 24"><path d="M4 5h6l2 2h8v12H4z"/></svg><span>Projekte</span><em class="badge" id="navProj">9</em></button>
       <button type="button" data-nav="Aufgaben"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></svg><span>Aufgaben</span></button>
+      <button type="button" data-nav="Rückblick"><svg viewBox="0 0 24 24"><path d="M5 19V11M11 19V6M17 19v-5M3 19h18"/></svg><span>Rückblick</span><em class="dot" id="rvDot" hidden title="Neuer Wochenrückblick"></em></button>
       <button type="button" data-nav="KI-Agenten"><svg viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="10" rx="2"/><path d="M12 4v4M9 13h.01M15 13h.01"/></svg><span>KI-Agenten</span></button>
       <button type="button" data-nav="Automationen"><svg viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg><span>Automationen</span></button>
       <button type="button" data-nav="Notion-Sync"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5l2 2M20 12a8 8 0 0 1-14 5l-2-2"/><path d="M20 4v5h-5M4 20v-5h5"/></svg><span>Notion-Sync</span></button>
@@ -404,7 +446,7 @@ body.detail-open{overflow:hidden}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v0.4 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
+      <small>Hybrid-Prototyp v0.5 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
     </div>
   </aside>
 
@@ -433,8 +475,21 @@ body.detail-open{overflow:hidden}
           <button type="button" data-tod="night" aria-pressed="false">Nacht</button>
         </div>
       </div>
-      <div class="ctl"><span>Wetter</span>
-        <button type="button" class="wxb" id="wxBtn" title="Wetter wechselt von selbst – klicken legt es fest"><span class="wx-ic" id="wxIc" aria-hidden="true"></span><b id="wxName">Klar</b><small id="wxMode">Auto</small></button>
+      <div class="ctl wxwrap"><span>Wetter</span>
+        <button type="button" class="wxb" id="wxBtn" aria-haspopup="true" aria-expanded="false" aria-controls="wxMenu"><span class="wx-ic" id="wxIc" aria-hidden="true"></span><b id="wxName">Klar</b><small id="wxMode">Auto</small></button>
+        <div class="wxmenu" id="wxMenu" role="menu" aria-label="Wetter" hidden>
+          <p class="wxsun" id="wxSun"></p>
+          <button type="button" role="menuitemradio" data-wx="auto">Automatisch <small>wechselt nach Zypern-Klima</small></button>
+          <button type="button" role="menuitemradio" data-wx="klar">Klar</button>
+          <button type="button" role="menuitemradio" data-wx="wolkig">Wolkig</button>
+          <button type="button" role="menuitemradio" data-wx="wind">Windig</button>
+          <button type="button" role="menuitemradio" data-wx="regen">Regen</button>
+          <button type="button" role="menuitemradio" data-wx="gewitter">Gewitter</button>
+          <button type="button" role="menuitemradio" data-wx="nebel">Nebel</button>
+        </div>
+      </div>
+      <div class="ctl"><span>Ton</span>
+        <button type="button" class="wxb" id="sndBtn" aria-pressed="false" title="Geräusche an oder aus"><span class="wx-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10z"/><path class="w" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span><b>Ton</b><small id="sndState">aus</small></button>
       </div>
       <div class="clock" aria-live="off">
         <b id="tCy">--:--</b>
@@ -465,6 +520,7 @@ body.detail-open{overflow:hidden}
   </main>
 
   <aside class="panel" aria-label="Details">
+    <section class="card glass today" id="todayCard" aria-label="Heute"></section>
     <section class="card glass" id="projCard" aria-live="polite"></section>
     <section class="card glass">
       <h3>KI-Agenten</h3>
@@ -483,6 +539,12 @@ body.detail-open{overflow:hidden}
     <div class="scene" id="scene"><canvas id="sceneCv" aria-hidden="true"></canvas><div class="scene-cap" id="sceneCap"></div></div>
     <div class="info" id="info"></div>
     <button type="button" class="d-close" id="dClose" aria-label="Detailansicht schließen" title="Schließen (Esc)">×</button>
+  </div>
+</div>
+<div class="review" id="review" hidden>
+  <div class="review-box glass" role="dialog" aria-modal="true" aria-labelledby="rvTitle">
+    <button type="button" class="d-close" id="rvClose" aria-label="Rückblick schließen" title="Schließen (Esc)">×</button>
+    <div id="rvBody"></div>
   </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -557,7 +619,7 @@ PLOTS.forEach(p => { P[p.id] = { ...p, group:'plot', building:'Bauplatz', status
 // Der Stand oben ist der Offline-Stand vom 30.09.2026; mit Notion-Verbindung ersetzt ihn applyLive().
 const ST_OF = { done:'Erledigt', todo:'Nicht begonnen', wait:'Nicht begonnen', run:'In Bearbeitung' };
 for (const p of PROJECTS){
-  p.tasks = (p.tasks || []).map(([title, s, prio, who]) => ({ id:null, title, status:ST_OF[s], prio:prio || 'Mittel', who:who || null }));
+  p.tasks = (p.tasks || []).map(([title, s, prio, who]) => ({ id:null, title, status:ST_OF[s], prio:prio || 'Mittel', who:who || null, today:false, doneAt:'' }));
   p.milestones = (p.milestones || []).map(([title, d]) => ({ id:null, title, status:'Erledigt', date:d.split('.').reverse().join('-') }));
 }
 const isDone = t => t.status === 'Erledigt';
@@ -728,6 +790,7 @@ const SMOKE_SRC = [[1233,66],[773,616]];
    ========================================================= */
 let mode = 'demo', demoTimer = 0, lastPick = null;
 function applyReal(){
+  if (live.ok && liveKI) return applyRealLive();
   assign('code','atlas','work','Gebäude-Illustrationen in die Panels einbauen');
   assign('gpt','atlas','work','Stiltest: Gebäude-Illustrationen');
   for (const id of ['claude','gem']) assign(id,'home','unknown','');
@@ -753,7 +816,7 @@ function setMode(m){
   $('#modeBadge').classList.toggle('live', m==='real');
   $('#modeText').textContent = m==='demo'
     ? 'Demo: KI-Aktivität ist simuliert · Projekte & Aufgaben sind echte Notion-Daten'
-    : 'Echter Stand 30.09.2026: Claude Code und ChatGPT arbeiten an Project Atlas';
+    : live.ok && liveKI ? `Echter Stand aus Notion „KI-Agenten“ · ${hhmm(live.at)}` : 'Echter Stand: Offline-Stand vom 30.09.2026';
   if (m==='real') applyReal(); else { demoTimer = 7; demoKick(); }
 }
 
@@ -821,10 +884,10 @@ function cyprusHour(){
 function lighting(){
   if (todMode==='day') return { dark:0, warm:0 };
   if (todMode==='night') return { dark:1, warm:0 };
-  const h = cyprusHour();
-  if (h >= 7.5 && h < 18.5) return { dark:0, warm:0 };
-  if (h >= 18.5 && h < 20.5){ const k=(h-18.5)/2; return { dark:k, warm:1-k*.6 }; }
-  if (h >= 5.5 && h < 7.5){ const k=(h-5.5)/2; return { dark:1-k, warm:.4+k*.6 }; }
+  const h = cyprusHour(), { rise, set } = sunToday(); // echte Sonnenzeiten für Zypern
+  if (h >= rise + .6 && h < set - .4) return { dark:0, warm:0 };
+  if (h >= set - .4 && h < set + 1.1){ const k = (h - (set - .4))/1.5; return { dark:k, warm:1 - k*.6 }; }
+  if (h >= rise - 1 && h < rise + .6){ const k = (h - (rise - 1))/1.6; return { dark:1 - k, warm:.4 + k*.6 }; }
   return { dark:1, warm:0 };
 }
 
@@ -833,7 +896,6 @@ function lighting(){
    ========================================================= */
 const WEATHER_TYPES = ['klar','wolkig','wind','regen','gewitter','nebel'];
 const WEATHER_LABEL = { klar:'Klar', wolkig:'Wolkig', wind:'Windig', regen:'Regen', gewitter:'Gewitter', nebel:'Nebel' };
-const WEATHER_WEIGHT = { klar:34, wolkig:22, wind:12, regen:16, gewitter:7, nebel:9 };
 const WEATHER_ICON = {
   klar:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/></svg>',
   wolkig:'<svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 18z"/></svg>',
@@ -845,8 +907,8 @@ const WEATHER_ICON = {
 const wx = { cur:'klar', manual:null, timer:60 + rnd()*60, amt:{ klar:1, wolkig:0, wind:0, regen:0, gewitter:0, nebel:0 }, flash:0, boltT:5 };
 let rain = [];
 const fogBlobs = Array.from({length:7}, (_,i) => ({ x:rnd()*1.2 - .1, y:.1 + i*.13 + rnd()*.05, r:.22 + rnd()*.18, sp:.004 + rnd()*.006 }));
-function nextWeather(){ const opts = WEATHER_TYPES.filter(k => k !== wx.cur); let r = rnd()*opts.reduce((n,k) => n + WEATHER_WEIGHT[k], 0); for (const k of opts){ r -= WEATHER_WEIGHT[k]; if (r <= 0) return k; } return 'klar'; }
-function paintWeather(){ $('#wxName').textContent = WEATHER_LABEL[wx.cur]; $('#wxMode').textContent = wx.manual ? 'fest' : 'Auto'; $('#wxIc').innerHTML = WEATHER_ICON[wx.cur]; $('#wxBtn').setAttribute('aria-label', `Wetter: ${WEATHER_LABEL[wx.cur]}, ${wx.manual ? 'festgelegt' : 'wechselt automatisch'}. Klicken zum Ändern.`); }
+function nextWeather(){ const w = climateWeights(), opts = WEATHER_TYPES.filter(k => k !== wx.cur); let r = rnd()*opts.reduce((n,k) => n + w[k], 0); for (const k of opts){ r -= w[k]; if (r <= 0) return k; } return 'klar'; }
+function paintWeather(){ $('#wxName').textContent = WEATHER_LABEL[wx.cur]; $('#wxMode').textContent = wx.manual ? 'fest' : 'Auto'; $('#wxIc').innerHTML = WEATHER_ICON[wx.cur]; $('#wxBtn').setAttribute('aria-label', `Wetter: ${WEATHER_LABEL[wx.cur]}, ${wx.manual ? 'festgelegt' : 'wechselt automatisch'}. Menü öffnen.`); for (const b of document.querySelectorAll('#wxMenu [data-wx]')) b.setAttribute('aria-checked', (b.dataset.wx === 'auto' ? !wx.manual : wx.manual === b.dataset.wx) ? 'true' : 'false'); }
 function simulateWeather(dt){
   if (!wx.manual){ wx.timer -= dt; if (wx.timer <= 0){ wx.cur = nextWeather(); wx.timer = 120 + rnd()*120; paintWeather(); } }
   const rate = reduceMotion ? 1 : dt/7;
@@ -915,10 +977,11 @@ function drawAgent(a, t){
   const s = st[a.id], px = SP*view.s, walking = s.route.length > 0;
   const bob = walking ? (Math.floor(t*8)%2) : 0;
   const X = WX(s.x) - 3*px, Y = WY(s.y) - 9*px - bob*px*.5;
-  ctx.save(); ctx.globalAlpha = s.status==='unknown' ? .55 : 1;
+  const idle = s.status==='unknown' || s.status==='off';
+  ctx.save(); ctx.globalAlpha = idle ? .55 : 1;
   ctx.globalCompositeOperation = 'lighter'; glow(WX(s.x), WY(s.y), 9*px, a.color, s.status==='work' ? .5 : .22); ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(WX(s.x), WY(s.y)+px*.3, 3.2*px, 1.1*px, 0, 0, Math.PI*2); ctx.fill();
-  const col = { A: s.status==='work' ? a.color : '#dfe8ea', S:shade(a.color,.55), B:a.color, V:'#132028', E: s.status==='unknown' ? '#51606a' : '#e8fbff', C:shade(a.color,.78), W:'#fff4df', L:shade(a.color,.45) };
+  const col = { A: s.status==='work' ? a.color : '#dfe8ea', S:shade(a.color,.55), B:a.color, V:'#132028', E: idle ? '#51606a' : '#e8fbff', C:shade(a.color,.78), W:'#fff4df', L:shade(a.color,.45) };
   blit(spriteRows(a.id), col, X, Y, px, s.face, walking ? Math.floor(t*8)%2 : null);
   ctx.restore();
   return { x:WX(s.x), y:Y };
@@ -1084,6 +1147,7 @@ function render(t){
   for (const l of leaves){ ctx.save(); ctx.translate(WX(l.x), WY(l.y)); ctx.rotate(l.rot); ctx.fillStyle = l.col; ctx.fillRect(-2*s, -1*s, 4*s, 2.2*s); ctx.restore(); }
   ctx.restore(); // Clip
   drawWeather(t);
+  drawFw(ctx, fwWorld, WX, WY, view.s, glow);
 
   // KI-Agenten + Namensschilder
   const order = [...AGENTS].sort((a,b) => st[a.id].y - st[b.id].y), heads = {};
@@ -1096,7 +1160,7 @@ function render(t){
   for (const a of order){ const s2 = st[a.id]; const key = s2.route.length ? a.id : s2.target; (groups[key] ||= []).push(a.id); }
   for (const key in groups){
     const baseY = Math.min(...groups[key].map(g => heads[g].y));
-    groups[key].forEach((id, k) => { const a = A[id], s2 = st[id]; tag(heads[id].x, baseY - k*19*dpr, s2.status==='unknown' ? a.name + ' · keine Meldung' : a.name, a.color, s2.status==='work', t); });
+    groups[key].filter(id => st[id].status !== 'off').forEach((id, k) => { const a = A[id], s2 = st[id]; tag(heads[id].x, baseY - k*19*dpr, s2.status==='unknown' ? a.name + ' · keine Meldung' : s2.status==='off' ? a.name + ' · offline' : a.name, a.color, s2.status==='work', t); });
   }
 }
 
@@ -1106,7 +1170,7 @@ function render(t){
 function simulate(dt, t){
   for (const a of AGENTS){ const s = st[a.id]; if (s.route.length && walk(s, dt, 55)) arrive(a.id); }
   if (mode==='demo') demoTick(dt);
-  simulateWeather(dt);
+  simulateWeather(dt); stepFw(fwWorld, dt); updateSound(dt);
   if (reduceMotion) return;
   for (const v of VILLAGERS){
     if (v.route.length){ walk(v, dt, 32); continue; }
@@ -1194,22 +1258,23 @@ function pixelAvatar(id){
   let r = ''; rows.forEach((row,y) => [...row].forEach((c,x) => { if (c!=='.') r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${col[c]}"/>`; }));
   return `<svg viewBox="0 0 6 9" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
 }
-const STATUS_TXT = { work:'Arbeitet', walk:'Unterwegs', ready:'Bereit', unknown:'Keine Meldung' };
+const STATUS_TXT = { work:'Arbeitet', walk:'Unterwegs', ready:'Bereit', unknown:'Keine Meldung', off:'Offline' };
 function renderAgents(){
   $('#agentList').innerHTML = AGENTS.map(a => {
     const s = st[a.id], where = s.target==='home' ? 'am KI-Kern' : P[s.target] ? P[s.target].name : '';
-    const line = s.status==='unknown' ? `${esc(a.role)} · ${esc(a.source)}` : s.status==='ready' ? `Bereit am KI-Kern · ${esc(a.role)}` : `${esc(where)}: ${esc(s.task)}`;
+    const line = (s.status==='unknown' || s.status==='off') ? `${esc(a.role)} · ${esc(a.source)}` : s.status==='ready' ? `Bereit am KI-Kern · ${esc(a.role)}` : `${esc(where)}: ${esc(s.task)}`;
     return `<button type="button" class="agent" data-agent="${a.id}">${pixelAvatar(a.id)}<span style="min-width:0"><span class="n" style="color:${a.color}">${esc(a.name)}</span><span class="a">${line}</span></span><span class="s ${s.status}"><i></i>${STATUS_TXT[s.status]}</span></button>`;
   }).join('');
   $('#agentNote').textContent = mode==='demo'
     ? 'Demo-Modus: Wer wo arbeitet, ist simuliert, damit du die Bewegung siehst. Die Aufgaben stammen aus deinem Notion.'
-    : 'Echter Stand vom 30.09.2026: ChatGPT malt im Auftrag von Claude Code die Gebäude-Illustrationen. Gemini ist angebunden, hat gerade keinen Auftrag. Live-Meldungen kommen mit Phase 2.';
+    : live.ok && liveKI ? 'Echter Stand aus der Notion-Datenbank „KI-Agenten“. Claude Code trägt dort ein, wer gerade woran arbeitet; das Dorf aktualisiert sich alle 2 Minuten.' : 'Echter Stand: Offline-Stand vom 30.09.2026. Mit Notion-Verbindung kommt er live aus der Datenbank „KI-Agenten“.';
 }
 function renderSummary(){
   const all = PROJECTS.flatMap(p => p.tasks), done = all.filter(isDone).length;
   const running = PROJECTS.filter(p => p.status!=='Nicht begonnen').length, act = AGENTS.filter(a => st[a.id].status==='work').length;
   $('#sum').innerHTML = [[PROJECTS.length,'Projekte gesamt'],[running,'laufen (inkl. Atlas)'],[`${done}/${all.length}`,'Aufgaben erledigt'],[PLOTS.length,'freie Bauplätze']]
     .map(([v,l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
+  renderToday();
   $('#hAct').textContent = act; $('#hProj').textContent = PROJECTS.length; $('#hOpen').textContent = all.length - done; $('#hDone').textContent = done;
 }
 function renderProject(){
@@ -1288,12 +1353,13 @@ $('#zFit').addEventListener('click', () => { tween = null; fit(); });
 $('#agentList').addEventListener('click', e => { const btn = e.target.closest('[data-agent]'); if (!btn) return; const t = st[btn.dataset.agent].target; select(t==='home' ? 'atlas' : t, true); });
 $('#q').addEventListener('input', e => { filter = e.target.value.trim().toLowerCase(); refreshLabels(); });
 $('#q').addEventListener('keydown', e => { if (e.key==='Enter'){ const hit = PROJECTS.find(p => match(p.id)); if (hit) select(hit.id, true); } });
-$('#mDemo').addEventListener('click', () => mode!=='demo' && setMode('demo'));
-$('#mReal').addEventListener('click', () => mode!=='real' && setMode('real'));
+$('#mDemo').addEventListener('click', () => { modePicked = true; if (mode !== 'demo') setMode('demo'); });
+$('#mReal').addEventListener('click', () => { modePicked = true; if (mode !== 'real') setMode('real'); });
 document.querySelectorAll('[data-tod]').forEach(b => b.addEventListener('click', () => { todMode = b.dataset.tod; document.querySelectorAll('[data-tod]').forEach(x => x.setAttribute('aria-pressed', x===b)); updateClock(); }));
 const toast = $('#toast'); let toastT;
 document.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', () => {
   if (b.dataset.nav === 'home') return;
+  if (b.dataset.nav === 'Rückblick'){ openReview(); return; }
   toast.textContent = `„${b.dataset.nav}“ kommt mit dem MVP (Phase 1). Im Prototyp ist nur die Übersicht aktiv.`;
   toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 2600);
 }));
@@ -1311,7 +1377,7 @@ function updateClock(){
    Notion live: lesen über die Datenbank-Ansichten, schreiben als Flo
    ========================================================= */
 const NOTION_DS = { tasks:'b19c21e5-bb94-434e-a17e-e5ff9e29d951', ms:'0df8af82-ff58-47af-80d2-ff5f549325d8' };
-const NOTION_VIEWS = { proj:'view://d94c5cce-eef1-4be0-aece-39b5f344602b', tasks:'view://4711c54c-b453-4086-a986-890248a94bba', ms:'view://7e256a73-16aa-47f8-874a-bd84b7ab1d26' };
+const NOTION_VIEWS = { proj:'view://d94c5cce-eef1-4be0-aece-39b5f344602b', tasks:'view://4711c54c-b453-4086-a986-890248a94bba', ms:'view://7e256a73-16aa-47f8-874a-bd84b7ab1d26', ki:'view://b206fba1-bb4b-48b0-a540-5b2b8d09ac8b' };
 const TRASH_PAGE = '3ebf5a8714b3811a80f8ff4d7426137c'; // „Papierkorb (aus dem Dashboard entfernt)“ unter der Hub-Seite
 const KI_OF = { '3ebf5a8714b381e3b511cc98927a6fe7':'gpt', '3ebf5a8714b381538de1d42c6ea5acb2':'gem', '3ebf5a8714b381768e8afd7db893a1b2':'claude', '3ebf5a8714b381f98616cf33b0166b43':'code' };
 const DENIED = ['not_in_manifest','consent_required','not_granted','needs_reauth','server_not_connected','selection_required','blocked_by_policy','approval_required','capability_disabled','capability_removed'];
@@ -1358,10 +1424,12 @@ function refreshLive(){
   if (!live.mcp) return Promise.resolve();
   if (loading) return loading;
   if (!live.ok) setSync('conn'); else setSync('busy', 'Lädt aus Notion …');
-  loading = Promise.all([queryView(NOTION_VIEWS.proj), queryView(NOTION_VIEWS.tasks), queryView(NOTION_VIEWS.ms)])
-    .then(([pr, ts, ms]) => {
+  loading = Promise.all([queryView(NOTION_VIEWS.proj), queryView(NOTION_VIEWS.tasks), queryView(NOTION_VIEWS.ms), queryView(NOTION_VIEWS.ki).catch(() => null)])
+    .then(([pr, ts, ms, ki]) => {
       if (live.busy){ clearTimeout(reT); reT = setTimeout(refreshLive, 1500); return; } // laufende Änderung nicht überschreiben
+      const first = !live.ok; if (ki) applyKI(ki);
       applyLive(pr, ts, ms); live.ok = true; live.denied = false; live.at = new Date(); setSync('live');
+      if (first && !modePicked && liveKI) setMode('real'); else if (mode === 'real') setMode('real');
     })
     .catch(e => { if (DENIED.includes(e && e.code)) live.denied = true; setSync(live.ok && !live.denied ? 'live' : 'err', errText(e)); if (live.ok && !live.denied) toastMsg(errText(e) + ' Angezeigt wird der letzte Stand.'); })
     .finally(() => { loading = null; });
@@ -1376,8 +1444,10 @@ function applyLive(projRows, taskRows, msRows){
     p.progress = typeof r['Fortschritt Prozent'] === 'number' ? r['Fortschritt Prozent'] : null; }
   for (const p of PROJECTS){ p.tasks = []; p.milestones = []; }
   for (const r of taskRows) for (const pid of rel(r.Projekt)){ const p = byId[pid]; if (!p) continue;
-    p.tasks.push({ id:idOf(r.url), title:r.Titel || '(ohne Titel)', status:r.Status || 'Nicht begonnen', prio:r['Priorität'] || 'Mittel', who:KI_OF[rel(r['Zuständige KI'])[0]] || null }); }
+    p.tasks.push({ id:idOf(r.url), title:r.Titel || '(ohne Titel)', status:r.Status || 'Nicht begonnen', prio:r['Priorität'] || 'Mittel', who:KI_OF[rel(r['Zuständige KI'])[0]] || null, today:r.Heute === '__YES__' || r.Heute === true, doneAt:r['date:Erledigt am:start'] || '' }); }
+  const firstLoad = !live.ok;
   for (const r of msRows) for (const pid of rel(r.Projekt)){ const p = byId[pid]; if (!p) continue;
+    const mid = idOf(r.url); if (!firstLoad && r.Status === 'Erledigt' && prevMs[mid] && prevMs[mid] !== 'Erledigt' && !firedMs.has(mid)){ firedMs.add(mid); fireworksWorld(p.id); } prevMs[mid] = r.Status;
     p.milestones.push({ id:idOf(r.url), title:r.Titel || '(ohne Titel)', status:r.Status || 'Nicht begonnen', date:r['date:Zieldatum:start'] || '' }); }
   buildLabels(); placeLabels(); changed();
   if (detailId) renderDetail(true);
@@ -1403,7 +1473,7 @@ const toTrash = id => callNotion('notion-move-pages', { page_or_database_ids:[id
 function setField(item, key, val, label, notionProps){ const prev = item[key]; item[key] = val; write(label, () => updProps(item.id, notionProps), () => { item[key] = prev; }); }
 function removeItem(list, item, label){ const i = list.indexOf(item); if (i < 0) return; list.splice(i, 1); write(label, () => toTrash(item.id), () => list.splice(Math.min(i, list.length), 0, item)); }
 function addTask(pr, title, prio){
-  const t = { id:null, title, status:'Nicht begonnen', prio, who:null, pending:true }; pr.tasks.push(t);
+  const t = { id:null, title, status:'Nicht begonnen', prio, who:null, today:false, doneAt:'', pending:true }; pr.tasks.push(t);
   write('Aufgabe anlegen', async () => {
     const r = await callNotion('notion-create-pages', { parent:{ type:'data_source_id', data_source_id:NOTION_DS.tasks }, pages:[{ properties:{ Titel:title, Status:'Nicht begonnen', 'Priorität':prio, Projekt:[pageUrl(pr.notion)] } }] });
     t.id = idOf(r && r.pages && r.pages[0] && r.pages[0].id); t.pending = false;
@@ -1436,6 +1506,42 @@ const INTERIOR = {
     walk:[[700,600],[800,720],[620,760],[900,560],[560,640]],
     lights:[[1020,407,2.2],[467,240,.9],[840,167,.9],[1087,253,.9],[400,680,.9],[1027,587,.9],[91,349,.9],[213,333,1.2],[1220,333,1.2],[1027,273,.7]],
     fire:[[1020,410]], sparkle:[], pet:[1010,470] },
+  sbweb:{ src:'assets/innen/sbweb.webp', door:[753,933], px:13,
+    spots:[ { x:690, y:525, kind:'desk', face:1 }, { x:980, y:565, kind:'desk', face:-1 }, { x:227, y:510, kind:'desk', face:1 }, { x:200, y:590, kind:'read', face:1 } ],
+    walk:[[720,747],[440,747],[1067,747],[800,600]],
+    lights:[[520,800,1.1],[993,787,1.1],[607,160,.8],[747,80,.8],[933,113,.8],[391,287,.8],[587,400,.7],[1060,413,.7],[967,460,.7],[1313,80,.8],[1287,287,.7],[1433,460,.8],[1320,573,.7],[153,607,.8],[140,373,.7]],
+    screens:[[680,380],[833,387]], sparkle:[[753,240],[693,200],[827,267],[253,267],[230,330]], fire:[], pet:[307,640] },
+  sbshop:{ src:'assets/innen/sbshop.webp', door:[760,920], px:13,
+    spots:[ { x:747, y:590, kind:'desk', face:-1 }, { x:1153, y:640, kind:'desk', face:1 }, { x:313, y:533, kind:'ladder', face:1 }, { x:440, y:627, kind:'desk', face:-1 }, { x:1200, y:747, kind:'desk', face:1 } ],
+    walk:[[747,693],[573,747],[960,747],[867,600]],
+    lights:[[553,807,1.1],[980,807,1.1],[533,180,.8],[940,187,.8],[1117,127,.8],[1387,280,.8],[873,427,.7],[333,600,.7],[113,467,.8],[293,267,.7],[747,267,1.6]],
+    sparkle:[[687,220],[760,220],[820,213],[640,213]], fire:[], pet:[400,760] },
+  mkt:{ src:'assets/innen/mkt.webp', door:[760,920], px:13,
+    spots:[ { x:753, y:507, kind:'desk', face:1 }, { x:1040, y:627, kind:'desk', face:1 }, { x:1287, y:627, kind:'desk', face:-1 }, { x:333, y:560, kind:'read', face:1 } ],
+    walk:[[760,720],[573,747],[933,747],[827,600]],
+    lights:[[760,133,1],[853,267,.8],[267,300,.8],[353,387,.8],[440,600,.9],[107,547,.8],[527,800,1.1],[993,800,1.1],[1047,387,.8],[1160,200,.7],[1387,373,1.1],[180,353,1.1],[993,400,.7],[760,367,.6],[920,387,.6]],
+    screens:[[1211,493]], blinkers:[[663,360,705,380]], sparkle:[], fire:[], pet:[320,693] },
+  seo:{ src:'assets/innen/seo.webp', door:[767,920], px:13,
+    spots:[ { x:667, y:560, kind:'desk', face:1 }, { x:1073, y:610, kind:'desk', face:1 }, { x:133, y:560, kind:'ladder', face:1 }, { x:333, y:560, kind:'desk', face:-1 }, { x:1160, y:640, kind:'desk', face:1 } ],
+    walk:[[767,747],[440,747],[1093,747]],
+    lights:[[313,233,.8],[143,280,.8],[500,327,.8],[687,347,.7],[1007,333,.7],[1220,233,.8],[1393,280,.8],[237,520,.8],[1060,467,.7],[1027,467,.6],[1260,520,.7],[547,793,1.1],[989,793,1.1]],
+    sparkle:[[733,113],[667,53],[920,53],[827,147],[973,160],[596,327],[940,327]], fire:[], pet:[287,627] },
+  drop:{ src:'assets/innen/drop.webp', door:[747,933], px:13,
+    spots:[ { x:440, y:720, kind:'desk', face:1 }, { x:960, y:720, kind:'desk', face:-1 }, { x:1200, y:667, kind:'desk', face:1 }, { x:253, y:590, kind:'desk', face:-1 }, { x:380, y:507, kind:'ladder', face:1 } ],
+    walk:[[747,560],[1067,533],[933,800],[560,853]],
+    lights:[[517,127,.9],[764,187,.9],[933,233,.8],[1224,280,.9],[1473,413,.9],[80,400,.9],[213,500,.8],[453,813,1.1],[1033,813,1.1]],
+    waterRect:[870,170,1170,420], sparkle:[], fire:[], pet:[1000,560] },
+  digi:{ src:'assets/innen/digi.webp', door:[740,920], px:13,
+    spots:[ { x:393, y:590, kind:'desk', face:-1 }, { x:1160, y:590, kind:'desk', face:1 }, { x:747, y:560, kind:'desk', face:-1 }, { x:960, y:575, kind:'desk', face:1 } ],
+    walk:[[747,693],[573,747],[933,747]],
+    lights:[[571,127,.8],[687,240,.8],[1193,207,.8],[107,327,.8],[87,460,.8],[440,400,.7],[1393,300,.7],[1320,653,.8],[1367,627,.7],[513,760,1.1],[969,760,1.1]],
+    screens:[[233,460],[327,427],[287,527],[1197,453],[1320,467],[607,340],[727,407],[1047,393]], blinkers:[[880,293,973,533]], sparkle:[], fire:[], pet:[667,747] },
+  atlas:{ src:'assets/innen/atlas.webp', door:[767,920], px:13,
+    spots:[ { x:327, y:760, kind:'desk', face:1 }, { x:1187, y:760, kind:'desk', face:-1 }, { x:213, y:547, kind:'desk', face:-1 }, { x:1313, y:547, kind:'desk', face:1 }, { x:400, y:340, kind:'desk', face:-1 }, { x:1127, y:340, kind:'desk', face:1 } ],
+    walk:[[767,747],[587,693],[947,693]],
+    lights:[[613,40,.8],[920,53,.8],[500,167,.8],[1037,167,.8],[300,187,.8],[1236,187,.8],[113,307,.8],[1420,307,.8],[320,633,.9],[1213,633,.9],[593,793,1.1],[940,793,1.1]],
+    screens:[[367,300],[320,320],[1160,293],[1220,320],[167,507],[1367,507],[380,700],[1153,700]], hub:[767,420],
+    nodes:[[613,420],[920,420],[483,511],[1053,511],[533,620],[997,620],[767,664],[527,353],[1007,353]], sparkle:[], fire:[], pet:[867,627] },
 };
 const ART_FX = {
   sb:{ lights:[[0.404,0.445],[0.718,0.536],[0.411,0.649],[0.168,0.552],[0.58,0.586],[0.896,0.591],[0.285,0.877],[0.922,0.388],[0.071,0.727],[0.917,0.822],[0.666,0.953],[0.103,0.876],[0.721,0.223],[0.109,0.328],[0.27,0.687],[0.844,0.372],[0.276,0.953],[0.924,0.297],[0.207,0.936],[0.635,0.316],[0.896,0.922],[0.083,0.391]], sparkle:[[0.431,0.051]], smoke:[] },
@@ -1455,7 +1561,9 @@ function buildScene(id){
   if (inn && imgOk(innerImgs[id])){
     const im = innerImgs[id];
     return { img:im, art:true, interior:true, sx:0, sy:0, sw:im.naturalWidth, sh:im.naturalHeight, smooth:true, agentPx:inn.px,
-      lights:inn.lights, fire:inn.fire, sparkle:inn.sparkle, smoke:[], cyan:[], water:[], blink:[], spots:inn.spots, walk:inn.walk, door:inn.door, pet:inn.pet };
+      lights:inn.lights, fire:inn.fire, sparkle:inn.sparkle, smoke:[], cyan:[], blink:[], spots:inn.spots, walk:inn.walk, door:inn.door, pet:inn.pet,
+      screens:inn.screens || [], blinkers:inn.blinkers || [], hub:inn.hub || null, nodes:inn.nodes || [],
+      water:inn.waterRect ? Array.from({length:90}, (_,k) => [inn.waterRect[0] + ((k*73)%97)/97*(inn.waterRect[2]-inn.waterRect[0]), inn.waterRect[1] + ((k*41)%89)/89*(inn.waterRect[3]-inn.waterRect[1])]) : [] };
   }
   const im = artImgs[id];
   if (imgOk(im)){
@@ -1582,6 +1690,12 @@ function renderScene(t){
   const base = sp.interior ? .32 + .25*L.dark : sp.art ? .22 + .5*L.dark : .12 + .7*lit, rr = sp.art ? sp.sw*.028 : 13;
   sp.lights.forEach(([x,y,w], i) => { const fl = reduceMotion ? 1 : .78 + .22*Math.sin(t*(2.1 + (i%4)*.7) + i*1.7) + (Math.sin(t*11 + i) > .97 ? -.25 : 0); sGlow(X(x), Y(y), rr*w*s*(.9 + .1*fl), '#ffc46e', base*fl); });
   for (const [x,y] of sp.fire){ const f = reduceMotion ? 1 : .7 + .3*Math.sin(t*9) * Math.sin(t*5.3 + 1); sGlow(X(x), Y(y), sp.sw*.07*s, '#ff8a3a', .35*f); sGlow(X(x), Y(y) - sp.sw*.01*s, sp.sw*.025*s, '#ffd27a', .5*f); }
+  (sp.screens || []).forEach(([x,y], i) => { const fl = reduceMotion ? 1 : .8 + .2*Math.sin(t*3.3 + i*2.1); sGlow(X(x), Y(y), sp.sw*.03*s, i%3===1 ? '#ff7ad9' : '#6ee7d8', .22*fl); });
+  for (const [x0,y0,x1,y1] of (sp.blinkers || [])) for (let k=0;k<12;k++){ if (!(reduceMotion ? k%2 : Math.sin(t*(2.5 + k%4) + k*1.7) > .25)) continue; sGlow(X(x0 + ((k*37)%11)/11*(x1-x0)), Y(y0 + ((k*53)%12)/12*(y1-y0)), 5*s + 2, ['#62d69c','#ff5a4a','#6ee7d8','#f4c86a'][k%4], .95); }
+  if (sp.hub){ // Datenimpulse vom Kristall zu den Arbeitspulten
+    sGlow(X(sp.hub[0]), Y(sp.hub[1]), sp.sw*.09*s, '#6ee7d8', .25 + .1*Math.sin(t*1.6));
+    sp.nodes.forEach(([x,y], i) => { const u = reduceMotion ? .5 : (t*.35 + i*.13) % 1; sGlow(X(sp.hub[0] + (x - sp.hub[0])*u), Y(sp.hub[1] + (y - sp.hub[1])*u), 10*s + 3, '#bff7f0', .9*(1 - u*.4)); sGlow(X(x), Y(y), 22*s, '#6ee7d8', .2 + .25*Math.max(0, Math.sin(t*2 + i))); });
+  }
   for (const [x,y] of sp.cyan) sGlow(X(x), Y(y), 30*s, '#6ee7d8', .3 + .3*lit);
   if (sp.crystal){ const pulse = .5 + .5*Math.sin(t*1.6); sGlow(X(CRYSTAL.x), Y(CRYSTAL.y), (80 + pulse*14)*s, '#6ee7d8', .22 + lit*.25);
     if (!reduceMotion) for (let k=0;k<6;k++){ const ang = t*.9 + k*1.047; sGlow(X(CRYSTAL.x + Math.cos(ang)*34), Y(CRYSTAL.y - 6 + Math.sin(ang)*12 - ((t*12 + k*9) % 40)*.4), 5*s, k%2 ? '#f4c86a' : '#bff7f0', .8); } }
@@ -1594,6 +1708,7 @@ function renderScene(t){
   sctx.globalCompositeOperation = 'source-over';
   for (const q of sceneSmoke){ const a = clamp(q.life,0,1)*.38; sctx.fillStyle = `rgba(228,231,235,${a})`; const sz = Math.max(2, q.size*s); sctx.fillRect(X(q.x) - sz/2, Y(q.y) - sz/2, sz, sz); }
   drawInterior(t, X, Y, s);
+  drawFw(sctx, fwScene, X, Y, s, sGlow, 3.2);
   // Vignette + Verlauf für die Beschriftung
   const vg = sctx.createRadialGradient(ax + aw/2, H/2, Math.min(aw,H)*.35, ax + aw/2, H/2, Math.max(aw,H)*.78); vg.addColorStop(0, 'rgba(5,10,12,0)'); vg.addColorStop(1, 'rgba(5,10,12,.55)'); sctx.fillStyle = vg; sctx.fillRect(0, 0, W, H);
   const bg = sctx.createLinearGradient(0, H*.78, 0, H); bg.addColorStop(0, 'rgba(5,10,12,0)'); bg.addColorStop(1, 'rgba(5,10,12,.6)'); sctx.fillStyle = bg; sctx.fillRect(0, H*.78, W, H*.22);
@@ -1604,6 +1719,7 @@ let sceneSmokeT = 0, enterDone = false;
 function simulateScene(dt){
   if (!scene) return;
   if (enterT < 1){ enterT = Math.min(1, enterT + dt*1.4); if (enterT >= 1) enterDone = true; }
+  stepFw(fwScene, dt);
   syncInterior(dt);
   if (reduceMotion) return;
   sceneSmokeT += dt;
@@ -1658,6 +1774,7 @@ function closeDetail(){
   const d = $('#detail'), app = $('.app');
   d.classList.remove('show'); document.body.classList.remove('detail-open'); app.removeAttribute('aria-hidden'); app.inert = false;
   setTimeout(() => { if (!detailId) d.hidden = true; }, reduceMotion ? 0 : 300);
+  fwScene = []; for (const b of pendingFw) setTimeout(() => fireworksWorld(b), 700); pendingFw = [];
   if (savedView && !reduceMotion){ tween = { fx:(cw/2 - view.ox)/view.s, fy:(ch/2 - view.oy)/view.s, fs:view.s, tx:savedView.cx, ty:savedView.cy, ts:savedView.s, t:0, sp:1.8 }; savedView = null; }
   if (lastFocus && lastFocus.isConnected && lastFocus.focus) lastFocus.focus();
   changed();
@@ -1709,7 +1826,7 @@ function itemRow(t, i, kind){
   return `<li class="trow st-${k}${kind==='ms' ? ' ms' : ''}${t.pending ? ' pending' : ''}" data-k="${kind}" data-i="${i}">` +
     `<button type="button" class="chk" data-act="toggle" aria-pressed="${k==='done'}" aria-label="${esc(t.title)}: ${k==='done' ? 'wieder öffnen' : 'als erledigt markieren'}"${dis}></button>` +
     `<span class="ttl" data-act="rename"${off ? '' : ' tabindex="0" role="button" title="Klicken zum Umbenennen"'}>${who}${esc(t.title)}</span>` +
-    (kind==='task' ? `<button type="button" class="pill st s-${k}" data-act="cycle" title="Status wechseln"${dis}>${LBL[k]}</button><button type="button" class="pill p-${esc(t.prio)}" data-act="prio" title="Priorität wechseln"${dis}>${esc(t.prio)}</button>`
+    (kind==='task' ? `<button type="button" class="pill st s-${k}" data-act="cycle" title="Status wechseln"${dis}>${LBL[k]}</button><button type="button" class="pill p-${esc(t.prio)}" data-act="prio" title="Priorität wechseln"${dis}>${esc(t.prio)}</button><button type="button" class="star${t.today ? ' on' : ''}" data-act="today" aria-pressed="${!!t.today}" aria-label="${esc(t.title)}: für heute vormerken" title="${t.today ? 'Aus „Heute“ entfernen' : 'Für heute vormerken'}"${dis}>${STAR_SVG}</button>`
                    : `<span class="date">${t.date ? fmtDate(t.date) : 'ohne Datum'}</span>`) +
     `<button type="button" class="del" data-act="del" aria-label="${esc(t.title)} entfernen" title="Entfernen – landet im Notion-Papierkorb"${dis}>${TRASH_SVG}</button></li>`;
 }
@@ -1752,8 +1869,9 @@ $('#info').addEventListener('click', e => {
   const pr = P[detailId], kind = li.dataset.k, list = kind==='task' ? pr.tasks : pr.milestones, item = (kind==='task' ? shownTasks : shownMs)[+li.dataset.i];
   if (!item || !item.id) return;
   const act = b.dataset.act;
-  if (act === 'toggle'){ const v = isDone(item) ? 'Nicht begonnen' : 'Erledigt'; setField(item, 'status', v, v==='Erledigt' ? 'Abhaken' : 'Wieder öffnen', { Status:v }); }
-  else if (act === 'cycle'){ const v = { 'Nicht begonnen':'In Bearbeitung', 'In Bearbeitung':'Erledigt', 'Erledigt':'Nicht begonnen' }[item.status] || 'Nicht begonnen'; setField(item, 'status', v, 'Status', { Status:v }); }
+  if (act === 'toggle'){ const v = isDone(item) ? 'Nicht begonnen' : 'Erledigt'; setStatus(item, v, v==='Erledigt' ? 'Abhaken' : 'Wieder öffnen', b); }
+  else if (act === 'cycle'){ const v = { 'Nicht begonnen':'In Bearbeitung', 'In Bearbeitung':'Erledigt', 'Erledigt':'Nicht begonnen' }[item.status] || 'Nicht begonnen'; setStatus(item, v, 'Status', b); }
+  else if (act === 'today') setToday(item, !item.today);
   else if (act === 'prio'){ const v = { Hoch:'Mittel', Mittel:'Niedrig', Niedrig:'Hoch' }[item.prio] || 'Mittel'; setField(item, 'prio', v, 'Priorität', { 'Priorität':v }); }
   else if (act === 'rename') startRename(li, item, kind);
   else if (act === 'del'){
@@ -1778,7 +1896,7 @@ $('#info').addEventListener('change', e => {
 $('#dClose').addEventListener('click', closeDetail);
 $('#detail').addEventListener('mousedown', e => { if (e.target.id === 'detail') closeDetail(); });
 document.addEventListener('keydown', e => {
-  if (!detailId) return;
+  if (!detailId || !$('#review').hidden) return;
   if (e.key === 'Escape'){ e.preventDefault(); closeDetail(); return; }
   if (e.key === 'Tab'){ const f = [...$('#detail').querySelectorAll('button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]')].filter(x => x.offsetParent !== null);
     if (!f.length) return; const i = f.indexOf(document.activeElement);
@@ -1788,6 +1906,239 @@ $('#projCard').addEventListener('click', e => { const b = e.target.closest('[dat
 function toastMsg(txt){ toast.textContent = txt; toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 4200); }
 
 /* =========================================================
+   Zeit & Sonne (Zypern): echte Sonnenauf- und -untergangszeiten
+   ========================================================= */
+const cyToday = () => new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'Asia/Nicosia'}).format(new Date());
+const addDays = (iso, n) => new Date(Date.parse(iso + 'T12:00:00Z') + n*864e5).toISOString().slice(0,10);
+function tzOffsetHours(tz, d){ const loc = new Date(d.toLocaleString('en-US',{timeZone:tz})), utc = new Date(d.toLocaleString('en-US',{timeZone:'UTC'})); return (loc - utc)/36e5; }
+function sunTimes(date){ // NOAA-Näherung für Limassol, Ergebnis in zyprischer Ortszeit (Stunden)
+  const lat = 34.68, lon = 33.04, rad = Math.PI/180;
+  const day = Math.floor((date - Date.UTC(date.getUTCFullYear(),0,0))/864e5), g = 2*Math.PI/365*(day - 1);
+  const eqt = 229.18*(0.000075 + 0.001868*Math.cos(g) - 0.032077*Math.sin(g) - 0.014615*Math.cos(2*g) - 0.040849*Math.sin(2*g));
+  const decl = 0.006918 - 0.399912*Math.cos(g) + 0.070257*Math.sin(g) - 0.006758*Math.cos(2*g) + 0.000907*Math.sin(2*g) - 0.002697*Math.cos(3*g) + 0.00148*Math.sin(3*g);
+  const ha = Math.acos(Math.cos(90.833*rad)/(Math.cos(lat*rad)*Math.cos(decl)) - Math.tan(lat*rad)*Math.tan(decl))/rad;
+  const off = tzOffsetHours('Asia/Nicosia', date);
+  return { rise:(720 - 4*(lon + ha) - eqt)/60 + off, set:(720 - 4*(lon - ha) - eqt)/60 + off };
+}
+let sunCache = { day:'', v:{ rise:6.7, set:18.6 } };
+function sunToday(){ const d = cyToday(); if (sunCache.day !== d){ try { sunCache = { day:d, v:sunTimes(new Date()) }; } catch { sunCache.day = d; } } return sunCache.v; }
+const hm = h => `${Math.floor(h)}:${String(Math.round((h % 1)*60) % 60).padStart(2,'0')}`;
+
+/* Zufallswetter nach Zypern-Klima: grobe Richtwerte (Regentage pro Monat, Limassol), kein Live-Wetter */
+function climateWeights(){
+  const m = +new Intl.DateTimeFormat('en-US',{month:'numeric',timeZone:'Asia/Nicosia'}).format(new Date()) - 1;
+  const rd = [9,8,6,3,1.5,.3,.1,.1,.6,2.5,5,8.5][m], winter = [0,1,2,10,11].includes(m);
+  const regen = rd/30*60, gewitter = regen*(winter || m === 9 ? .35 : .15), nebel = winter ? 6 : 2, wolkig = 8 + rd*1.8, wind = 10;
+  return { regen, gewitter, nebel, wolkig, wind, klar:Math.max(20, 100 - regen - gewitter - nebel - wolkig - wind) };
+}
+function toggleWxMenu(open){
+  const m = $('#wxMenu'), b = $('#wxBtn'), show = open ?? m.hidden;
+  m.hidden = !show; b.setAttribute('aria-expanded', show);
+  if (show){ const s = sunToday(); $('#wxSun').textContent = `Sonnenaufgang ${hm(s.rise)} · Untergang ${hm(s.set)} Uhr (Zypern)`; (m.querySelector('[aria-checked="true"]') || m.querySelector('button')).focus(); }
+}
+$('#wxBtn').addEventListener('click', e => { e.stopPropagation(); toggleWxMenu(); });
+$('#wxMenu').addEventListener('click', e => {
+  const b = e.target.closest('[data-wx]'); if (!b) return;
+  const k = b.dataset.wx; wx.manual = k === 'auto' ? null : k; if (wx.manual) wx.cur = wx.manual; else wx.timer = 90;
+  paintWeather(); toggleWxMenu(false); $('#wxBtn').focus();
+});
+document.addEventListener('click', e => { if (!$('#wxMenu').hidden && !e.target.closest('.wxwrap')) toggleWxMenu(false); });
+$('#wxMenu').addEventListener('keydown', e => {
+  const items = [...$('#wxMenu').querySelectorAll('[data-wx]')], i = items.indexOf(document.activeElement);
+  if (e.key === 'Escape'){ e.preventDefault(); toggleWxMenu(false); $('#wxBtn').focus(); }
+  else if (e.key === 'ArrowDown'){ e.preventDefault(); items[(i + 1) % items.length].focus(); }
+  else if (e.key === 'ArrowUp'){ e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+});
+
+/* =========================================================
+   Echter KI-Status aus der Notion-Datenbank „KI-Agenten“
+   ========================================================= */
+let liveKI = null, modePicked = false;
+function applyKI(rows){
+  liveKI = {};
+  for (const r of rows){ const id = KI_OF[idOf(r.url)]; if (!id) continue; liveKI[id] = { status:r.Status || 'Offline', task:r['Aktuelle Tätigkeit'] || '', projects:rel(r['Arbeitet an']) }; }
+}
+function applyRealLive(){
+  for (const a of AGENTS){
+    const k = liveKI[a.id];
+    if (!k || k.status === 'Offline'){ assign(a.id, 'home', 'off', ''); continue; }
+    if (k.status === 'Arbeitet'){ const p = k.projects.map(n => PROJECTS.find(q => q.notion === n)).find(Boolean); assign(a.id, p ? p.id : 'atlas', 'work', k.task || 'arbeitet'); continue; }
+    assign(a.id, 'home', 'ready', '');
+  }
+}
+
+/* =========================================================
+   Heute: Tagesziel mit drei Aufgaben (Notion-Feld „Heute“)
+   ========================================================= */
+let todayItems = [], goalDay = '';
+const projOf = item => PROJECTS.find(p => p.tasks.includes(item) || p.milestones.includes(item));
+const STAR_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>';
+function renderToday(){
+  const el = $('#todayCard'); if (!el) return;
+  const all = PROJECTS.flatMap(p => p.tasks.map(t => [t, p]));
+  const flagged = all.filter(([t]) => t.today).sort((a,b) => (isDone(a[0]) - isDone(b[0])) || byOrder(a[0], b[0]));
+  const free = Math.max(0, 3 - flagged.length);
+  const sugg = all.filter(([t]) => !t.today && !isDone(t)).sort((a,b) => byOrder(a[0], b[0])).slice(0, free);
+  todayItems = [...flagged, ...sugg];
+  const done = flagged.filter(([t]) => isDone(t)).length, ed = canEdit(), dis = ed ? '' : ' disabled';
+  const date = new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',timeZone:'Asia/Nicosia'}).format(new Date());
+  let h = `<h3>Heute <small>${esc(date)}${flagged.length ? ` · ${done} von ${flagged.length} geschafft` : ''}</small></h3>`;
+  if (flagged.length && done === flagged.length) h += `<div class="goal">Tagesziel geschafft. Stark!</div>`;
+  h += `<ul class="tlist">` + todayItems.map(([t, p], i) => {
+    const pin = i < flagged.length, k = stKey(t.status);
+    return `<li class="trow tday st-${k}${pin ? '' : ' sugg'}${t.pending ? ' pending' : ''}" data-ti="${i}">` +
+      (pin ? `<button type="button" class="chk" data-tact="toggle" aria-pressed="${k==='done'}" aria-label="${esc(t.title)}: ${k==='done' ? 'wieder öffnen' : 'als erledigt markieren'}"${dis || (t.id ? '' : ' disabled')}></button>` : `<span class="sugg-ic" aria-hidden="true">${STAR_SVG}</span>`) +
+      `<span class="ttl">${esc(t.title)}<small class="pj ${p.group==='sb' ? 'sb' : ''}">${pin ? '' : 'Vorschlag · '}${esc(p.name)}</small></span>` +
+      (pin ? `<button type="button" class="pill" data-tact="unpin" title="Aus „Heute“ entfernen" aria-label="${esc(t.title)} aus Heute entfernen"${dis}>×</button>` : `<button type="button" class="pill" data-tact="pin" title="Für heute vormerken"${dis}>+ Heute</button>`) + `</li>`;
+  }).join('') + `</ul>`;
+  if (!todayItems.length) h += `<div class="empty">Keine offenen Aufgaben. Genieß den Tag.</div>`;
+  else if (!ed) h += `<p class="note">Vormerken und Abhaken klappt mit Notion-Verbindung.</p>`;
+  else if (!flagged.length) h += `<p class="note">Mit „+ Heute“ wählst du bis zu drei Aufgaben für heute aus, im Projekt geht es über den Stern.</p>`;
+  if (el.innerHTML !== h) el.innerHTML = h;
+}
+$('#todayCard').addEventListener('click', e => {
+  const b = e.target.closest('[data-tact]'); if (!b || b.disabled || !canEdit()) return;
+  const [t] = todayItems[+b.closest('[data-ti]').dataset.ti] || []; if (!t || !t.id) return;
+  if (b.dataset.tact === 'toggle') setStatus(t, isDone(t) ? 'Nicht begonnen' : 'Erledigt', isDone(t) ? 'Wieder öffnen' : 'Abhaken', b);
+  else setToday(t, b.dataset.tact === 'pin');
+});
+function setToday(item, on){ const prev = item.today; item.today = on; write(on ? 'Für heute vormerken' : 'Aus „Heute“ entfernen', () => updProps(item.id, { Heute: on ? '__YES__' : '__NO__' }), () => { item.today = prev; }); }
+function setStatus(item, v, label, el){
+  const task = 'prio' in item, prev = { status:item.status, doneAt:item.doneAt }, props = { Status:v };
+  if (task){ if (v === 'Erledigt'){ item.doneAt = cyToday(); props['date:Erledigt am:start'] = item.doneAt; props['date:Erledigt am:is_datetime'] = 0; } else if (item.doneAt){ item.doneAt = ''; props['date:Erledigt am:start'] = null; } }
+  item.status = v;
+  if (v === 'Erledigt' && prev.status !== 'Erledigt') reward(item, el);
+  write(label, () => updProps(item.id, props), () => { item.status = prev.status; item.doneAt = prev.doneAt; });
+}
+
+/* =========================================================
+   Belohnungen: Funken beim Abhaken, Feuerwerk für Meilensteine und das Tagesziel
+   ========================================================= */
+const FW_COL = ['#f4c86a','#ff7ad9','#6ee7d8','#93a6ff','#ff9a5a','#b6f36a'];
+let fwWorld = [], fwScene = [], pendingFw = [];
+const firedMs = new Set();
+function burstAt(el, color){
+  if (!el || reduceMotion) return;
+  const r = el.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
+  for (let i=0;i<16;i++){
+    const d = document.createElement('i'); d.className = 'burst'; d.style.left = cx + 'px'; d.style.top = cy + 'px'; d.style.background = i%3 ? color : pick(FW_COL);
+    document.body.appendChild(d);
+    const a = i/16*Math.PI*2 + rnd()*.3, dist = 26 + rnd()*26;
+    d.animate([{ transform:'translate(-50%,-50%) scale(1)', opacity:1 }, { transform:`translate(calc(-50% + ${Math.cos(a)*dist}px), calc(-50% + ${Math.sin(a)*dist}px)) scale(.4)`, opacity:0 }], { duration:650 + rnd()*250, easing:'cubic-bezier(.2,.8,.2,1)' }).onfinish = () => d.remove();
+  }
+}
+function fwPos(bid){ if (bid === 'atlas' || !BLD[bid]) return [CRYSTAL.x, CRYSTAL.y - 30]; const b = BLD[bid].box; return [(b[0]+b[2])/2, b[1] + 25]; }
+function launch(list, x, y, n, spread, h){ for (let i=0;i<n;i++) list.push({ kind:'rocket', x:x + (rnd()-.5)*spread, y, vx:(rnd()-.5)*h*.12, vy:-h*(.9 + rnd()*.25), t:-i*.35, fuse:.9 + rnd()*.35, col:pick(FW_COL), h }); }
+function sparks(list, x, y, n, speed, col){ for (let i=0;i<n;i++){ const a = rnd()*Math.PI*2, v = speed*(.4 + rnd()*.6); list.push({ kind:'spark', x, y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, life:1, col:col || pick(FW_COL), g:speed*.9 }); } }
+function fireworksWorld(bid){ if (reduceMotion) return; const [x,y] = fwPos(bid); launch(fwWorld, x, y, 5, 70, 190); }
+function fireworksScene(){ if (reduceMotion || !scene) return; launch(fwScene, scene.sx + scene.sw*.5, scene.sy + scene.sh*.75, 5, scene.sw*.5, scene.sh*.75); }
+function stepFw(list, dt){
+  for (let i=list.length-1;i>=0;i--){ const f = list[i];
+    if (f.kind === 'rocket'){ f.t += dt; if (f.t < 0) continue; f.x += f.vx*dt; f.y += f.vy*dt; f.vy += f.h*.55*dt;
+      if (f.t > f.fuse){ list.splice(i,1); sparks(list, f.x, f.y, 44, f.h*.55, f.col); sfxPop(); } }
+    else { f.x += f.vx*dt; f.y += f.vy*dt; f.vy += f.g*.35*dt; f.vx *= .985; f.life -= dt*.75; if (f.life <= 0) list.splice(i,1); }
+  }
+}
+function drawFw(c, list, X, Y, s, glowFn, k = 1){
+  c.globalCompositeOperation = 'lighter';
+  for (const f of list){ if (f.kind === 'rocket'){ if (f.t < 0) continue; glowFn(X(f.x), Y(f.y), (7*s + 3)*k, '#fff1c9', .9); }
+    else { const a = Math.max(0, f.life); glowFn(X(f.x), Y(f.y), ((3 + 4*a)*s + 1)*k, f.col, a); } }
+  c.globalCompositeOperation = 'source-over';
+}
+function reward(item, el){
+  const p = projOf(item), color = p && p.group === 'sb' ? '#f4c86a' : '#62d69c';
+  burstAt(el, color); sfxChime();
+  if (!p) return;
+  if (!('prio' in item)){ // Meilenstein erreicht
+    if (item.id) firedMs.add(item.id);
+    if (detailId === p.id){ fireworksScene(); pendingFw.push(p.id); } else fireworksWorld(p.id);
+    toastMsg(`Meilenstein erreicht: ${item.title}`);
+  } else if (!reduceMotion){ const [x,y] = fwPos(p.id); sparks(fwWorld, x, y + 40, 22, 60); }
+  setTimeout(() => { // Tagesziel komplett?
+    const flagged = PROJECTS.flatMap(q => q.tasks).filter(t => t.today);
+    if (item.today && flagged.length && flagged.every(isDone) && goalDay !== cyToday()){ goalDay = cyToday(); fireworksWorld('atlas'); if (detailId) fireworksScene(); toastMsg('Tagesziel geschafft. Stark!'); }
+  }, 0);
+}
+
+/* =========================================================
+   Wochenrückblick
+   ========================================================= */
+let rvOff = 0, rvLast = null;
+function isoWeek(iso){ const d = new Date(iso + 'T12:00:00Z'), day = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - day + 3); const y = new Date(Date.UTC(d.getUTCFullYear(),0,4)); return 1 + Math.round(((d - y)/864e5 - 3 + ((y.getUTCDay() + 6) % 7))/7); }
+function weekBounds(off){ const t = cyToday(), d = new Date(t + 'T12:00:00Z'), dow = (d.getUTCDay() + 6) % 7, mon = addDays(t, -dow + off*7); return [mon, addDays(mon, 6)]; }
+const dm = iso => { const [y,m,d] = iso.split('-'); return `${d}.${m}.`; };
+function rvList(rows, extra){ return rows.length ? `<ul class="tasks">` + rows.map(([t,p]) => `<li class="${stKey(t.status)}"><span class="ic"></span><span class="tt">${esc(t.title)} <small class="pj ${p.group==='sb'?'sb':''}">${esc(p.name)}</small></span><span class="tm">${extra ? extra(t) : ''}</span></li>`).join('') + `</ul>` : `<div class="empty">Nichts.</div>`; }
+function renderReview(){
+  const [a, b] = weekBounds(rvOff), today = cyToday(), cur = rvOff === 0;
+  const rows = PROJECTS.flatMap(p => p.tasks.map(t => [t, p])), ms = PROJECTS.flatMap(p => p.milestones.map(m => [m, p]));
+  const doneWeek = rows.filter(([t]) => isDone(t) && t.doneAt && t.doneAt >= a && t.doneAt <= b).sort((x,y) => x[0].doneAt.localeCompare(y[0].doneAt));
+  const noDate = rows.filter(([t]) => isDone(t) && !t.doneAt).length;
+  const running = rows.filter(([t]) => t.status === 'In Bearbeitung'), high = rows.filter(([t]) => !isDone(t) && t.prio === 'Hoch');
+  const soon = ms.filter(([m]) => !isDone(m) && m.date && m.date >= today && m.date <= addDays(today, 14)), late = ms.filter(([m]) => !isDone(m) && m.date && m.date < today);
+  let h = `<div class="eyebrow">Wochenrückblick${cur ? ' · diese Woche' : ''}</div><div class="rv-head"><button type="button" class="pill" data-rv="-1" aria-label="Vorherige Woche">‹</button><h2 id="rvTitle">KW ${isoWeek(a)} · ${dm(a)}–${dm(b)}${b.slice(0,4)}</h2><button type="button" class="pill" data-rv="1" aria-label="Nächste Woche"${cur ? ' disabled' : ''}>›</button></div>`;
+  h += `<p class="note" style="margin:0">${live.ok ? 'Live aus Notion.' : 'Offline-Stand vom 30.09.2026.'} „Erledigt am“ wird beim Abhaken im Dashboard gesetzt.</p>`;
+  h += `<div class="kpis rv-k"><div class="kpi"><b>${doneWeek.length}</b><span>erledigt in dieser Woche</span></div><div class="kpi"><b>${running.length}</b><span>in Bearbeitung${cur ? '' : ' (heute)'}</span></div><div class="kpi"><b>${high.length}</b><span>offen, Prio hoch</span></div><div class="kpi"><b>${soon.length}</b><span>Meilensteine in 14 Tagen</span></div></div>`;
+  h += `<section><h3>Erledigt</h3>${rvList(doneWeek, t => dm(t.doneAt))}${noDate ? `<p class="note">${noDate} erledigte Aufgaben von früher haben noch kein Erledigt-Datum und fehlen deshalb hier.</p>` : ''}</section>`;
+  h += `<section><h3>Läuft gerade</h3>${rvList(running)}</section>`;
+  h += `<section><h3>Offen mit Priorität Hoch</h3>${rvList(high)}</section>`;
+  h += `<section><h3>Meilensteine</h3>${late.length ? `<p class="note warn">Überfällig</p>${rvList(late, m => dm(m.date))}` : ''}${soon.length ? rvList(soon, m => dm(m.date)) : late.length ? '' : '<div class="empty">In den nächsten 14 Tagen ist kein Meilenstein fällig.</div>'}</section>`;
+  $('#rvBody').innerHTML = h;
+}
+function openReview(){ rvOff = 0; rvLast = document.activeElement; renderReview(); $('#review').hidden = false; $('#rvClose').focus(); try { localStorage.setItem('atlas-rv-seen', weekBounds(0)[0]); } catch {} paintRvDot(); }
+function closeReview(){ $('#review').hidden = true; if (rvLast && rvLast.focus) rvLast.focus(); }
+function paintRvDot(){ let seen = ''; try { seen = localStorage.getItem('atlas-rv-seen') || ''; } catch {} const dow = (new Date(cyToday() + 'T12:00:00Z').getUTCDay() + 6) % 7; $('#rvDot').hidden = !(dow >= 4 && seen !== weekBounds(0)[0]); }
+$('#rvClose').addEventListener('click', closeReview);
+$('#review').addEventListener('mousedown', e => { if (e.target.id === 'review') closeReview(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#review').hidden){ e.preventDefault(); closeReview(); } });
+$('#rvBody').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b || b.disabled) return; rvOff = Math.min(0, rvOff + +b.dataset.rv); renderReview(); });
+
+/* =========================================================
+   Geräusche (standardmäßig aus): Wind, Regen, Donner, Vögel, Kaminfeuer, Glocke
+   ========================================================= */
+const snd = { on:false, ac:null, master:null, gWind:null, gRain:null, birdT:3, fireT:0, lastFlash:0 };
+function soundInit(){
+  if (snd.ac) return true;
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+  const ac = new AC(), buf = ac.createBuffer(1, ac.sampleRate*2, ac.sampleRate), d = buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i] = Math.random()*2 - 1;
+  const src = ac.createBufferSource(); src.buffer = buf; src.loop = true;
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380;
+  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1700; bp.Q.value = .6;
+  snd.gWind = ac.createGain(); snd.gRain = ac.createGain(); snd.gWind.gain.value = 0; snd.gRain.gain.value = 0;
+  snd.master = ac.createGain(); snd.master.gain.value = .55; snd.master.connect(ac.destination);
+  src.connect(lp).connect(snd.gWind).connect(snd.master); src.connect(bp).connect(snd.gRain).connect(snd.master); src.start();
+  snd.ac = ac; snd.noise = buf; return true;
+}
+function tone(freq, t0, dur, type, vol, slide){ const ac = snd.ac, o = ac.createOscillator(), g = ac.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t0); if (slide) o.frequency.exponentialRampToValueAtTime(slide, t0 + dur); g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .012); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur); o.connect(g).connect(snd.master); o.start(t0); o.stop(t0 + dur + .05); }
+function noise(t0, dur, freq, vol, type){ const ac = snd.ac, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = snd.noise; f.type = type || 'lowpass'; f.frequency.setValueAtTime(freq, t0); g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .02); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur); s.connect(f).connect(g).connect(snd.master); s.start(t0, Math.random()*1.5); s.stop(t0 + dur + .05); return f; }
+const ready2 = () => snd.on && snd.ac && snd.ac.state === 'running';
+function sfxChime(){ if (!ready2()) return; const t = snd.ac.currentTime; tone(1318.5, t, .55, 'sine', .12); tone(1975.5, t + .09, .8, 'sine', .09); }
+function sfxPop(){ if (!ready2()) return; const t = snd.ac.currentTime; noise(t, .35, 1400, .22); for (let i=0;i<5;i++) noise(t + .08 + rnd()*.35, .04, 4000, .05, 'highpass'); }
+function updateSound(dt){
+  if (!ready2()) return;
+  const ac = snd.ac, t = ac.currentTime, wet = Math.min(1, wx.amt.regen + wx.amt.gewitter), inside = !!detailId, L = lighting();
+  snd.gWind.gain.setTargetAtTime((.015 + .1*wx.amt.wind + .035*wet)*(inside ? .35 : 1), t, .8);
+  snd.gRain.gain.setTargetAtTime(.17*wet*(inside ? .3 : 1), t, .8);
+  if (wx.flash > .95 && snd.lastFlash < .5){ const f = noise(t + .5, 2.6, 260, .5); f.frequency.exponentialRampToValueAtTime(60, t + 3); }
+  snd.lastFlash = wx.flash;
+  snd.birdT -= dt;
+  if (snd.birdT <= 0){ snd.birdT = 2.5 + rnd()*6; if (!inside && L.dark < .3 && wet < .2 && wx.amt.nebel < .5){ const f = 2400 + rnd()*900; tone(f, t, .1, 'sine', .035, f*1.35); tone(f*1.1, t + .14, .09, 'sine', .03, f*1.5); } }
+  if (inside && scene && scene.fire && scene.fire.length){ snd.fireT -= dt; if (snd.fireT <= 0){ snd.fireT = .05 + rnd()*.25; noise(t, .03 + rnd()*.04, 2500 + rnd()*2500, .03 + rnd()*.05, 'highpass'); } }
+}
+function paintSound(){ const b = $('#sndBtn'); b.setAttribute('aria-pressed', snd.on); $('#sndState').textContent = snd.on ? 'an' : 'aus'; b.classList.toggle('on', snd.on); }
+$('#sndBtn').addEventListener('click', () => {
+  snd.on = !snd.on;
+  if (snd.on){ if (!soundInit()){ snd.on = false; toastMsg('Dieser Browser kann hier keine Töne abspielen.'); } else snd.ac.resume(); }
+  else if (snd.ac) snd.ac.suspend();
+  try { localStorage.setItem('atlas-sound', snd.on ? '1' : '0'); } catch {}
+  paintSound();
+});
+try { if (localStorage.getItem('atlas-sound') === '1'){ snd.on = true; document.addEventListener('pointerdown', () => { if (snd.on && soundInit()) snd.ac.resume(); }, { once:true }); } } catch {}
+paintSound();
+
+const prevMs = {};
+
+/* =========================================================
    Start
    ========================================================= */
 buildLabels();
@@ -1795,7 +2146,7 @@ new ResizeObserver(resize).observe(stage);
 resize();
 updateClock(); setInterval(updateClock, 15000);
 paintWeather();
-$('#wxBtn').addEventListener('click', () => { const order = [null, ...WEATHER_TYPES], i = order.indexOf(wx.manual); wx.manual = order[(i + 1) % order.length]; if (wx.manual) wx.cur = wx.manual; else wx.timer = 90; paintWeather(); });
+paintRvDot();
 setMode('demo');
 renderProject(); flush();
 Promise.all([loadImg(baseImg, 'assets/dorf.webp'), loadImg(lightImg, 'assets/lichter.png')])

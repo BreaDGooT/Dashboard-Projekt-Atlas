@@ -14,9 +14,9 @@ case "${1:-}" in
     codex exec --skip-git-repo-check --sandbox read-only "$2"
     ;;
   image)
-    [ $# -ge 3 ] || { echo "Nutzung: $0 image \"Beschreibung\" ziel.png [vorlage.png]" >&2; exit 1; }
+    [ $# -ge 3 ] || { echo "Nutzung: $0 image \"Beschreibung\" ziel.png [vorlage.png …]" >&2; exit 1; }
     marker=$(mktemp); trap 'rm -f "$marker"' EXIT
-    ref=(); [ -n "${4:-}" ] && ref=(-i "$4")   # optionale Vorlage, z. B. Kartenausschnitt für einheitlichen Stil
+    ref=(); for f in "${@:4}"; do ref+=(-i "$f"); done   # optionale Vorlagen, z. B. Kartenausschnitt + Stilbeispiel
     codex exec --skip-git-repo-check --sandbox read-only \
       "Erzeuge mit deinem eingebauten Bildwerkzeug genau ein Bild: $2. Antworte danach nur mit OK." ${ref[@]+"${ref[@]}"} >&2
     # Codex legt Bilder unter ~/.codex/generated_images ab; das neueste seit dem Start übernehmen.
@@ -27,7 +27,7 @@ case "${1:-}" in
     echo "$3"
     ;;
   *)
-    echo "Nutzung: $0 login | status | text \"Auftrag\" | image \"Beschreibung\" ziel.png [vorlage.png]" >&2
+    echo "Nutzung: $0 login | status | text \"Auftrag\" | image \"Beschreibung\" ziel.png [vorlage.png …]" >&2
     exit 1
     ;;
 esac
