@@ -5,7 +5,8 @@
 //   ./team/gemini.sh text  "Prompt"              Text-Antwort (Flash, Free Tier)
 //   ./team/gemini.sh image "Prompt" out.png      Bild erzeugen und speichern
 //
-// Schlüssel: Umgebungsvariable GEMINI_API_KEY (nie in Code oder Chat).
+// Schlüssel: bevorzugt als API-Credential der Cloud-Umgebung (Proxy setzt den Header x-goog-api-key,
+// der Schlüssel ist in der Sitzung nie sichtbar). Alternativ Umgebungsvariable GEMINI_API_KEY.
 // Modelle optional überschreiben: GEMINI_TEXT_MODEL, GEMINI_IMAGE_MODEL.
 
 import { writeFile } from 'node:fs/promises';
@@ -19,16 +20,18 @@ function fail(msg) {
 }
 
 async function call(path, body) {
-  if (!KEY) fail('GEMINI_API_KEY fehlt. Bitte in den Umgebungs-Einstellungen hinterlegen.');
+  const headers = { 'content-type': 'application/json' };
+  if (KEY) headers['x-goog-api-key'] = KEY; // sonst ergänzt der Proxy den Schlüssel (API-Credential)
   const res = await fetch(`${API}/${path}`, {
     method: body ? 'POST' : 'GET',
-    headers: { 'x-goog-api-key': KEY, 'content-type': 'application/json' },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     const reason = data.error?.message || res.statusText;
     if (res.status === 429) fail(`Limit erreicht (429): ${reason}`);
+    if (!KEY && (res.status === 400 || res.status === 401 || res.status === 403)) fail(`Kein gültiger Schlüssel angekommen (${res.status}). API-Credential für generativelanguage.googleapis.com prüfen oder GEMINI_API_KEY setzen. Google meldet: ${reason}`);
     fail(`Fehler ${res.status}: ${reason}`);
   }
   return data;

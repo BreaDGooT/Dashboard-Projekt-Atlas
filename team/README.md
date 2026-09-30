@@ -5,15 +5,17 @@ Claude Code ist der **Dirigent**: Er nimmt Flos Auftrag an, verteilt Teilaufgabe
 | Mitglied | Rolle | Anbindung | Stand |
 |---|---|---|---|
 | Claude Code | Dirigent, Code, Zusammenführung | läuft hier | aktiv |
-| Gemini | Recherche, Texte, Bilder | `team/gemini.sh` über API-Schlüssel `GEMINI_API_KEY` | bereit, wartet auf Schlüssel |
+| Gemini | Recherche, Texte, Bilder | `team/gemini.sh` – Schlüssel als API-Credential (oder `GEMINI_API_KEY`) | bereit, wartet auf Schlüssel |
 | ChatGPT | Zweitmeinung, Bilder, Codex-Aufgaben | Codex CLI (ChatGPT-Plus-Login) oder OpenAI-API | geplant – Netzwerkfreigabe für `api.openai.com` und `auth.openai.com` nötig |
 | Claude (App) | Konzept & Texte im Chat mit Flo | Notion-Konnektor | manuell / One-Klick |
 
 ## Gemini einrichten (einmalig)
 
 1. In Google AI Studio einen API-Schlüssel erstellen (Google-Konto, keine Kreditkarte nötig).
-2. In den Einstellungen der Cloud-Umgebung als Umgebungsvariable `GEMINI_API_KEY` hinterlegen – nie im Chat einfügen.
-3. Neue Sitzung starten; dann `./team/gemini.sh models` zum Test.
+2. Auf claude.ai/code im Browser: Cloud-Symbol mit dem Umgebungsnamen über dem Eingabefeld → beim Eintrag auf das Zahnrad → **Update cloud environment**.
+3. Empfohlen – **API credentials** → **Add credential**: Name `Gemini API`, Allowed websites `generativelanguage.googleapis.com`, Custom header Name `x-goog-api-key`, Prefix leeren, Value = Schlüssel → **Connect**. Der Schlüssel ist danach in keiner Sitzung sichtbar.
+   Alternative: unter **Environment variables** die Zeile `GEMINI_API_KEY=…` eintragen → **Save changes**.
+4. Neue Sitzung starten; dann `./team/gemini.sh models` zum Test.
 
 ## Nutzung
 
