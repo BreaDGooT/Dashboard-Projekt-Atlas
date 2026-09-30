@@ -25,6 +25,7 @@ Claude Code ist der **Dirigent**: Er nimmt Flos Auftrag an, verteilt Teilaufgabe
 
 ./team/chatgpt.sh status                                       # Login noch gültig?
 ./team/chatgpt.sh image "Pixel-Art Dorfhaus …" assets/haus.png
+./team/chatgpt.sh image "Nahansicht des Gebäudes …" assets/haus.png vorlage.png   # mit Bildvorlage für einheitlichen Stil
 ./team/chatgpt.sh text  "Zweitmeinung zu …"
 ```
 
@@ -35,7 +36,7 @@ Das Skript nimmt das neueste passende Flash-Modell. Ist es überlastet (503), ab
 - Schlüssel kommt über das API-Credential an, Modellliste abrufbar.
 - **Text:** funktioniert im Free Tier. `gemini-3.8-flash` und `gemini-3.7-flash` meldeten beim Test 503 (Überlast), `gemini-3.6-flash` antwortete.
 - **Bilder:** im Free Tier gesperrt (Google meldet Limit 0 für alle Bildmodelle). Erst nutzbar, wenn im Google-AI-Studio-Projekt die Abrechnung aktiviert ist.
-- **ChatGPT (Codex 0.159.2):** Login per Gerätecode klappt über den Proxy der Umgebung. Bilder kommen über das eingebaute Bildwerkzeug (1254 × 1254 px PNG, ohne API-Schlüssel), Text über `codex exec`. Gegenprüfung Gemini am selben Tag: `gemini-3.8-flash` und `gemini-3.7-flash` weiter 503, `gemini-3.6-flash` antwortet.
+- **ChatGPT (Codex 0.159.2):** Login per Gerätecode klappt über den Proxy der Umgebung. Bilder kommen über das eingebaute Bildwerkzeug (1254 × 1254 px PNG, ohne API-Schlüssel), Text über `codex exec`. Mit Bildvorlage (`-i`) übernimmt ChatGPT Form, Farben und Details zuverlässig (Stiltest Gebäude-Illustrationen). Der Proxy blockiert dabei `ab.chatgpt.com` und `*.oaiusercontent.com` – das sind Nebendienste, Bilder kommen trotzdem an. Gegenprüfung Gemini am selben Tag: `gemini-3.8-flash` und `gemini-3.7-flash` weiter 503, `gemini-3.6-flash` antwortet.
 
 ## ChatGPT einrichten (Bilder über das Plus-Abo)
 
