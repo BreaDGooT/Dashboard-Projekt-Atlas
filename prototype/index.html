@@ -148,14 +148,18 @@ a{color:inherit}
 .sb .bar i{background:linear-gradient(90deg,#d9a441,var(--star))}
 .stage.compact .lbl-row,.stage.compact .lbl-state,.stage.compact .lbl-ai{display:none}
 .stage.dense.far .lbl-state{display:none}
-.stage.dense.far .lbl.plot:not(.sel){display:none}
+.lbl-plus{display:none;font-family:var(--f-ui);font-weight:700;font-size:15px;line-height:1}
+.stage.far .lbl.plot:not(.sel) .lbl-name{display:none}
+.stage.far .lbl.plot:not(.sel) .lbl-plus{display:block}
+.stage.far .lbl.plot:not(.sel){padding:3px 7px}
 .stage.compact .lbl{padding:3px 6px}
 .stage.compact .lbl-name{font-size:11px}
 .stage.compact .lbl:not(.sel):not(.core){width:14px;height:14px;padding:0;border-radius:50%;border-width:2px;background:rgba(8,16,20,.9)}
 .stage.compact .lbl:not(.sel):not(.core)::before{display:none}
 .stage.compact .lbl:not(.sel):not(.core)::after{content:"";position:absolute;inset:-8px;border:0;margin:0;transform:none}
 .stage.compact .lbl:not(.sel):not(.core) .lbl-name{display:none}
-.stage.compact .lbl.plot:not(.sel){display:none}
+.stage.compact .lbl.plot:not(.sel){width:auto;height:auto;border-radius:8px;padding:2px 6px}
+.stage.compact .lbl.plot:not(.sel) .lbl-plus{display:block}
 .stage.compact .badge-mode{font-size:10.5px;padding:4px 8px;top:8px;left:8px}
 .stage.compact .zoom button{width:30px;height:30px;font-size:15px}
 
@@ -399,11 +403,17 @@ body.detail-open{overflow:hidden}
 .sel{padding-right:6px}
 .grid2{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:end}
 .tlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
-.trow{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto 28px 28px;gap:8px;align-items:center;padding:6px 6px;border-radius:9px;border:1px solid transparent;transition:background .15s,opacity .2s}
+.tlist{container-type:inline-size}
+.tctl{display:flex;align-items:center;gap:6px}
+.trow{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 6px;border-radius:9px;border:1px solid transparent;transition:background .15s,opacity .2s}
 .trow:hover{background:rgba(255,255,255,.035);border-color:var(--line)}
 .trow.pending{opacity:.55}
 .trow.pending button{pointer-events:none}
-.trow.ms{grid-template-columns:22px minmax(0,1fr) auto 28px}
+.trow.ms{grid-template-columns:22px minmax(0,1fr) auto}
+@container (max-width:560px){ .trow:not(.tday):not(.ms){grid-template-columns:22px minmax(0,1fr)} .trow:not(.tday):not(.ms) .tctl{grid-column:2;flex-wrap:wrap} }
+.whosel{font:inherit;font-family:var(--f-ui);font-size:11px;font-weight:600;color:var(--fg-3);background:rgba(9,16,22,.5);border:1px solid var(--line-2);border-radius:99px;padding:2px 4px;max-width:92px;cursor:pointer}
+.whosel:disabled{cursor:default;opacity:.7}
+.whosel:focus{outline:none;border-color:var(--core)}
 .chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--fg-3);background:none;cursor:pointer;display:grid;place-items:center;padding:0}
 .chk:hover{border-color:var(--ok)}
 .trow.st-done .chk{background:var(--ok);border-color:var(--ok)}
@@ -431,6 +441,8 @@ body.detail-open{overflow:hidden}
 .date{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--fg-3);white-space:nowrap}
 .add{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;margin-top:8px}
 .add .btn{margin:0}
+.np{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.np .btn{margin-top:0;align-self:flex-start}
 #dAddM{grid-template-columns:minmax(0,1fr) auto}
 #dAddM input[name="t"]{grid-column:1 / -1}
 .btn.pri{background:rgba(110,231,216,.14);border-color:rgba(110,231,216,.5);color:var(--core)}
@@ -447,7 +459,6 @@ body.detail-open{overflow:hidden}
   .info{top:calc(44vh - 18px);left:0;right:0;bottom:0;width:auto;border-radius:18px 18px 0 0;padding:18px 16px 28px;transform:translateY(30px)}
   .d-close{top:14px;right:14px}
   .info h2{font-size:25px}
-  .trow{grid-template-columns:22px minmax(0,1fr) auto 28px 28px}
   .trow .pill.st{display:none}
 }
 
@@ -516,7 +527,7 @@ body.detail-open{overflow:hidden}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v0.7 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
+      <small>Hybrid-Prototyp v0.8 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: live aus Notion, bearbeitbar in der Detailansicht</small>
     </div>
   </aside>
 
@@ -692,7 +703,19 @@ const PLOTS = [
   { id:'plot3', name:'Freier Bauplatz', x:1088, y:472 },
 ];
 const P = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
-PLOTS.forEach(p => { P[p.id] = { ...p, group:'plot', building:'Bauplatz', status:'frei', plot:true }; });
+PLOTS.forEach((p,i) => { P[p.id] = { ...p, group:'plot', building:'Bauplatz', status:'frei', plot:true, slot:i+1 }; });
+const freePlots = () => PLOTS.filter(p => !p.taken);
+// Projekt auf einem Bauplatz (Notion-Feld „Bauplatz“) wird als Baustelle ins Dorf gesetzt
+function placeOnPlot(n, data){
+  const plot = PLOTS[n-1]; if (!plot) return null;
+  const id = 'bp' + n;
+  let pr = P[id];
+  if (!pr){ pr = { id, building:'Baustelle', tasks:[], milestones:[], progressFrom:'tasks', dyn:true, slot:n }; PROJECTS.push(pr); P[id] = pr; }
+  Object.assign(pr, data);
+  BLD[id] = { box:[plot.x-72, plot.y-64, plot.x+72, plot.y+30], front:[plot.x, plot.y+24], label:[plot.x, plot.y-58, 'above'] };
+  plot.taken = id; return pr;
+}
+function clearPlots(keep){ for (let i = PROJECTS.length - 1; i >= 0; i--){ const pr = PROJECTS[i]; if (pr.dyn && !keep.has(pr.id)){ PROJECTS.splice(i, 1); delete P[pr.id]; delete BLD[pr.id]; PLOTS[pr.slot-1].taken = null; if (selected === pr.id) selected = 'plot' + pr.slot; } } }
 
 // Aufgaben & Meilensteine als Objekte mit den Notion-Status „Nicht begonnen · In Bearbeitung · Erledigt“.
 // Der Stand oben ist der Offline-Stand vom 30.09.2026; mit Notion-Verbindung ersetzt ihn applyLive().
@@ -1080,6 +1103,26 @@ function drawPet(p, t){
   ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(WX(p.x), WY(p.y)+px*.2, w*px*.42, 1.2*px, 0, 0, Math.PI*2); ctx.fill();
   blit(rows, p.col, WX(p.x) - w/2*px, WY(p.y) - h*px - bob, px, p.face, null);
 }
+// Baustelle: Bauzaun, Gerüst, Kisten, Schild, Kran-Arm und Hammerfunken; wächst mit dem Fortschritt
+const sitBuild = {};
+function drawSite(c, X, Y, s, t, pr){
+  const plot = PLOTS[pr.slot-1], x = plot.x, y = plot.y, px = Math.max(1, 2.4*s);
+  const g = (pr.tasks.length ? pr.tasks.filter(isDone).length/pr.tasks.length : 0);
+  const R = (a,b,w,h,col) => { c.fillStyle = col; c.fillRect(Math.round(X(x + a*2.4)), Math.round(Y(y + b*2.4)), Math.ceil(w*px), Math.ceil(h*px)); };
+  c.fillStyle = 'rgba(92,64,38,.55)'; c.beginPath(); c.ellipse(X(x), Y(y + 4), 64*s, 24*s, 0, 0, Math.PI*2); c.fill();
+  const floors = 1 + Math.round(g*3), lift = (sitBuild[pr.slot] ?? 1);
+  R(-16,-4,32,4,'#8a6a4a'); R(-16,-4,32,1,'#a88560');                                  // Fundament
+  for (let f=0; f<floors; f++){ const top = -4 - (f+1)*9*Math.min(1, lift); R(-14, top, 28, 9, f === floors-1 ? '#c9a57a' : '#b98f62'); R(-14, top, 28, 1, '#dcc09a'); R(-9, top + 3, 4, 4, '#3a2a1c'); R(5, top + 3, 4, 4, '#3a2a1c'); }
+  const topY = -4 - floors*9;
+  for (const gx of [-18, 17]) R(gx, topY - 6, 1.4, -topY + 6, '#7a5a36');                   // Gerüst
+  for (let k = topY; k < -4; k += 6) R(-18, k, 36.4, 1, '#8c6a42');
+  R(22,-30,1.6,30,'#d4a23a'); R(10,-31,26,1.6,'#d4a23a');                               // Kran
+  const sw = reduceMotion ? 0 : Math.sin(t*.8)*3; R(30 + sw*.2,-29,.6,10 + sw,'#444');  R(28.6 + sw*.2,-19 + sw,3.4,3,'#b0552e');
+  for (const [a,b] of [[-30,4],[-24,6],[26,5]]) { R(a,b-4,5,4,'#a0763f'); R(a,b-4,5,1,'#c8995a'); }                         // Kisten
+  for (let k=-28; k<=28; k+=7) R(k, 10, 1, 4, '#caa36a'); R(-28, 11, 57, .8, '#caa36a');                                       // Zaun
+  R(-4, 14, 8, 5, '#e2c48a'); R(-.4, 19, .8, 3, '#7a5a36'); R(-3, 15.5, 6, .7, '#7a5a36'); R(-3, 17, 4, .7, '#7a5a36');        // Schild
+  if (!reduceMotion && Math.sin(t*5 + pr.slot) > .85){ c.globalCompositeOperation = 'lighter'; for (let i=0;i<5;i++){ const a = rnd()*6.28, d = (2 + rnd()*5)*px; c.fillStyle = '#ffd27a'; c.fillRect(X(x + 16*2.4) + Math.cos(a)*d, Y(y + (topY+3)*2.4) + Math.sin(a)*d, px*.7, px*.7); } c.globalCompositeOperation = 'source-over'; }
+}
 function drawAngler(t){
   const s = view.s, A0 = ANG, px = A0.px*s;
   const catching = A0.phase==='catch', u = catching ? Math.min(1, A0.t/1.3) : 0;
@@ -1126,7 +1169,7 @@ function tag(x, y, text, color, working, t){
   ctx.fillStyle = '#e6eef0'; ctx.textBaseline = 'middle'; ctx.fillText(text, tx, by + th/2 + .5*dpr);
   ctx.restore();
 }
-function routePts(bid){ return ROUTES[bid] ? [...ROUTES[bid], BLD[bid] ? BLD[bid].front : ROUTES[bid][ROUTES[bid].length-1]] : null; }
+function routePts(bid){ return ROUTES[bid] ? [...ROUTES[bid], BLD[bid] ? BLD[bid].front : ROUTES[bid][ROUTES[bid].length-1]] : BLD[bid] ? [BLD[bid].front] : [[PLAZA.x, PLAZA.y]]; }
 function pointOnPoly(pts, u){
   let total = 0; const seg = [];
   for (let i=1;i<pts.length;i++){ const d = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); seg.push(d); total += d; }
@@ -1164,6 +1207,7 @@ function render(t){
   for (const v of walkers) drawVillager(v, t);
   for (const p of [...PETS].sort((a,b) => a.y - b.y)) drawPet(p, t);
   drawAngler(t);
+  for (const pr of PROJECTS) if (pr.dyn) drawSite(ctx, WX, WY, view.s, t, pr);
 
   // Beleuchtung
   const rect = [view.ox, view.oy, IW*s, IH*s];
@@ -1258,6 +1302,7 @@ function simulate(dt, t){
     let dest; do { dest = pick(DESTS); } while (dest === v.at);
     v.route = pathBetween(v.at && v.at !== 'plaza' ? v.at : null, dest); v.at = dest; v.wait = 3 + rnd()*6;
   }
+  for (const k in sitBuild) sitBuild[k] = Math.min(1, sitBuild[k] + dt*.6);
   for (const p of PETS){
     if (p.route.length){ p.sit = 0; if (walk(p, dt, p.sp)) p.sit = p.sitNext ? 1 : 0; continue; }
     p.wait -= dt; if (p.wait <= 0) petPlan(p);
@@ -1299,17 +1344,17 @@ function anchorOf(id){
 }
 function buildLabels(){
   labelsEl.innerHTML = '';
-  for (const pr of [...PROJECTS, ...PLOTS.map(p => P[p.id])]){
+  for (const pr of [...PROJECTS, ...freePlots().map(p => P[p.id])]){
     const el = document.createElement('button');
     const pos = anchorOf(pr.id)[2];
     el.type = 'button';
     el.className = 'lbl ' + (pr.id==='atlas' ? 'core' : pr.plot ? 'plot' : pr.group==='sb' ? 'sb' : 'other') + (pos==='below' ? ' below' : pos==='center' ? ' mid' : '');
     el.dataset.id = pr.id;
     const pg = pr.plot ? null : progressOf(pr);
-    el.innerHTML = `<span class="lbl-name">${esc(pr.name)}</span>` +
+    el.innerHTML = (pr.plot ? '<span class="lbl-plus" aria-hidden="true">+</span>' : '') + `<span class="lbl-name">${esc(pr.name)}</span>` +
       (pr.plot ? '' : pg !== null ? `<span class="lbl-row"><span class="bar"><i style="width:${pg}%"></i></span>${pg}%</span>` : `<span class="lbl-state">${esc(pr.status)}</span>`) +
       `<span class="lbl-ai"></span>`;
-    el.setAttribute('aria-label', pr.plot ? 'Freier Bauplatz für ein neues Projekt' : `${pr.name}, ${pr.status}${pg!==null ? ', ' + pg + ' Prozent' : ''}`);
+    el.title = pr.plot ? 'Freier Bauplatz: neues Projekt anlegen' : ''; el.setAttribute('aria-label', pr.plot ? 'Freier Bauplatz: neues Projekt anlegen' : `${pr.name}, ${pr.status}${pg!==null ? ', ' + pg + ' Prozent' : ''}`);
     el.addEventListener('click', () => pr.plot ? select(pr.id) : openDetail(pr.id));
     el.addEventListener('mouseenter', () => { hovered = pr.id; if (!pr.plot) ensureImg(pr.id); });
     el.addEventListener('focus', () => { if (!pr.plot) ensureImg(pr.id); });
@@ -1348,23 +1393,30 @@ function renderAgents(){
   }).join('');
   $('#agentNote').textContent = mode==='demo'
     ? 'Demo-Modus: Wer wo arbeitet, ist simuliert, damit du die Bewegung siehst. Die Aufgaben stammen aus deinem Notion.'
-    : live.ok && liveKI ? 'Echter Stand aus der Notion-Datenbank „KI-Agenten“. Claude Code trägt dort ein, wer gerade woran arbeitet; das Dorf aktualisiert sich alle 2 Minuten.' : 'Echter Stand: Offline-Stand vom 30.09.2026. Mit Notion-Verbindung kommt er live aus der Datenbank „KI-Agenten“.';
+    : live.ok && liveKI ? 'Echter Stand: Eine KI arbeitet, wenn sie in „KI-Agenten“ auf „Arbeitet“ steht oder eine ihr zugewiesene Aufgabe „In Bearbeitung“ ist. Das Dorf aktualisiert sich alle 2 Minuten.' : 'Echter Stand: Offline-Stand vom 30.09.2026. Mit Notion-Verbindung kommt er live aus der Datenbank „KI-Agenten“.';
 }
 function renderSummary(){
   const all = PROJECTS.flatMap(p => p.tasks), done = all.filter(isDone).length;
   const running = PROJECTS.filter(p => p.status!=='Nicht begonnen').length, act = AGENTS.filter(a => st[a.id].status==='work').length;
-  $('#sum').innerHTML = [[PROJECTS.length,'Projekte gesamt'],[running,'laufen (inkl. Atlas)'],[`${done}/${all.length}`,'Aufgaben erledigt'],[PLOTS.length,'freie Bauplätze']]
+  $('#sum').innerHTML = [[PROJECTS.length,'Projekte gesamt'],[running,'laufen (inkl. Atlas)'],[`${done}/${all.length}`,'Aufgaben erledigt'],[freePlots().length,'freie Bauplätze']]
     .map(([v,l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
   renderToday();
+  $('#subline').textContent = `${PROJECTS.length} Projekte · 4 KI-Partner · 1 große Karte`; $('#navProj').textContent = PROJECTS.length;
   $('#hAct').textContent = act; $('#hProj').textContent = PROJECTS.length; $('#hOpen').textContent = all.length - done; $('#hDone').textContent = done;
 }
 function renderProject(){
   const pr = P[selected];
   if (pr.plot){
-    $('#projCard').innerHTML = `<div class="eyebrow">Ausgewählt · Bauplatz</div><h2>Freier Bauplatz</h2>
+    const draft = $('#npName') ? $('#npName').value : '';
+    $('#projCard').innerHTML = `<div class="eyebrow">Ausgewählt · Bauplatz ${pr.slot}</div><h2>Freier Bauplatz</h2>
       <div class="chips"><span class="chip st-none">frei</span></div>
-      <p class="desc">Hier kann dein nächstes Projekt einziehen. Lege es in Notion unter „Projekte“ an – dann bekommt es hier ein eigenes Gebäude.</p>
-      <a class="btn" href="${NOTION}3ec50ed7a8c4402ca44637ea943ac758" target="_blank" rel="noopener">Projekte in Notion öffnen <span aria-hidden="true">↗</span></a>`;
+      <p class="desc">Hier kann dein nächstes Projekt einziehen. Es entsteht in Notion unter „Projekte“ und steht hier sofort als Baustelle.</p>` +
+      (canEdit() ? `<form class="np" id="npForm"><label class="fld"><span>Projektname</span><input class="inp" id="npName" name="n" maxlength="80" required placeholder="z. B. Podcast"></label>
+        <label class="fld"><span>Bereich</span><select class="sel" name="b"><option>Weiteres Projekt</option><option>SternenBücher</option></select></label>
+        <button class="btn pri" type="submit">Projekt anlegen</button></form>`
+        : `<div class="ro" style="margin-top:12px">Anlegen klappt, wenn du das Dashboard in Claude öffnest und Notion erlaubst.</div>`) +
+      `<a class="btn" href="${NOTION}3ec50ed7a8c4402ca44637ea943ac758" target="_blank" rel="noopener">Projekte in Notion öffnen <span aria-hidden="true">↗</span></a>`;
+    if ($('#npName')) $('#npName').value = draft;
     return;
   }
   const pg = progressOf(pr), open = pr.tasks.filter(t => !isDone(t)), done = pr.tasks.length - open.length;
@@ -1398,7 +1450,7 @@ function hitAgent(q){ let best=null, bd=22; for (const a of AGENTS){ const s = s
 function hitBuilding(q){
   if (((q.x-PLAZA.x)/PLAZA.rx)**2 + ((q.y-PLAZA.y)/PLAZA.ry)**2 < 1) return 'atlas';
   for (const id of Object.keys(BLD)){ const b = BLD[id].box; if (q.x > b[0] && q.x < b[2] && q.y > b[1] && q.y < b[3]) return id; }
-  for (const p of PLOTS) if (Math.hypot(q.x-p.x, (q.y-p.y)*1.4) < 70) return p.id;
+  for (const p of freePlots()) if (Math.hypot(q.x-p.x, (q.y-p.y)*1.4) < 70) return p.id;
   return null;
 }
 const pointers = new Map(); let drag = null, pinch = null;
@@ -1459,7 +1511,7 @@ function updateClock(){
 /* =========================================================
    Notion live: lesen über die Datenbank-Ansichten, schreiben als Flo
    ========================================================= */
-const NOTION_DS = { tasks:'b19c21e5-bb94-434e-a17e-e5ff9e29d951', ms:'0df8af82-ff58-47af-80d2-ff5f549325d8' };
+const NOTION_DS = { tasks:'b19c21e5-bb94-434e-a17e-e5ff9e29d951', ms:'0df8af82-ff58-47af-80d2-ff5f549325d8', proj:'18d5fb23-9ba2-47c5-a651-f732eef5d26b' };
 const NOTION_VIEWS = { proj:'view://d94c5cce-eef1-4be0-aece-39b5f344602b', tasks:'view://4711c54c-b453-4086-a986-890248a94bba', ms:'view://7e256a73-16aa-47f8-874a-bd84b7ab1d26', ki:'view://b206fba1-bb4b-48b0-a540-5b2b8d09ac8b' };
 const TRASH_PAGE = '3ebf5a8714b3811a80f8ff4d7426137c'; // „Papierkorb (aus dem Dashboard entfernt)“ unter der Hub-Seite
 const KI_OF = { '3ebf5a8714b381e3b511cc98927a6fe7':'gpt', '3ebf5a8714b381538de1d42c6ea5acb2':'gem', '3ebf5a8714b381768e8afd7db893a1b2':'claude', '3ebf5a8714b381f98616cf33b0166b43':'code' };
@@ -1519,7 +1571,12 @@ function refreshLive(){
   return loading;
 }
 function applyLive(projRows, taskRows, msRows){
-  const byId = {}; for (const p of PROJECTS) byId[p.notion] = p;
+  const keep = new Set();
+  for (const r of projRows){ const m = /Bauplatz (\d)/.exec(r.Bauplatz || ''), nid = idOf(r.url); if (!m || PROJECTS.some(p => !p.dyn && p.notion === nid)) continue;
+    const n = +m[1]; if (!PLOTS[n-1] || keep.has('bp' + n)) continue;
+    placeOnPlot(n, { name:r.Projektname || 'Neues Projekt', notion:nid, group:r.Bereich === 'SternenBücher' ? 'sb' : 'other', status:r.Status || 'Nicht begonnen' }); keep.add('bp' + n); }
+  clearPlots(keep);
+  const byId = {}; for (const p of PROJECTS) if (p.notion) byId[p.notion] = p;
   for (const r of projRows){ const p = byId[idOf(r.url)]; if (!p) continue; // nur Projekte, die im Dorf ein Gebäude haben
     if (r.Projektname) p.name = r.Projektname;
     if (r.Status) p.status = r.Status;
@@ -1663,7 +1720,7 @@ function buildScene(id){
   // Kein eigenes Bild: Ausschnitt der Dorf-Karte, die KIs arbeiten vor dem Eingang
   const aw = sceneArea()[2], ar = aw/H;
   const b = id==='atlas' ? [640,330,915,560] : BLD[id].box, cx = (b[0]+b[2])/2, cy = (b[1]+b[3])/2;
-  let sw = (b[2]-b[0])*1.45, sh = (b[3]-b[1])*1.45;
+  const zf = P[id] && P[id].dyn ? 3.2 : 1.45; let sw = (b[2]-b[0])*zf, sh = (b[3]-b[1])*zf;
   if (sw/sh < ar) sw = sh*ar; else sh = sw/ar;
   sw = Math.min(sw, IW); sh = Math.min(sh, IH);
   const sx = clamp(cx - sw/2, 0, IW - sw), sy = clamp(cy - sh/2, 0, IH - sh), inR = (x,y) => x >= sx && x <= sx+sw && y >= sy && y <= sy+sh;
@@ -1795,6 +1852,7 @@ function renderScene(t){
   if (!reduceMotion && sp.interior) for (const m of motes){ const x = sp.sw*(.2 + m.u*.6) + Math.sin(t*m.sp + m.ph)*sp.sw*.01, y = sp.sh*(.25 + ((m.v + t*.012*m.sp) % .6)), a = (Math.sin(t*1.5 + m.ph)*.5 + .5); sGlow(X(x), Y(y), 3 + sp.sw*.002*s, '#fff1c9', .22*a); }
   sctx.globalCompositeOperation = 'source-over';
   for (const q of sceneSmoke){ const a = clamp(q.life,0,1)*.38; sctx.fillStyle = `rgba(228,231,235,${a})`; const sz = Math.max(2, q.size*s); sctx.fillRect(X(q.x) - sz/2, Y(q.y) - sz/2, sz, sz); }
+  if (!sp.art) for (const pr of PROJECTS) if (pr.dyn) drawSite(sctx, X, Y, s, t, pr);
   drawInterior(t, X, Y, s);
   drawFw(sctx, fwScene, X, Y, s, sGlow, 3.2);
   // Vignette + Verlauf für die Beschriftung
@@ -1853,7 +1911,7 @@ function showDetail(id){
   sceneSmoke = []; scene = null; inAgents = {}; enterT = wasOpen || reduceMotion ? 1 : 0; enterDone = enterT >= 1;
   demoVisit(id);
   const pr = P[id], inn = INTERIOR[id];
-  $('#sceneCap').innerHTML = `<b>${esc(pr.building)}</b><span>${inn ? 'Innenansicht · gemalt von ChatGPT' : pr.art ? 'Außenansicht · Innenraum folgt' : 'Ausschnitt der Dorf-Karte · Innenraum folgt'}</span>`;
+  $('#sceneCap').innerHTML = `<b>${esc(pr.building)}</b><span>${inn ? 'Innenansicht · gemalt von ChatGPT' : pr.dyn ? 'Baustelle · das Gebäude wächst mit erledigten Aufgaben' : pr.art ? 'Außenansicht · Innenraum folgt' : 'Ausschnitt der Dorf-Karte · Innenraum folgt'}</span>`;
   renderDetail(); sizeScene(); $('#dClose').focus();
   if (live.mcp && (!live.at || Date.now() - live.at > 20000)) refreshLive();
 }
@@ -1910,14 +1968,15 @@ function renderDetail(keep){
 }
 function itemRow(t, i, kind){
   const k = stKey(t.status), off = !canEdit() || !t.id, dis = off ? ' disabled' : '';
-  const who = t.who && A[t.who] ? `<span class="who" style="background:${A[t.who].color}" title="${esc(A[t.who].name)}"></span>` : '';
+  const who = kind !== 'task' && t.who && A[t.who] ? `<span class="who" style="background:${A[t.who].color}" title="${esc(A[t.who].name)}"></span>` : '';
   const LBL = { todo:'Offen', run:'In Arbeit', done:'Erledigt' };
+  const whoSel = `<select class="whosel" data-who aria-label="${esc(t.title)}: zuständige KI" title="Zuständige KI"${dis}${t.who && A[t.who] ? ` style="color:${A[t.who].color};border-color:${rgba(A[t.who].color,.5)}"` : ''}><option value="">KI –</option>${AGENTS.map(a => `<option value="${a.id}"${t.who === a.id ? ' selected' : ''}>${esc(a.name)}</option>`).join('')}</select>`;
   return `<li class="trow st-${k}${kind==='ms' ? ' ms' : ''}${t.pending ? ' pending' : ''}" data-k="${kind}" data-i="${i}">` +
     `<button type="button" class="chk" data-act="toggle" aria-pressed="${k==='done'}" aria-label="${esc(t.title)}: ${k==='done' ? 'wieder öffnen' : 'als erledigt markieren'}"${dis}></button>` +
     `<span class="ttl" data-act="rename"${off ? '' : ' tabindex="0" role="button" title="Klicken zum Umbenennen"'}>${who}${esc(t.title)}</span>` +
-    (kind==='task' ? `<button type="button" class="pill st s-${k}" data-act="cycle" title="Status wechseln"${dis}>${LBL[k]}</button><button type="button" class="pill p-${esc(t.prio)}" data-act="prio" title="Priorität wechseln"${dis}>${esc(t.prio)}</button><button type="button" class="star${t.today ? ' on' : ''}" data-act="today" aria-pressed="${!!t.today}" aria-label="${esc(t.title)}: für heute vormerken" title="${t.today ? 'Aus „Heute“ entfernen' : 'Für heute vormerken'}"${dis}>${STAR_SVG}</button>`
+    `<span class="tctl">` + (kind==='task' ? whoSel + `<button type="button" class="pill st s-${k}" data-act="cycle" title="Status wechseln"${dis}>${LBL[k]}</button><button type="button" class="pill p-${esc(t.prio)}" data-act="prio" title="Priorität wechseln"${dis}>${esc(t.prio)}</button><button type="button" class="star${t.today ? ' on' : ''}" data-act="today" aria-pressed="${!!t.today}" aria-label="${esc(t.title)}: für heute vormerken" title="${t.today ? 'Aus „Heute“ entfernen' : 'Für heute vormerken'}"${dis}>${STAR_SVG}</button>`
                    : `<span class="date">${t.date ? fmtDate(t.date) : 'ohne Datum'}</span>`) +
-    `<button type="button" class="del" data-act="del" aria-label="${esc(t.title)} entfernen" title="Entfernen – landet im Notion-Papierkorb"${dis}>${TRASH_SVG}</button></li>`;
+    `<button type="button" class="del" data-act="del" aria-label="${esc(t.title)} entfernen" title="Entfernen – landet im Notion-Papierkorb"${dis}>${TRASH_SVG}</button></span></li>`;
 }
 function renderDetailLists(){
   if (!detailId || document.querySelector('.ttl-in')) return;
@@ -1975,7 +2034,16 @@ $('#info').addEventListener('submit', e => {
   if (f.id === 'dAddT') addTask(pr, title, f.elements.p.value); else addMilestone(pr, title, f.elements.d.value);
   f.elements.t.value = ''; if (f.elements.d) f.elements.d.value = ''; f.elements.t.focus();
 });
+// Zuständige KI setzen (Notion-Feld „Zuständige KI“). Im echten Stand läuft die KI zu Aufgaben „In Bearbeitung“.
+function setWho(item, id){
+  if (!item || !item.id || (item.who || '') === id) return;
+  const prev = item.who; item.who = id || null;
+  const rel2 = id && KI_PAGE[id] ? [pageUrl(KI_PAGE[id])] : [];
+  if (mode === 'real') applyReal();
+  write('Zuständige KI', () => updProps(item.id, { 'Zuständige KI':rel2 }), () => { item.who = prev; if (mode === 'real') applyReal(); });
+}
 $('#info').addEventListener('change', e => {
+  if (e.target.matches('[data-who]')){ const li = e.target.closest('.trow'); if (canEdit() && li) setWho(shownTasks[+li.dataset.i], e.target.value); return; }
   if (!canEdit()) return; const pr = P[detailId], el = e.target;
   if (el.id === 'dStatus' && el.value !== pr.status){ const prev = pr.status; pr.status = el.value; buildLabels(); placeLabels(); write('Projektstatus', () => updProps(pr.notion, { Status:pr.status }), () => { pr.status = prev; buildLabels(); placeLabels(); if (detailId) renderDetail(); }); }
   if (el.id === 'dDesc' && el.value.trim() !== (pr.desc || '')){ const prev = pr.desc, v = el.value.trim(); pr.desc = v; write('Beschreibung', () => updProps(pr.notion, { Beschreibung:v }), () => { pr.desc = prev; if (detailId) renderDetail(); }); }
@@ -1990,6 +2058,19 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Tab'){ const f = [...$('#detail').querySelectorAll('button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]')].filter(x => x.offsetParent !== null);
     if (!f.length) return; const i = f.indexOf(document.activeElement);
     if (e.shiftKey && (i <= 0)){ e.preventDefault(); f[f.length-1].focus(); } else if (!e.shiftKey && i === f.length-1){ e.preventDefault(); f[0].focus(); } }
+});
+$('#projCard').addEventListener('submit', e => {
+  e.preventDefault(); if (e.target.id !== 'npForm' || !canEdit()) return;
+  const plot = P[selected]; if (!plot || !plot.plot) return;
+  const name = e.target.elements.n.value.trim(), area = e.target.elements.b.value; if (!name) return;
+  const n = plot.slot, pr = placeOnPlot(n, { name, notion:null, group:area === 'SternenBücher' ? 'sb' : 'other', status:'Nicht begonnen', progress:null, desc:'' });
+  pr.pending = true; buildLabels(); placeLabels(); select(pr.id, true); sitBuild[n] = 0;
+  write('Projekt anlegen', async () => {
+    const r = await callNotion('notion-create-pages', { parent:{ type:'data_source_id', data_source_id:NOTION_DS.proj }, pages:[{ properties:{ Projektname:name, Status:'Nicht begonnen', Bereich:area, Bauplatz:'Bauplatz ' + n } }] });
+    pr.notion = idOf(r && r.pages && r.pages[0] && r.pages[0].id); pr.pending = false;
+    if (!pr.notion) throw { code:'upstream_error', message:'keine Seiten-ID erhalten' };
+    toastMsg(`„${name}“ steht jetzt auf Bauplatz ${n}.`);
+  }, () => { clearPlots(new Set(PROJECTS.filter(p => p.dyn && p !== pr).map(p => p.id))); buildLabels(); placeLabels(); select('plot' + n); });
 });
 $('#projCard').addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) openDetail(b.dataset.open); });
 function toastMsg(txt){ toast.textContent = txt; toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 4200); }
@@ -2101,8 +2182,11 @@ function applyKI(rows){
 function applyRealLive(){
   for (const a of AGENTS){
     const k = liveKI[a.id];
-    if (!k || k.status === 'Offline'){ assign(a.id, 'home', 'off', ''); continue; }
+    if (!k){ assign(a.id, 'home', 'off', ''); continue; }
+    if (k.status === 'Offline'){ const job = PROJECTS.flatMap(p => p.tasks.map(t => [t, p])).find(([t]) => t.who === a.id && t.status === 'In Bearbeitung'); if (job){ assign(a.id, job[1].id, 'work', job[0].title); continue; } assign(a.id, 'home', 'off', ''); continue; }
     if (k.status === 'Arbeitet'){ const p = k.projects.map(n => PROJECTS.find(q => q.notion === n)).find(Boolean); assign(a.id, p ? p.id : 'atlas', 'work', k.task || 'arbeitet'); continue; }
+    const job = PROJECTS.flatMap(p => p.tasks.map(t => [t, p])).find(([t]) => t.who === a.id && t.status === 'In Bearbeitung');
+    if (job){ assign(a.id, job[1].id, 'work', job[0].title); continue; }
     assign(a.id, 'home', 'ready', '');
   }
 }
@@ -2146,7 +2230,7 @@ function setToday(item, on){ const prev = item.today; item.today = on; write(on 
 function setStatus(item, v, label, el){
   const task = 'prio' in item, prev = { status:item.status, doneAt:item.doneAt }, props = { Status:v };
   if (task){ if (v === 'Erledigt'){ item.doneAt = cyToday(); props['date:Erledigt am:start'] = item.doneAt; props['date:Erledigt am:is_datetime'] = 0; } else if (item.doneAt){ item.doneAt = ''; props['date:Erledigt am:start'] = null; } }
-  item.status = v;
+  item.status = v; if (mode === 'real') applyReal();
   if (v === 'Erledigt' && prev.status !== 'Erledigt') reward(item, el);
   write(label, () => updProps(item.id, props), () => { item.status = prev.status; item.doneAt = prev.doneAt; });
 }
@@ -2309,6 +2393,7 @@ function thumbOf(id){
   let sw = (b[2]-b[0])*1.3, sh = sw*h/w; if (sh < (b[3]-b[1])*1.3){ sh = (b[3]-b[1])*1.3; sw = sh*w/h; }
   const sx = clamp((b[0]+b[2])/2 - sw/2, 0, IW - sw), sy = clamp((b[1]+b[3])/2 - sh/2, 0, IH - sh), g = c.getContext('2d');
   g.imageSmoothingQuality = 'high'; g.drawImage(baseImg, sx, sy, sw, sh, 0, 0, w, h);
+  if (P[id] && P[id].dyn){ const k = w/sw; drawSite(g, x => (x - sx)*k, y => (y - sy)*k, k, 0, P[id]); return thumbs[id] = c.toDataURL('image/jpeg', .84); }
   return thumbs[id] = c.toDataURL('image/jpeg', .84);
 }
 function renderSheetProjects(){
@@ -2423,6 +2508,7 @@ function renderSheetSettings(){
 }
 $('#shBody').addEventListener('change', e => {
   const el = e.target;
+  if (el.matches('[data-who]')){ const li = el.closest('.trow'), pair = li && sheetItems[+li.dataset.i]; if (canEdit() && pair) setWho(pair[0], el.value); return; }
   if (el.id === 'tfProj'){ taskFilter.proj = el.value; saveFilter(); renderTaskList(); if ($('#tfAdd')) $('#tfAdd').elements.p.value = el.value || 'atlas'; }
   else if (el.id === 'tfPrio'){ taskFilter.prio = el.value; saveFilter(); renderTaskList(); }
   else if (el.id === 'tfToday'){ taskFilter.today = el.checked; saveFilter(); renderTaskList(); }
