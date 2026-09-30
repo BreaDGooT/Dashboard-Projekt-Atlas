@@ -30,11 +30,27 @@ async function call(path, body) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     const reason = data.error?.message || res.statusText;
-    if (res.status === 429) fail(`Limit erreicht (429): ${reason}`);
-    if (!KEY && (res.status === 400 || res.status === 401 || res.status === 403)) fail(`Kein gültiger Schlüssel angekommen (${res.status}). API-Credential für generativelanguage.googleapis.com prüfen oder GEMINI_API_KEY setzen. Google meldet: ${reason}`);
-    fail(`Fehler ${res.status}: ${reason}`);
+    const msg = res.status === 429 ? `Limit erreicht (429): ${reason}`
+      : !KEY && [400, 401, 403].includes(res.status) ? `Kein gültiger Schlüssel angekommen (${res.status}). API-Credential für generativelanguage.googleapis.com prüfen oder GEMINI_API_KEY setzen. Google meldet: ${reason}`
+      : `Fehler ${res.status}: ${reason}`;
+    throw Object.assign(new Error(msg), { status: res.status });
   }
   return data;
+}
+
+// Überlastet (503), abgeschaltet (404) oder Kontingent weg (429): nächstes Modell versuchen.
+const RETRY = [404, 429, 500, 503];
+
+async function generate(kind, body) {
+  const models = await pickModels(kind);
+  for (const [i, model] of models.slice(0, 3).entries()) {
+    try {
+      return { model, data: await call(`models/${model}:generateContent`, body) };
+    } catch (e) {
+      if (!RETRY.includes(e.status) || i === Math.min(models.length, 3) - 1) throw e;
+      console.error(`[${model}] ${e.status} – weiter mit nächstem Modell`);
+    }
+  }
 }
 
 async function listModels() {
@@ -48,10 +64,10 @@ async function listModels() {
   return out.filter(m => (m.supportedGenerationMethods || []).includes('generateContent'));
 }
 
-// Neuestes passendes Modell wählen, falls keins vorgegeben ist.
-async function pickModel(kind) {
+// Passende Modelle, neuestes zuerst, falls keins vorgegeben ist.
+async function pickModels(kind) {
   const override = kind === 'image' ? process.env.GEMINI_IMAGE_MODEL : process.env.GEMINI_TEXT_MODEL;
-  if (override) return override;
+  if (override) return [override];
   const names = (await listModels()).map(m => m.name.replace('models/', ''));
   const candidates = names.filter(n =>
     n.includes('flash') && !n.includes('lite') && !n.includes('tts') && !n.includes('live') &&
@@ -60,22 +76,21 @@ async function pickModel(kind) {
   if (!candidates.length) fail(`Kein passendes ${kind}-Modell gefunden. Mit "models" prüfen.`);
   const version = n => (n.match(/(\d+(?:\.\d+)?)/) || [0, 0])[1] * 1;
   candidates.sort((a, b) => version(b) - version(a) || a.includes('preview') - b.includes('preview'));
-  return candidates[0];
+  return candidates;
 }
 
 const [cmd, prompt, outFile] = process.argv.slice(2);
 
+try {
 if (cmd === 'models') {
   for (const m of await listModels()) console.log(m.name.replace('models/', ''));
 } else if (cmd === 'text' && prompt) {
-  const model = await pickModel('text');
-  const data = await call(`models/${model}:generateContent`, { contents: [{ parts: [{ text: prompt }] }] });
+  const { model, data } = await generate('text', { contents: [{ parts: [{ text: prompt }] }] });
   const text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
   console.error(`[${model}]`);
   console.log(text.trim());
 } else if (cmd === 'image' && prompt && outFile) {
-  const model = await pickModel('image');
-  const data = await call(`models/${model}:generateContent`, {
+  const { model, data } = await generate('image', {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: { responseModalities: ['TEXT', 'IMAGE'] },
   });
@@ -88,4 +103,7 @@ if (cmd === 'models') {
 } else {
   console.log('Nutzung: gemini.sh models | text "Prompt" | image "Prompt" datei.png');
   process.exit(cmd ? 1 : 0);
+}
+} catch (e) {
+  fail(e.message);
 }
