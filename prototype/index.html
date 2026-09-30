@@ -1,5 +1,5 @@
 <title>Project Atlas</title>
-<meta name="description" content="Hybrid-Prototyp v0.1 – Pixelwelt mit modernen Glas-Panels für Flos Projekte und KI-Agenten.">
+<meta name="description" content="Hybrid-Prototyp v0.2 – animiertes Pixel-Dorf mit Glas-Panels für Flos Projekte und KI-Team.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Figtree:wght@400;500;600;700&family=Pixelify+Sans:wght@500;600;700&display=swap" rel="stylesheet">
@@ -101,12 +101,22 @@ a{color:inherit}
 
 /* ---------- Welt ---------- */
 .stage{grid-column:2;position:relative;min-height:0;overflow:hidden;border-radius:var(--r);border:1px solid var(--line);background:#0b1512;box-shadow:0 18px 40px rgba(0,0,0,.45)}
-.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;cursor:default}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 .stage canvas.hot{cursor:pointer}
+.stage canvas.dragging{cursor:grabbing}
+.zoom{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;gap:6px}
+.zoom button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line-2);background:rgba(8,16,20,.82);color:var(--fg);font-family:var(--f-ui);font-weight:700;font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.zoom button:hover{border-color:var(--core);color:var(--core)}
+.zoom svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 #labels{position:absolute;inset:0;pointer-events:none}
 .lbl{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px 5px;border-radius:8px;border:1px solid rgba(110,231,216,.45);background:rgba(8,16,20,.82);cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.45);transition:transform .18s ease, opacity .2s ease, border-color .2s}
 .lbl:hover{transform:translate(-50%,-100%) translateY(-2px);border-color:var(--core)}
 .lbl.below{transform:translate(-50%,0)}
+.lbl.mid{transform:translate(-50%,-50%)}
+.lbl.mid:hover{transform:translate(-50%,-50%) translateY(-2px)}
+.lbl.plot{border-style:dashed;border-color:rgba(214,230,220,.4);background:rgba(8,16,20,.62);padding:3px 8px}
+.lbl.plot .lbl-name{font-size:11px;color:var(--fg-2)}
+.lbl.plot.sel{box-shadow:0 0 0 2px rgba(214,230,220,.4)}
 .lbl.below:hover{transform:translate(-50%,0) translateY(2px)}
 .lbl.sb{border-color:rgba(244,200,106,.55)}
 .lbl.sb:hover{border-color:var(--star)}
@@ -129,11 +139,14 @@ a{color:inherit}
 .stage.compact .lbl:not(.sel):not(.core){width:14px;height:14px;padding:0;border-radius:50%;border-width:2px;background:rgba(8,16,20,.9)}
 .stage.compact .lbl:not(.sel):not(.core)::after{content:"";position:absolute;inset:-8px}
 .stage.compact .lbl:not(.sel):not(.core) .lbl-name{display:none}
+.stage.compact .lbl.plot:not(.sel){display:none}
+.stage.compact .badge-mode{font-size:10.5px;padding:4px 8px;top:8px;left:8px}
+.stage.compact .zoom button{width:30px;height:30px;font-size:15px}
 
 .badge-mode{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:rgba(8,16,20,.8);border:1px solid var(--line-2);font-family:var(--f-ui);font-size:12px;font-weight:600;color:var(--fg-2);max-width:calc(100% - 24px)}
 .badge-mode i{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 8px var(--warn);flex:none}
 .badge-mode.live i{background:var(--ok);box-shadow:0 0 8px var(--ok)}
-.hud{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;pointer-events:none}
+.hud{position:absolute;left:12px;right:60px;bottom:12px;display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;pointer-events:none}
 .hud-core{pointer-events:auto;display:flex;align-items:center;gap:14px;padding:9px 14px;border-radius:12px;background:rgba(8,16,20,.8);border:1px solid rgba(110,231,216,.35)}
 .hud-core .t{display:flex;flex-direction:column;line-height:1.1}
 .hud-core .t b{font-family:var(--f-ui);font-size:12px;letter-spacing:.16em;color:var(--core)}
@@ -282,7 +295,7 @@ a{color:inherit}
         <rect x="2" y="9" width="6" height="1" fill="#8a6b47"/>
       </svg>
       <strong>Gute Ideen wachsen hier.</strong>
-      <small>Hybrid-Prototyp v0.1<br>Projekte &amp; Aufgaben: Notion-Stand 30.09.2026</small>
+      <small>Hybrid-Prototyp v0.2 · Karte gemalt von ChatGPT<br>Projekte &amp; Aufgaben: Notion-Stand 30.09.2026</small>
     </div>
   </aside>
 
@@ -318,10 +331,15 @@ a{color:inherit}
   </header>
 
   <main class="stage" id="stage" aria-label="Projektwelt">
-    <canvas id="world" role="img" aria-label="Pixel-Dorf: jedes Gebäude ist ein Projekt, in der Mitte der KI-Kern Project Atlas. KI-Agenten laufen zu den Projekten, an denen sie arbeiten."></canvas>
+    <canvas id="world" role="img" aria-label="Gemaltes Pixel-Dorf: jedes Gebäude ist ein Projekt, in der Mitte der KI-Kern Project Atlas. KI-Agenten laufen zu den Projekten, an denen sie arbeiten. Ziehen verschiebt die Karte, Mausrad oder zwei Finger zoomen."></canvas>
     <div id="labels"></div>
     <div class="badge-mode" id="modeBadge"><i></i><span id="modeText">Demo: KI-Aktivität ist simuliert · Projekte &amp; Aufgaben sind echte Notion-Daten</span></div>
     <div class="tip" id="tip" hidden></div>
+    <div class="zoom" role="group" aria-label="Kartenansicht">
+      <button type="button" id="zIn" title="Hineinzoomen" aria-label="Hineinzoomen">+</button>
+      <button type="button" id="zOut" title="Herauszoomen" aria-label="Herauszoomen">−</button>
+      <button type="button" id="zFit" title="Ganze Karte zeigen" aria-label="Ganze Karte zeigen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    </div>
     <div class="hud">
       <div class="hud-core">
         <div class="t"><b>AI WORKFLOW CORE</b><span>Planen · Recherchieren · Erstellen · Automatisieren</span></div>
@@ -349,28 +367,34 @@ a{color:inherit}
 </div>
 <div class="toast" id="toast" role="status"></div>
 
+<script src="assets/mapdata.js"></script>
 <script>
 (() => {
 'use strict';
 
 /* =========================================================
-   Daten – Snapshot aus Notion (30.09.2026)
+   Karte & Daten
    ========================================================= */
+const MD = window.MAPDATA;
+const IW = MD.size[0], IH = MD.size[1];
 const NOTION = 'https://app.notion.com/p/';
-const W = 520, H = 320;
-const CORE = { x: 260, y: 160 };
 
 const PROJECTS = [
-  { id:'atlas', name:'Project Atlas', group:'core', building:'KI-Kern', status:'Planung',
+  { id:'atlas', name:'Project Atlas', group:'core', building:'KI-Kern', status:'In Bearbeitung',
     desc:'Dieses Dashboard. Plan, Entscheidungen und offene Fragen liegen auf der Hub-Seite.',
-    notion:'3ebf5a8714b381a68331f37170907e4c', progressFrom:'tasks',
+    notion:'3ebf5a8714b3815aba29daf8c2849250', progressFrom:'tasks',
     tasks:[
       ['Plan & Notion-Struktur anlegen','done','Hoch','code'],
       ['Projekte in Notion ergänzen','done','Hoch','code'],
-      ['Hybrid-Prototyp bauen','done','Hoch','code'],
-      ['Offene Fragen beantworten (Status-Genauigkeit)','wait','Hoch'],
-      ['Plugins frontend-design + Design aktivieren','wait','Mittel'],
+      ['Hybrid-Prototyp v0.1 bauen','done','Hoch','code'],
+      ['Offene Fragen beantworten (Status-Weg der KI-Anzeige)','done','Hoch'],
+      ['Grafik-Weg für die Welt festlegen','done','Hoch'],
+      ['KI-Team: Gemini-Mitarbeiter bauen','done','Hoch','code'],
+      ['Dorf-Karte in ChatGPT erzeugen','done','Hoch','gpt'],
+      ['Welt v0.2 auf der Dorf-Karte bauen','done','Hoch','code'],
+      ['Gemini-API-Schlüssel hinterlegen','wait','Hoch'],
       ['MVP: Welt + Notion-Anbindung + Detail-Panels','todo','Hoch','code'],
+      ['Plugins frontend-design + Design aktivieren','todo','Mittel'],
       ['Konzeptbilder für Projekt-Häuser erstellen','todo','Mittel','gpt'],
       ['UI-Texte & Informationsstruktur der Panels','todo','Mittel','claude'],
       ['Design-Abgleich Prototyp vs. Moodboard','todo','Niedrig','gem'],
@@ -390,10 +414,9 @@ const PROJECTS = [
       ['Erster Buch-Erstentwurf komplett – Widder (S. 1–48)','16.09.2026'],
       ['Illustrations-Workflow etabliert (8/10 Szenen final)','16.09.2026'],
     ],
-    // Story, Charakter, Illustration, Layout – 2 = fertig, 1 = in Arbeit, 0 = nicht begonnen
     zodiac:[['Widder','♈',[2,2,1,0]],['Stier','♉'],['Zwillinge','♊'],['Krebs','♋'],['Löwe','♌'],['Jungfrau','♍'],
             ['Waage','♎'],['Skorpion','♏'],['Schütze','♐'],['Steinbock','♑'],['Wassermann','♒'],['Fische','♓']] },
-  { id:'sbweb', name:'SternenBücher Website', group:'sb', building:'Web-Turm', status:'Nicht begonnen', notion:'3ebf5a8714b3814e9c31dde321a69769' },
+  { id:'sbweb', name:'SternenBücher Website', group:'sb', building:'Sternenturm', status:'Nicht begonnen', notion:'3ebf5a8714b3814e9c31dde321a69769' },
   { id:'sbshop', name:'SternenBücher Shop', group:'sb', building:'Sternen-Laden', status:'Nicht begonnen', notion:'3ebf5a8714b38164b8a6caa55a6d1926' },
   { id:'mkt', name:'Marketing & Social', group:'other', building:'Funkhaus', status:'Nicht begonnen', notion:'3ebf5a8714b381cb9a45df7bb5f31c7f' },
   { id:'seo', name:'SEO', group:'other', building:'Observatorium', status:'Nicht begonnen', notion:'3ebf5a8714b381d68978e8452e628e9a' },
@@ -401,17 +424,48 @@ const PROJECTS = [
   { id:'etsy', name:'Etsy Shop', group:'other', building:'Werkstatt', status:'Nicht begonnen', notion:'3ebf5a8714b38116a8c0fd1c8ae707a5' },
   { id:'digi', name:'Digitale Produkte', group:'other', building:'Pixel-Labor', status:'Nicht begonnen', notion:'3ebf5a8714b38101ac77c6205660f874' },
 ];
+const PLOTS = [
+  { id:'plot1', name:'Freier Bauplatz', x:888, y:232 },
+  { id:'plot2', name:'Freier Bauplatz', x:455, y:452 },
+  { id:'plot3', name:'Freier Bauplatz', x:1088, y:472 },
+];
 const P = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
+PLOTS.forEach(p => { P[p.id] = { ...p, group:'plot', building:'Bauplatz', status:'frei', plot:true }; });
+
+// Gebäude auf der Karte (Bildkoordinaten): Klickfläche, Eingang, Beschriftung
+const BLD = {
+  sbweb:  { box:[492,8,572,205],    front:[525,248],  label:[528,118,'center'] },
+  sb:     { box:[225,40,495,262],   front:[345,258],  label:[350,268,'below'] },
+  sbshop: { box:[548,112,722,288],  front:[605,272],  label:[630,292,'below'] },
+  mkt:    { box:[1085,15,1375,282], front:[1190,275], label:[1200,292,'below'] },
+  seo:    { box:[1330,295,1508,498],front:[1420,495], label:[1418,298,'above'] },
+  drop:   { box:[1130,600,1395,800],front:[1220,760], label:[1290,606,'above'] },
+  etsy:   { box:[628,600,905,800],  front:[675,765],  label:[768,806,'below'] },
+  digi:   { box:[235,540,500,765],  front:[400,760],  label:[372,546,'above'] },
+};
+const PLAZA = { x:777, y:458, rx:165, ry:82 };
+const CRYSTAL = { x:777, y:413 };
+const ROUTES = {
+  sb:     [[700,400],[630,345],[545,330],[540,300],[470,275],[345,258]],
+  sbweb:  [[700,400],[630,345],[545,330],[540,300],[525,248]],
+  sbshop: [[700,400],[630,345],[545,330],[560,300],[605,272]],
+  mkt:    [[840,395],[900,355],[980,340],[1010,315],[1100,300],[1190,275]],
+  seo:    [[900,470],[980,500],[1060,540],[1200,560],[1330,540],[1420,495]],
+  etsy:   [[760,555],[720,610],[690,690],[675,765]],
+  digi:   [[660,520],[590,560],[520,620],[450,700],[400,760]],
+  drop:   [[880,540],[980,580],[1080,600],[1150,680],[1220,760]],
+  bridge: [[615,470],[530,480],[420,495],[320,500],[210,492],[120,490]],
+};
+const HOME = [[700,472],[738,502],[816,502],[854,472]];
+const CORE_SLOT = [[735,448],[758,472],[796,472],[819,448]];
 
 const AGENTS = [
-  { id:'claude', name:'Claude', vendor:'Anthropic', color:'#e8866a', role:'Konzept, Texte, Reviews', source:'Halbautomatisch über Konnektor (Notion/MCP)', mark:'spark' },
-  { id:'code', name:'Claude Code', vendor:'Anthropic', color:'#f2b04a', role:'Hauptentwickler dieses Dashboards', source:'Automatisch über Hooks', mark:'prompt' },
-  { id:'gpt', name:'ChatGPT', vendor:'OpenAI', color:'#4fd9a8', role:'Bilder, Illustrationen, Icons', source:'Halbautomatisch – Weg noch zu prüfen', mark:'ring' },
-  { id:'gem', name:'Gemini', vendor:'Google', color:'#93a6ff', role:'Recherche, Bildideen, Design-Abgleich', source:'Manuell per Klick – Weg noch zu prüfen', mark:'diamond' },
+  { id:'claude', name:'Claude', vendor:'Anthropic', color:'#e8866a', role:'Konzept, Texte, Reviews', source:'Halbautomatisch über Notion', mark:'spark' },
+  { id:'code', name:'Claude Code', vendor:'Anthropic', color:'#f2b04a', role:'Dirigent & Hauptentwickler', source:'Automatisch – verteilt die Aufgaben', mark:'prompt' },
+  { id:'gpt', name:'ChatGPT', vendor:'OpenAI', color:'#4fd9a8', role:'Bilder, Zweitmeinung, Codex', source:'Team-Mitglied – Anbindung folgt', mark:'ring' },
+  { id:'gem', name:'Gemini', vendor:'Google', color:'#93a6ff', role:'Recherche, Texte, Bilder', source:'Team-Mitglied – wartet auf API-Schlüssel', mark:'diamond' },
 ];
 const A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
-
-// Beispiel-Aufträge nur für den Demo-Modus (klar als simuliert gekennzeichnet)
 const DEMO = {
   claude:[['sb','Aszendenten-Textvarianten entwerfen'],['mkt','Content-Plan für Social Media skizzieren'],['seo','Keyword-Ideen ordnen'],['atlas','UI-Texte für die Panels schreiben'],['etsy','Listing-Texte formulieren']],
   code:[['atlas','MVP: Notion-Anbindung bauen'],['sbweb','Website-Grundgerüst aufsetzen'],['digi','Download-Seite prototypen'],['sbshop','Shop-Anbindung vorbereiten']],
@@ -428,402 +482,173 @@ const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const rnd = mulberry32(20260930);
-function hash(x,y,s){let h=(Math.imul(x|0,374761393)+Math.imul(y|0,668265263)+Math.imul(s|0,1442695041))|0;h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;return(h>>>0)/4294967296}
-function vnoise(x,y,sc,s){const gx=x/sc,gy=y/sc,x0=Math.floor(gx),y0=Math.floor(gy),fx=gx-x0,fy=gy-y0;const a=hash(x0,y0,s),b=hash(x0+1,y0,s),c=hash(x0,y0+1,s),d=hash(x0+1,y0+1,s);const u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v}
 const rgb = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
 const rgba = (h,a) => { const c = rgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; };
-function segDist(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;let t=l?((px-ax)*dx+(py-ay)*dy)/l:0;t=clamp(t,0,1);return Math.hypot(ax+t*dx-px,ay+t*dy-py)}
-function catmull(pts, n){const out=[];for(let i=0;i<pts.length-1;i++){const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];for(let k=0;k<n;k++){const t=k/n,t2=t*t,t3=t2*t;out.push([.5*((2*p1[0])+(-p0[0]+p2[0])*t+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3),.5*((2*p1[1])+(-p0[1]+p2[1])*t+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3)])}}out.push(pts[pts.length-1]);return out}
+const shade = (hex,k) => { const c = rgb(hex).map(v => clamp(Math.round(v*k),0,255)); return `rgb(${c[0]},${c[1]},${c[2]})`; };
+const pick = arr => arr[Math.floor(rnd()*arr.length)];
+
+// Wasser-Raster aus der Kartenanalyse
+const [GW, GH] = MD.grid, CELL = MD.cell;
+const waterBits = new Uint8Array(GW*GH);
+for (let i=0;i<MD.waterMask.length;i++){ const v = parseInt(MD.waterMask[i],16); for (let k=0;k<4;k++){ const idx=i*4+k; if (idx<waterBits.length) waterBits[idx] = (v >> (3-k)) & 1; } }
+const isWater = (x,y) => { const gx=Math.floor(x/CELL), gy=Math.floor(y/CELL); return gx>=0&&gy>=0&&gx<GW&&gy<GH && waterBits[gy*GW+gx]===1; };
+const riverPts = MD.water.filter(p => p[0] < 620);
+const lakePts = MD.water.filter(p => p[0] > 1000 && p[1] > 780);
 
 /* =========================================================
-   Welt-Geometrie
+   Figuren: Wege, Bewegung
    ========================================================= */
-const RIVER = catmull([[70,-8],[64,50],[82,110],[62,175],[80,235],[68,330]], 10);
-function riverDist(x,y){let m=1e9;for(let i=0;i<RIVER.length-1;i++){const d=segDist(x,y,RIVER[i][0],RIVER[i][1],RIVER[i+1][0],RIVER[i+1][1]);if(d<m)m=d}return m}
-const LAKE = { x:448, y:290, rx:66, ry:40 };
-const lakeE = (x,y) => ((x-LAKE.x)/LAKE.rx)**2 + ((y-LAKE.y)/LAKE.ry)**2;
-
-// Gebäude: Tür-Position (Unterkante Mitte), Bounds und Weg-Krümmung
-const BLD = [
-  { id:'sb',     x:165, y:92,  kind:'library',     bend:-6 },
-  { id:'sbweb',  x:118, y:138, kind:'tower',       bend:6 },
-  { id:'sbshop', x:214, y:106, kind:'shop',        bend:4 },
-  { id:'mkt',    x:360, y:84,  kind:'radio',       bend:-8 },
-  { id:'seo',    x:414, y:158, kind:'observatory', bend:6 },
-  { id:'drop',   x:364, y:242, kind:'warehouse',   bend:-8 },
-  { id:'etsy',   x:262, y:268, kind:'workshop',    bend:6 },
-  { id:'digi',   x:152, y:238, kind:'lab',         bend:-6 },
-];
-const B = Object.fromEntries(BLD.map(b => [b.id, b]));
-
-function makePath(from, to, bend){
-  const dx = to.x - from.x, dy = to.y - from.y, L = Math.hypot(dx,dy), ux = dx/L, uy = dy/L;
-  const c = { x:(from.x+to.x)/2 - uy*bend, y:(from.y+to.y)/2 + ux*bend };
-  const n = Math.max(12, Math.round(L/2.5)), pts = [];
-  for (let k=0;k<=n;k++){ const t=k/n, mt=1-t; pts.push({ x:mt*mt*from.x+2*mt*t*c.x+t*t*to.x, y:mt*mt*from.y+2*mt*t*c.y+t*t*to.y }); }
-  return pts;
+function pathBetween(from, to, slotIndex){
+  const r = [];
+  if (from && ROUTES[from]) { const rt = ROUTES[from]; for (let i=rt.length-1;i>=0;i--) r.push(rt[i]); }
+  if (to === 'home') r.push(HOME[slotIndex ?? 0]);
+  else if (to === 'atlas') r.push(CORE_SLOT[slotIndex ?? 0]);
+  else if (to === 'plaza') r.push([PLAZA.x + (rnd()-.5)*200, PLAZA.y + 30 + (rnd()-.5)*50]);
+  else if (ROUTES[to]) r.push(...ROUTES[to]);
+  return r.map(p => ({ x:p[0], y:p[1] }));
 }
-function withLengths(pts){ let acc=0; pts[0].d=0; for(let i=1;i<pts.length;i++){ acc+=Math.hypot(pts[i].x-pts[i-1].x, pts[i].y-pts[i-1].y); pts[i].d=acc; } pts.len=acc; return pts; }
-function pointAt(pts, u){ const target=u*pts.len; let i=1; while(i<pts.length-1 && pts[i].d<target) i++; const a=pts[i-1], b=pts[i], seg=(b.d-a.d)||1, k=clamp((target-a.d)/seg,0,1); return { x:a.x+(b.x-a.x)*k, y:a.y+(b.y-a.y)*k }; }
-
-for (const b of BLD){
-  const dx=b.x-CORE.x, dy=(b.y+3)-CORE.y, L=Math.hypot(dx,dy);
-  const start={ x:CORE.x+dx/L*25, y:CORE.y+dy/L*25 };
-  b.path = withLengths(makePath(start, { x:b.x, y:b.y+3 }, b.bend));
-  b.phase = rnd();
-}
-const DECO_PATH = makePath({ x:140, y:243 }, { x:-6, y:266 }, 6);
-
-/* =========================================================
-   Statische Pixelwelt rendern (einmalig)
-   ========================================================= */
-const world = document.createElement('canvas'); world.width=W; world.height=H;
-const w = world.getContext('2d');
-const img = w.createImageData(W,H), D = img.data;
-const waterMask = new Uint8Array(W*H);
-function setPx(x,y,c){ if(x<0||y<0||x>=W||y>=H) return; const i=(y*W+x)*4; D[i]=c[0];D[i+1]=c[1];D[i+2]=c[2];D[i+3]=255; }
-
-const GRASS = ['#2d6638','#377741','#43884a','#529a50'].map(rgb);
-const FLOWERS = ['#f28fb0','#f4efe0','#f6d56a','#b394f0'].map(rgb);
-const WATER = ['#1c5a80','#27719a','#3a8db4'].map(rgb);
-const SAND = ['#b69e68','#a58e59'].map(rgb);
-const DIRT = ['#8a6b47','#977650','#a4835b'].map(rgb);
-const DIRT_EDGE = rgb('#6f5337');
-const STONE = ['#8b9298','#979ea3','#a5abaf'].map(rgb);
-
-// Gras, Wasser, Ufer
-for (let y=0;y<H;y++) for (let x=0;x<W;x++){
-  const rd = x < 140 ? riverDist(x,y) + (vnoise(x,y,9,7)-.5)*3 : 99;
-  const e = lakeE(x,y) + (vnoise(x,y,8,8)-.5)*.12;
-  const tR = rd/8.5, tL = Math.sqrt(Math.max(0,e));
-  const t = Math.min(tR, tL);
-  if (t < 1){
-    waterMask[y*W+x] = 1;
-    let c = t < .45 ? WATER[0] : t < .8 ? WATER[1] : WATER[2];
-    if (hash(x,y,11) > .975) c = rgb('#6fb6d2');
-    setPx(x,y,c);
-  } else if (t < 1.2){
-    setPx(x,y, SAND[hash(x,y,12) > .5 ? 0 : 1]);
-  } else {
-    const n = vnoise(x,y,22,1)*.6 + vnoise(x,y,6,2)*.4 + (hash(x,y,3)-.5)*.14;
-    setPx(x,y, GRASS[clamp(Math.floor(n*4),0,3)]);
-    const f = hash(x,y,9);
-    if (f > .9965) setPx(x,y, FLOWERS[Math.floor(hash(x,y,10)*4)]);
-    else if (f > .986) setPx(x,y, rgb('#24552e'));
+function walk(w, dt, speed){
+  let move = speed*dt;
+  while (move > 0 && w.route.length){
+    const q = w.route[0], dx=q.x-w.x, dy=q.y-w.y, d=Math.hypot(dx,dy);
+    if (Math.abs(dx) > .3) w.face = dx > 0 ? 1 : -1;
+    if (d <= move){ w.x=q.x; w.y=q.y; w.route.shift(); move -= d; }
+    else { w.x += dx/d*move; w.y += dy/d*move; move = 0; }
   }
-}
-// Wege stempeln
-function stamp(pts, r, fn){ for (const q of pts){ const cx=Math.round(q.x), cy=Math.round(q.y); for(let y=-r;y<=r;y++) for(let x=-r;x<=r;x++){ if(x*x+y*y<=r*r+1) fn(cx+x,cy+y); } } }
-const allPaths = [...BLD.map(b => b.path), DECO_PATH];
-for (const pts of allPaths) stamp(pts, 4, (x,y) => { if(x>=0&&y>=0&&x<W&&y<H&&!waterMask[y*W+x]) setPx(x,y,DIRT_EDGE); });
-for (const pts of allPaths) stamp(pts, 3, (x,y) => { if(x>=0&&y>=0&&x<W&&y<H&&!waterMask[y*W+x]) setPx(x,y, DIRT[Math.floor(hash(x,y,21)*3)]); });
-// Platz mit Kopfsteinpflaster
-for (let y=CORE.y-28;y<=CORE.y+28;y++) for (let x=CORE.x-28;x<=CORE.x+28;x++){
-  const d = Math.hypot(x-CORE.x, y-CORE.y);
-  if (d > 27) continue;
-  if (d > 25) { setPx(x,y, rgb('#5a6167')); continue; }
-  const row = Math.floor(y/4), off = (row%2)*3;
-  const mortar = ((x+off)%6===0) || (y%4===0);
-  setPx(x,y, mortar ? rgb('#6a7176') : STONE[Math.floor(hash(x,y,31)*3)]);
-  if (d < 11) setPx(x,y, d > 9 ? rgb('#2b333b') : rgb('#3a434d'));
-  if (d >= 7.5 && d < 8.5 && hash(x,y,32) > .45) setPx(x,y, rgb('#2c8f86'));
-}
-w.putImageData(img, 0, 0);
-
-// Pixel-Zeichenhelfer
-function p(x,y,wd,ht,c){ w.fillStyle=c; w.fillRect(Math.round(x),Math.round(y),Math.round(wd),Math.round(ht)); }
-const glowSpots = []; // {x,y,c,r,kind}
-const smokeSrc = [];
-
-function gable(bx,by,wd,ht,rh,pal,opt={}){
-  const x0 = bx - Math.floor(wd/2), y0 = by - ht;
-  p(x0-2,by-1,wd+5,3,'rgba(0,0,0,0.28)');
-  p(x0,y0,wd,ht,pal.wall);
-  for (let x=x0+7;x<x0+wd-3;x+=8) p(x,y0,1,ht,pal.wallDk);
-  p(x0,y0,1,ht,pal.wallDk); p(x0+wd-1,y0,1,ht,pal.wallDk); p(x0,by-2,wd,2,pal.wallDk);
-  const half = wd/2 + 2;
-  for (let i=0;i<rh;i++){
-    const inset = Math.round(i*half/rh), rx = x0-2+inset, rw = wd+4-2*inset;
-    if (rw < 2) break;
-    const y = y0-1-i, mid = rx + Math.floor(rw/2), tile = i%3===1;
-    p(rx,y,mid-rx,1, tile ? pal.roof[1] : pal.roof[0]);
-    p(mid,y,rx+rw-mid,1, tile ? pal.roof[2] : pal.roof[1]);
-    p(rx,y,1,1,pal.roof[2]); p(rx+rw-1,y,1,1,pal.roof[2]);
-  }
-  p(x0-2,y0-1,wd+4,1,pal.roof[2]);
-  if (opt.door !== false){ p(bx-3,by-9,7,9,pal.trim); p(bx-2,by-8,5,8,'#6e4a2c'); p(bx+1,by-5,1,1,'#f4c86a'); }
-  const n = opt.windows ?? 2, wy = y0+4, glass = opt.glass || '#ffd27a';
-  const slots = n===0 ? [] : n===4 ? [x0+3,x0+10,x0+wd-14,x0+wd-7] : [x0+4,x0+wd-9];
-  for (const wx of slots){ p(wx-1,wy-1,6,6,pal.trim); p(wx,wy,4,4,glass); p(wx+2,wy,1,4,pal.trim); p(wx,wy+2,4,1,pal.trim); glowSpots.push({x:wx+2,y:wy+2,c:glass,r:7,kind:'win',wx,wy}); }
-  if (opt.chimney !== false){
-    const cx = x0+wd-9, inset = (x0+wd+1)-(cx+4), i = Math.ceil(inset*rh/half), ry = y0-1-i;
-    p(cx,ry-6,4,8,'#8a5a44'); p(cx-1,ry-7,6,2,'#5c3a2c'); smokeSrc.push({x:cx+2,y:ry-8});
-  }
-  return { x0, y0, top:y0-rh-1 };
-}
-const INDIGO = ['#6a6fd6','#5357bd','#3a3d92'];
-
-const drawers = {
-  library(b){
-    const r = gable(b.x,b.y,46,20,14,{wall:'#e8d6ab',wallDk:'#b99d6d',roof:INDIGO,trim:'#3b2a1e'},{windows:4});
-    // Rosenfenster + Stern auf dem Dach
-    p(b.x-2,r.y0+3,5,5,'#3b2a1e'); p(b.x-1,r.y0+4,3,3,'#f4c86a'); glowSpots.push({x:b.x,y:r.y0+5,c:'#f4c86a',r:8,kind:'win',wx:b.x-1,wy:r.y0+4,ww:3});
-    const py = r.top; p(b.x,py-5,1,5,'#f4c86a'); p(b.x-2,py-3,5,1,'#f4c86a'); p(b.x-1,py-4,3,3,'#ffe6a3');
-    // Banner & Bücherstapel
-    p(b.x-9,b.y-9,2,7,'#f4c86a'); p(b.x+8,b.y-9,2,7,'#f4c86a'); p(b.x-9,b.y-3,2,1,'#b58a2f'); p(b.x+8,b.y-3,2,1,'#b58a2f');
-    p(b.x+26,b.y-2,7,2,'#c0504d'); p(b.x+27,b.y-4,6,2,'#4a7bd0'); p(b.x+26,b.y-6,7,2,'#e0b04a'); p(b.x+27,b.y-8,5,2,'#6cae62');
-    b.w=50; b.top=py-6; b.stars=true;
-  },
-  tower(b){
-    const r = gable(b.x,b.y,18,32,12,{wall:'#cfc7b8',wallDk:'#9e9586',roof:INDIGO,trim:'#3b2a1e'},{windows:0,chimney:false});
-    p(b.x-6,r.y0+13,12,8,'#1d2b33'); p(b.x-5,r.y0+14,10,6,'#6ee7d8'); p(b.x-4,r.y0+15,5,1,'#effffc'); p(b.x-4,r.y0+17,8,1,'#bff5ee'); p(b.x-4,r.y0+18,6,1,'#bff5ee');
-    glowSpots.push({x:b.x,y:r.y0+17,c:'#6ee7d8',r:9,kind:'win',wx:b.x-5,wy:r.y0+14,ww:10,wh:6});
-    p(b.x-3,r.y0+4,6,6,'#3b2a1e'); p(b.x-2,r.y0+5,4,4,'#ffd27a'); glowSpots.push({x:b.x,y:r.y0+7,c:'#ffd27a',r:6,kind:'win',wx:b.x-2,wy:r.y0+5});
-    const py = r.top; p(b.x,py-7,1,8,'#5c4630'); p(b.x+1,py-7,5,3,'#f4c86a');
-    b.w=22; b.top=py-8;
-  },
-  shop(b){
-    const r = gable(b.x,b.y,32,17,10,{wall:'#efe0bf',wallDk:'#c2a878',roof:['#e2b654','#c99a3c','#9b7328'],trim:'#3b2a1e'},{windows:0});
-    p(r.x0+3,b.y-11,9,7,'#3b2a1e'); p(r.x0+4,b.y-10,7,5,'#ffe1a0'); p(r.x0+21,b.y-11,9,7,'#3b2a1e'); p(r.x0+22,b.y-10,7,5,'#ffe1a0');
-    glowSpots.push({x:r.x0+7,y:b.y-8,c:'#ffd27a',r:8,kind:'win',wx:r.x0+4,wy:b.y-10,ww:7,wh:5},{x:r.x0+25,y:b.y-8,c:'#ffd27a',r:8,kind:'win',wx:r.x0+22,wy:b.y-10,ww:7,wh:5});
-    for (let i=0;i<36;i+=3) p(r.x0-2+i,b.y-15,3,3, (i/3)%2 ? '#5357bd' : '#f4c86a');
-    for (let i=0;i<36;i+=3) p(r.x0-1+i,b.y-12,1,1,(i/3)%2 ? '#3a3d92' : '#c99a3c');
-    p(r.x0+34,b.y-6,6,6,'#a8793f'); p(r.x0+34,b.y-6,6,1,'#c79a5a'); p(r.x0+36,b.y-6,1,6,'#7d5a2e');
-    b.w=36; b.top=r.top;
-  },
-  radio(b){
-    const r = gable(b.x,b.y,28,16,10,{wall:'#ece0c8',wallDk:'#bca781',roof:['#e0685a','#c24f43','#8f3a30'],trim:'#3b2a1e'});
-    const tx = b.x+20;
-    p(tx,b.y-48,1,48,'#8995a0'); p(tx+6,b.y-48,1,48,'#8995a0');
-    for (let y=b.y-46;y<b.y-2;y+=6) for(let k=0;k<6;k++){ p(tx+k,y+k,1,1,'#6d7883'); }
-    p(tx+1,b.y-52,5,4,'#aab4bd'); p(tx+2,b.y-55,3,3,'#c9d1d8');
-    b.redLight = { x:tx+3, y:b.y-56 };
-    p(b.x-15,b.y-12,2,3,'#f08a3c'); p(b.x-17,b.y-13,2,5,'#f08a3c'); p(b.x-18,b.y-14,1,7,'#d8702a');
-    b.w=36; b.top=b.y-58;
-  },
-  observatory(b){
-    const x0=b.x-15, y0=b.y-14;
-    p(x0-2,b.y-1,35,3,'rgba(0,0,0,0.28)');
-    p(x0,y0,30,14,'#dcd6cb'); p(x0,y0,30,1,'#b8b1a4'); p(x0,b.y-2,30,2,'#a9a49a'); p(x0,y0,1,14,'#a9a49a'); p(x0+29,y0,1,14,'#a9a49a');
-    const R=14;
-    for (let dy=0;dy<R;dy++){ const hw=Math.round(Math.sqrt(R*R-dy*dy)); const y=y0-1-dy;
-      p(b.x-hw,y,hw*2+1,1,'#a9b6c3'); p(b.x-hw,y,Math.max(1,Math.round(hw*.7)),1,'#cbd6df'); p(b.x+Math.round(hw*.5),y,Math.max(1,hw-Math.round(hw*.5)+1),1,'#7e8c9a'); }
-    p(b.x+1,y0-13,2,13,'#26303b');
-    for (let k=0;k<8;k++) p(b.x+2+k,y0-11-k,2,2,'#5c6b79');
-    p(b.x+10,y0-20,2,2,'#dfe7ee');
-    p(b.x-3,b.y-9,7,9,'#3b2a1e'); p(b.x-2,b.y-8,5,8,'#6e4a2c');
-    p(x0+4,y0+4,4,4,'#3b2a1e'); p(x0+5,y0+5,2,2,'#ffd27a'); p(x0+22,y0+4,4,4,'#3b2a1e'); p(x0+23,y0+5,2,2,'#ffd27a');
-    glowSpots.push({x:x0+6,y:y0+6,c:'#ffd27a',r:6,kind:'win',wx:x0+5,wy:y0+5,ww:2,wh:2},{x:x0+24,y:y0+6,c:'#ffd27a',r:6,kind:'win',wx:x0+23,wy:y0+5,ww:2,wh:2});
-    b.w=32; b.top=y0-R-6;
-  },
-  warehouse(b){
-    const r = gable(b.x,b.y,48,16,7,{wall:'#b88f60',wallDk:'#8e6a42',roof:['#7e98ad','#65819a','#4b6378'],trim:'#3a2a1c'},{door:false,windows:2});
-    for (let y=r.y0+11;y<b.y-2;y+=3) p(r.x0+1,y,46,1,'#a37d52');
-    p(b.x-7,b.y-11,14,11,'#3a2a1c'); p(b.x-6,b.y-10,12,10,'#5b4330');
-    for (let k=0;k<10;k++){ p(b.x-6+k*1.2,b.y-10+k,1,1,'#7a5c3e'); p(b.x+5-k*1.2,b.y-10+k,1,1,'#7a5c3e'); }
-    p(r.x0-9,b.y-7,7,7,'#c99a5b'); p(r.x0-6,b.y-7,1,7,'#ead3a6'); p(r.x0-8,b.y-13,6,6,'#b98a4c'); p(r.x0-5,b.y-13,1,6,'#ead3a6');
-    // Steg + Boot
-    for (let i=0;i<7;i++){ p(r.x0+48+i*3,b.y+2+i*2,4,4,'#8b5e3c'); p(r.x0+48+i*3,b.y+2+i*2,4,1,'#a4744c'); }
-    p(r.x0+50,b.y+6,1,6,'#5a3a22'); p(r.x0+62,b.y+13,1,6,'#5a3a22');
-    const bx = 424, by = 274;
-    p(bx,by,15,3,'#8b5e3c'); p(bx+2,by+3,11,1,'#6b4428'); p(bx+1,by-1,13,1,'#a4744c'); p(bx+6,by-9,1,8,'#5c4630'); p(bx+7,by-8,5,6,'#efe6d4'); p(bx+9,by-3,3,2,'#c99a5b');
-    b.w=52; b.top=r.top;
-  },
-  workshop(b){
-    const r = gable(b.x,b.y,32,18,12,{wall:'#f1e4ce',wallDk:'#c9b28c',roof:['#ec9152','#d0763d','#9f562a'],trim:'#3b2a1e'});
-    p(r.x0-9,b.y-10,1,10,'#6b4428'); p(r.x0-4,b.y-10,1,10,'#6b4428'); p(r.x0-10,b.y-14,8,7,'#f7f1e6');
-    p(r.x0-9,b.y-13,2,2,'#e27aa0'); p(r.x0-6,b.y-12,2,2,'#7ab8e2'); p(r.x0-8,b.y-10,3,1,'#6cae62');
-    p(r.x0+34,b.y-4,4,4,'#e27aa0'); p(r.x0+37,b.y-3,3,3,'#7ab8e2'); p(r.x0+35,b.y-3,1,1,'#f7c0d4');
-    p(b.x+7,b.y-15,7,6,'#6b4428'); p(b.x+9,b.y-13,1,1,'#e27aa0'); p(b.x+11,b.y-13,1,1,'#e27aa0'); p(b.x+9,b.y-12,3,1,'#e27aa0'); p(b.x+10,b.y-11,1,1,'#e27aa0');
-    b.w=44; b.top=r.top;
-  },
-  lab(b){
-    const r = gable(b.x,b.y,34,18,10,{wall:'#dde3e8',wallDk:'#aab4bd',roof:['#4cb8b0','#34968f','#23706b'],trim:'#2a3138'},{glass:'#6ee7d8'});
-    const dx=r.x0+4, dy=r.y0-6;
-    p(dx,dy,6,1,'#cfd8df'); p(dx+1,dy+1,4,1,'#aab4bd'); p(dx+2,dy+2,1,3,'#7e8a95');
-    p(b.x+4,r.top-6,1,6,'#7e8a95');
-    b.antenna = { x:b.x+4, y:r.top-7 };
-    b.w=38; b.top=r.top-8;
-  },
-};
-
-// Bäume, Laternen, Steine: platzieren, ohne Wege, Wasser, Gebäude und Platz zu blockieren
-const bounds = {
-  sb:{x0:-28,x1:36,y0:-40}, sbweb:{x0:-12,x1:12,y0:-54}, sbshop:{x0:-20,x1:28,y0:-30}, mkt:{x0:-20,x1:30,y0:-60},
-  seo:{x0:-18,x1:18,y0:-36}, drop:{x0:-34,x1:30,y0:-26}, etsy:{x0:-28,x1:30,y0:-34}, digi:{x0:-20,x1:20,y0:-36},
-};
-function blocked(x,y,m){
-  if (x<2||x>W-3||y<6||y>H-2) return true;
-  if (Math.hypot(x-CORE.x,y-CORE.y) < 36) return true;
-  if (x < 140 && riverDist(x,y) < 13) return true;
-  if (lakeE(x,y) < 1.35) return true;
-  for (const b of BLD){ const q=bounds[b.id]; if (x>b.x+q.x0-m && x<b.x+q.x1+m && y>b.y+q.y0-m && y<b.y+8+m) return true; }
-  for (const pts of allPaths) for (let i=0;i<pts.length;i+=2){ const q=pts[i]; if (Math.abs(q.x-x)<8 && Math.abs(q.y-y)<8 && Math.hypot(q.x-x,q.y-y)<7.5) return true; }
-  if (x>418 && x<445 && y>262 && y<282) return true;
-  return false;
-}
-const deco = [];
-const trees = [];
-for (let i=0;i<900 && trees.length<150;i++){
-  const x = Math.round(rnd()*W), y = Math.round(rnd()*H);
-  if (blocked(x,y,4)) continue;
-  if (trees.some(t => Math.abs(t.x-x)<9 && Math.abs(t.y-y)<7)) continue;
-  const pine = rnd() < .45;
-  trees.push({ x, y, pine, s: pine ? 3 + Math.floor(rnd()*2) : 4 + Math.floor(rnd()*3) });
-}
-function drawTree(t){
-  const {x,y} = t;
-  p(x-4,y-1,9,2,'rgba(0,0,0,0.22)');
-  if (t.pine){
-    p(x,y-4,2,4,'#5a3a24');
-    const C=['#3f8f5a','#2f7348','#1f5236'];
-    for (let k=0;k<t.s;k++){ const wd=11-k*2, top=y-5-k*4; for(let r=0;r<5;r++){ const ww=Math.max(1,Math.round((wd*(r+1))/5)); p(x+1-Math.floor(ww/2),top-4+r,ww,1, r===4?C[2]:(r<2?C[0]:C[1])); } }
-  } else {
-    p(x,y-4,2,4,'#5a3a24');
-    const R=t.s, cy=y-4-R;
-    for (let dy=-R;dy<=R;dy++) for (let dx=-R;dx<=R;dx++){
-      const d = dx*dx+dy*dy; if (d > R*R+1) continue;
-      let c = '#3e8a42'; const s = dx+dy;
-      if (d > (R-1)*(R-1)) c = '#244f2b'; else if (s < -R*.6) c = '#6bb85c'; else if (s < 0) c = '#4f9e4b'; else if (s > R*.7) c = '#2f6d35';
-      p(x+1+dx,cy+dy,1,1,c);
-    }
-    if (hash(x,y,41) > .7){ p(x-1,cy-1,1,1,'#e86a6a'); p(x+3,cy+1,1,1,'#e86a6a'); }
-  }
-}
-const lanterns = [];
-for (const b of BLD){
-  for (const u of [.42,.78]){
-    const q = pointAt(b.path,u), q2 = pointAt(b.path, Math.min(1,u+.02));
-    const dx=q2.x-q.x, dy=q2.y-q.y, L=Math.hypot(dx,dy)||1, side = (u<.5?1:-1);
-    const lx = Math.round(q.x - dy/L*6*side), ly = Math.round(q.y + dx/L*6*side);
-    lanterns.push({x:lx,y:ly});
-  }
-}
-const rocks = [];
-for (let i=0;i<400 && rocks.length<14;i++){ const x=Math.round(rnd()*140), y=Math.round(rnd()*H); const d=riverDist(x,y); if (d>10 && d<13) rocks.push({x,y}); }
-
-// Tiefensortiert zeichnen
-const draws = [];
-for (const b of BLD) draws.push({ y:b.y, f:() => drawers[b.kind](b) });
-for (const t of trees) draws.push({ y:t.y, f:() => drawTree(t) });
-for (const l of lanterns) draws.push({ y:l.y, f:() => { p(l.x-1,l.y,3,1,'rgba(0,0,0,.3)'); p(l.x,l.y-7,1,7,'#3a3a3f'); p(l.x-1,l.y-9,3,2,'#ffd27a'); p(l.x-1,l.y-10,3,1,'#3a3a3f'); } });
-for (const r of rocks) draws.push({ y:r.y, f:() => { p(r.x,r.y-2,4,2,'#8f969b'); p(r.x+1,r.y-3,2,1,'#b3b9bd'); p(r.x,r.y,4,1,'#5c6267'); } });
-draws.sort((a,b) => a.y - b.y).forEach(d => d.f());
-for (const l of lanterns) glowSpots.push({ x:l.x, y:l.y-8, c:'#ffcf73', r:12, kind:'lamp' });
-
-// Brücke über den Fluss (Deko-Weg)
-{
-  let best=null, bd=1e9; for (const q of DECO_PATH){ const d=riverDist(q.x,q.y); if(d<bd){bd=d;best=q;} }
-  const bx=Math.round(best.x)-12, by=Math.round(best.y)-4;
-  p(bx,by+1,25,7,'#8b5e3c'); for(let i=0;i<25;i+=3) p(bx+i,by+1,1,7,'#6b4428');
-  p(bx,by,25,1,'#5a3a22'); p(bx,by+8,25,1,'#5a3a22'); p(bx,by-2,1,3,'#5a3a22'); p(bx+24,by-2,1,3,'#5a3a22'); p(bx,by+8,1,3,'#5a3a22'); p(bx+24,by+8,1,3,'#5a3a22');
+  return w.route.length === 0;
 }
 
-// Wasser-Glitzer vorbereiten
-const sparkles = [];
-for (let i=0;i<6000 && sparkles.length<260;i++){ const x=Math.floor(rnd()*W), y=Math.floor(rnd()*H); if (waterMask[y*W+x]) sparkles.push({x,y,ph:rnd()*6.28,sp:1+rnd()*2}); }
-const fireflies = Array.from({length:26}, () => ({ x:rnd()*W, y:rnd()*H, ph:rnd()*6.28, sp:.4+rnd()*.6 }));
-const sbStars = Array.from({length:9}, (_,i) => ({ dx:(rnd()-.5)*64, dy:-18-rnd()*26, ph:rnd()*6.28 }));
-
-/* =========================================================
-   Agenten-Logik
-   ========================================================= */
-const HOME = AGENTS.map((a,i) => { const ang = (200 + i*46) * Math.PI/180; return { x: CORE.x + Math.cos(ang)*18, y: CORE.y + 4 + Math.sin(ang)*-12 }; });
-const CORE_SLOT = AGENTS.map((a,i) => { const ang = (i/AGENTS.length)*Math.PI*2 + .6; return { x: CORE.x + Math.cos(ang)*14, y: CORE.y + 3 + Math.sin(ang)*7 }; });
+// KI-Agenten
 const st = {};
-AGENTS.forEach((a,i) => { st[a.id] = { i, x:HOME[i].x, y:HOME[i].y, route:[], at:'home', target:'home', status:'ready', task:'', next:null, face:1 }; });
-
-function workSpot(id, bid){ const i = st[id].i; if (bid==='atlas') return CORE_SLOT[i]; const b = B[bid]; return { x: b.x - 9 + i*6, y: b.y + 6 + (i%2) }; }
-function routeTo(id, bid){
-  const s = st[id], r = [];
-  if (s.at !== 'home' && s.at !== 'atlas' && B[s.at]) { const pts = B[s.at].path; for (let i=pts.length-1;i>=0;i-=2) r.push({x:pts[i].x,y:pts[i].y}); r.push(pts[0]); }
-  if (bid === 'home' || bid === 'atlas'){ r.push(bid==='home' ? HOME[s.i] : CORE_SLOT[s.i]); }
-  else { const pts = B[bid].path; if (s.at==='home'||s.at==='atlas'||!B[s.at]) r.push({x:pts[0].x,y:pts[0].y}); for (let i=0;i<pts.length;i+=2) r.push({x:pts[i].x,y:pts[i].y}); r.push(workSpot(id,bid)); }
-  return r;
-}
+AGENTS.forEach((a,i) => { st[a.id] = { i, x:HOME[i][0], y:HOME[i][1], route:[], at:'home', target:'home', status:'ready', task:'', next:null, face:1 }; });
+function workSpot(id, bid){ const s = st[id]; if (bid==='atlas') return { x:CORE_SLOT[s.i][0], y:CORE_SLOT[s.i][1] }; const f = BLD[bid].front; return { x:f[0] - 24 + s.i*16, y:f[1] + 10 + (s.i%2)*4 }; }
 function assign(id, bid, status, task){
   const s = st[id];
   if (s.target === bid && s.route.length === 0){ s.status = status; s.task = task; changed(); return; }
-  s.route = routeTo(id, bid); s.target = bid; s.next = { status, task };
-  s.status = 'walk'; s.task = task;
+  const from = (s.at==='home'||s.at==='atlas') ? null : s.at;
+  s.route = pathBetween(from, bid, s.i);
+  if (bid !== 'home' && bid !== 'atlas') s.route.push(workSpot(id, bid));
+  s.target = bid; s.next = { status, task }; s.status = 'walk'; s.task = task;
   if (reduceMotion){ const last = s.route[s.route.length-1]; s.x=last.x; s.y=last.y; s.route=[]; arrive(id); }
   changed();
 }
 function arrive(id){ const s = st[id]; s.at = s.target; if (s.next){ s.status = s.next.status; s.task = s.next.task; s.next = null; } changed(); }
-function step(dt){
-  for (const a of AGENTS){
-    const s = st[a.id]; if (!s.route.length) continue;
-    let move = 22*dt;
-    while (move > 0 && s.route.length){
-      const q = s.route[0], dx=q.x-s.x, dy=q.y-s.y, d=Math.hypot(dx,dy);
-      if (Math.abs(dx) > .2) s.face = dx > 0 ? 1 : -1;
-      if (d <= move){ s.x=q.x; s.y=q.y; s.route.shift(); move -= d; }
-      else { s.x += dx/d*move; s.y += dy/d*move; move = 0; }
-    }
-    if (!s.route.length) arrive(a.id);
-  }
-}
 const workingAt = bid => AGENTS.filter(a => st[a.id].status==='work' && st[a.id].target===bid).map(a => a.id);
 const headingTo = bid => AGENTS.filter(a => st[a.id].target===bid && (st[a.id].status==='work'||st[a.id].status==='walk')).map(a => a.id);
 
-// Modi
+// Dorfbewohner, Katze, Enten, Vögel, Schmetterlinge
+const VILLAGERS = [
+  { hair:'#5a3a22', skin:'#f1c7a1', shirt:'#d9573f', pants:'#3d4f7a' },
+  { hair:'#e0b04a', skin:'#e8b48f', shirt:'#4f9e6b', pants:'#6b4a2e' },
+  { hair:'#2b2b33', skin:'#c98e6a', shirt:'#6f7fd1', pants:'#3a3a44' },
+].map((v,i) => ({ ...v, x:PLAZA.x - 60 + i*60, y:PLAZA.y + 40, route:[], at:null, wait:1 + i*2, face:1 }));
+const DESTS = ['sb','sbshop','mkt','seo','etsy','digi','drop','bridge','plaza','plaza'];
+const cat = { x:PLAZA.x + 90, y:PLAZA.y + 20, tx:0, ty:0, wait:2, face:-1, sit:0 };
+const ducks = Array.from({length:3}, (_,i) => { const p = lakePts[Math.floor(rnd()*lakePts.length)] || [1300,930]; return { x:p[0], y:p[1], a:rnd()*6.28, sp:5+rnd()*4, turn:0 }; });
+let birds = [], birdT = 6;
+const butterflies = Array.from({length:6}, (_,i) => { const c = [PLOTS[0],PLOTS[1],PLOTS[2],{x:PLAZA.x,y:PLAZA.y+60}][i%4]; return { cx:c.x, cy:c.y, ph:rnd()*6.28, r:30+rnd()*30, col:pick(['#f7c6e0','#fff3b0','#ffffff','#bfe3ff']) }; });
+const fireflies = Array.from({length:40}, () => { let x, y, tries=0; do { x = rnd()*IW; y = rnd()*IH; tries++; } while (isWater(x,y) && tries < 20); return { x, y, ph:rnd()*6.28, sp:.4+rnd()*.6 }; });
+const clouds = Array.from({length:3}, (_,i) => ({ x:rnd()*IW, y:150 + i*320 + rnd()*80, r:180 + rnd()*90 }));
+let leaves = [], gustT = 12, gust = 0;
+const flow = Array.from({length:reduceMotion ? 0 : 90}, () => spawnFlow({}));
+function spawnFlow(f){ const p = riverPts[Math.floor(rnd()*riverPts.length)] || [150,400]; f.x = p[0]; f.y = p[1]; f.life = 0; f.max = 1.2 + rnd()*1.8; return f; }
+const foam = Array.from({length:reduceMotion ? 0 : 36}, (_,i) => ({ zone:i%3, t:rnd() }));
+const FOAM_ZONES = [[48,0,165,190],[40,0,110,120],[255,935,318,995]];
+const lakeRipples = Array.from({length:22}, () => { const p = lakePts[Math.floor(rnd()*lakePts.length)] || [1300,930]; return { x:p[0], y:p[1], ph:rnd()*6.28 }; });
+const smoke = [];
+const SMOKE_SRC = [[1233,66],[773,616]];
+
+/* =========================================================
+   Modi
+   ========================================================= */
 let mode = 'demo', demoTimer = 0, lastPick = null;
 function applyReal(){
-  assign('code','atlas','work','Hybrid-Prototyp bauen');
+  assign('code','atlas','work','Welt v0.2 auf der Dorf-Karte bauen');
   for (const id of ['claude','gpt','gem']) assign(id,'home','unknown','');
 }
 function demoKick(){
   const seq = [['code','atlas','MVP: Notion-Anbindung bauen'],['gem','sb','Szene 9: Sternmuster korrigieren'],['claude','sb','Aszendenten-Textvarianten entwerfen'],['gpt','etsy','Mockups für Listings entwerfen']];
-  seq.forEach(([id,bid,task],k) => setTimeout(() => { if (mode==='demo') assign(id,bid,'work',task); }, reduceMotion ? 0 : 400 + k*1300));
+  seq.forEach(([id,bid,task],k) => setTimeout(() => { if (mode==='demo') assign(id,bid,'work',task); }, reduceMotion ? 0 : 500 + k*1400));
 }
 function demoTick(dt){
   demoTimer -= dt; if (demoTimer > 0) return;
-  demoTimer = 4 + rnd()*3.5;
+  demoTimer = 5 + rnd()*4;
   const pool = AGENTS.filter(a => a.id !== lastPick && st[a.id].status !== 'walk');
   if (!pool.length) return;
-  const a = pool[Math.floor(rnd()*pool.length)]; lastPick = a.id;
-  if (rnd() < .22 && st[a.id].target !== 'home'){ assign(a.id,'home','ready',''); return; }
+  const a = pick(pool); lastPick = a.id;
+  if (rnd() < .2 && st[a.id].target !== 'home'){ assign(a.id,'home','ready',''); return; }
   const opts = DEMO[a.id].filter(o => o[0] !== st[a.id].target);
-  const [bid, task] = opts[Math.floor(rnd()*opts.length)];
+  const [bid, task] = pick(opts);
   assign(a.id, bid, 'work', task);
 }
 function setMode(m){
   mode = m;
   $('#mDemo').setAttribute('aria-pressed', m==='demo'); $('#mReal').setAttribute('aria-pressed', m==='real');
-  const badge = $('#modeBadge');
-  badge.classList.toggle('live', m==='real');
+  $('#modeBadge').classList.toggle('live', m==='real');
   $('#modeText').textContent = m==='demo'
     ? 'Demo: KI-Aktivität ist simuliert · Projekte & Aufgaben sind echte Notion-Daten'
-    : 'Echter Stand 30.09.2026: Claude Code baut Project Atlas · übrige KIs noch ohne Anbindung';
-  if (m==='real') applyReal(); else { demoTimer = 6; demoKick(); }
+    : 'Echter Stand 30.09.2026: Claude Code baut Project Atlas · Team-Anbindung folgt';
+  if (m==='real') applyReal(); else { demoTimer = 7; demoKick(); }
 }
 
 /* =========================================================
-   Rendering
+   Ansicht: Zoomen & Verschieben
    ========================================================= */
 const cv = $('#world'), ctx = cv.getContext('2d'), stage = $('#stage');
-let dpr = 1, cw = 0, ch = 0, sc = 3, ox = 0, oy = 0;
-let selected = 'sb', hovered = null, hoverAgent = null, filter = '';
-let todMode = 'auto';
-
+let dpr = 1, cw = 0, ch = 0;
+const view = { s:1, ox:0, oy:0 };
+let fitS = 1, tween = null, lastSize = [0,0];
+const maxS = () => fitS*3.2;
+const WX = x => view.ox + x*view.s, WY = y => view.oy + y*view.s;
+function clampView(){
+  const w = IW*view.s, h = IH*view.s;
+  view.ox = w <= cw ? (cw-w)/2 : clamp(view.ox, cw-w, 0);
+  view.oy = h <= ch ? (ch-h)/2 : clamp(view.oy, ch-h, 0);
+}
+function centerOn(x, y, s){ view.s = clamp(s, fitS, maxS()); view.ox = cw/2 - x*view.s; view.oy = ch/2 - y*view.s; clampView(); placeLabels(); }
+function fit(){ fitS = Math.min(cw/IW, ch/IH); const cover = Math.max(cw/IW, ch/IH); centerOn(IW/2, IH/2, clamp(cw/IW, fitS, cover)); }
+let bgCanvas = null;
+function buildBackdrop(){
+  if (!ready) return;
+  bgCanvas = document.createElement('canvas'); bgCanvas.width = cw; bgCanvas.height = ch;
+  const b = bgCanvas.getContext('2d'), cover = Math.max(cw/IW, ch/IH)*1.08;
+  b.filter = 'blur(18px) saturate(1.1)';
+  b.drawImage(baseImg, (cw - IW*cover)/2, (ch - IH*cover)/2, IW*cover, IH*cover);
+  b.filter = 'none'; b.fillStyle = 'rgba(9,16,22,.55)'; b.fillRect(0, 0, cw, ch);
+}
+function zoomAt(f, px, py){
+  const s0 = view.s, s = clamp(s0*f, fitS, maxS());
+  const ix = (px-view.ox)/s0, iy = (py-view.oy)/s0;
+  view.s = s; view.ox = px - ix*s; view.oy = py - iy*s; clampView(); placeLabels();
+}
+function focusOn(id){
+  let x, y;
+  if (id==='atlas'){ x = PLAZA.x; y = PLAZA.y; }
+  else if (P[id].plot){ x = P[id].x; y = P[id].y; }
+  else { const b = BLD[id].box; x = (b[0]+b[2])/2; y = (b[1]+b[3])/2; }
+  const s = Math.max(view.s, fitS*1.35);
+  tween = { fx:(cw/2 - view.ox)/view.s, fy:(ch/2 - view.oy)/view.s, fs:view.s, tx:x, ty:y, ts:s, t:0 };
+  if (reduceMotion){ centerOn(x, y, s); tween = null; }
+}
 function resize(){
   const r = stage.getBoundingClientRect();
   dpr = Math.min(window.devicePixelRatio || 1, 2);
   cw = Math.max(1, Math.round(r.width*dpr)); ch = Math.max(1, Math.round(r.height*dpr));
   cv.width = cw; cv.height = ch;
-  const raw = Math.min(cw/400, ch/250);
-  sc = raw >= 2 ? Math.floor(raw) : raw;
-  ox = Math.round(cw/2 - CORE.x*sc); oy = Math.round(ch/2 - (CORE.y-4)*sc);
   stage.classList.toggle('compact', r.width < 640);
-  placeLabels();
-  if (reduceMotion) render(performance.now()/1000);
+  if (Math.abs(r.width-lastSize[0]) > 40 || Math.abs(r.height-lastSize[1]) > 120 || !lastSize[0]) { fit(); lastSize = [r.width, r.height]; }
+  else { fitS = Math.min(cw/IW, ch/IH); clampView(); placeLabels(); }
+  buildBackdrop();
+  if (reduceMotion && ready) render(performance.now()/1000);
 }
-const WX = x => ox + x*sc, WY = y => oy + y*sc;
 
+/* =========================================================
+   Tageszeit
+   ========================================================= */
+let todMode = 'auto';
 function cyprusHour(){
   const parts = new Intl.DateTimeFormat('de-DE',{hour:'numeric',minute:'numeric',hour12:false,timeZone:'Asia/Nicosia'}).formatToParts(new Date());
-  const h = +parts.find(x => x.type==='hour').value, m = +parts.find(x => x.type==='minute').value;
-  return (h%24) + m/60;
+  return (+parts.find(x => x.type==='hour').value % 24) + (+parts.find(x => x.type==='minute').value)/60;
 }
 function lighting(){
   if (todMode==='day') return { dark:0, warm:0 };
@@ -835,54 +660,70 @@ function lighting(){
   return { dark:1, warm:0 };
 }
 
-function glow(x,y,r,col,a){
-  const g = ctx.createRadialGradient(x,y,0,x,y,r);
-  g.addColorStop(0, rgba(col,a)); g.addColorStop(1, rgba(col,0));
-  ctx.fillStyle = g; ctx.fillRect(x-r,y-r,r*2,r*2);
+/* =========================================================
+   Bilder laden, Leucht-Ebene vorbereiten
+   ========================================================= */
+const baseImg = new Image(), lightImg = new Image();
+let ready = false, glowCanvas = null;
+function loadImg(img, src){ return new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error(src)); img.src = src; }); }
+function buildGlow(){
+  glowCanvas = document.createElement('canvas'); glowCanvas.width = IW; glowCanvas.height = IH;
+  const g = glowCanvas.getContext('2d'); g.globalCompositeOperation = 'lighter';
+  const halo = (x,y,r,col,a) => { const gr = g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0, rgba(col,a)); gr.addColorStop(1, rgba(col,0)); g.fillStyle = gr; g.fillRect(x-r,y-r,r*2,r*2); };
+  for (const [x,y,c] of MD.warm){ if (c < 8) continue; halo(x, y, Math.min(42, 12 + Math.sqrt(c)*2.4), '#ffc46e', .42); }
+  for (const [x,y,c] of MD.cyan){ halo(x, y, 30, '#6ee7d8', .45); }
 }
-const smoke = [];
-let smokeT = 0;
 
+/* =========================================================
+   Zeichnen
+   ========================================================= */
+function glow(x,y,r,col,a){ if (r <= 0 || a <= 0) return; const g = ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0, rgba(col,a)); g.addColorStop(1, rgba(col,0)); ctx.fillStyle = g; ctx.fillRect(x-r,y-r,r*2,r*2); }
 function spriteRows(id){
-  const m = A[id].mark;
-  const chest = m==='spark' ? 'WCW' : m==='prompt' ? 'CWC' : m==='ring' ? 'WCW' : 'CWC';
-  return [
-    '..A...',
-    '..S...',
-    '.BBBB.',
-    'BVVVVB',
-    'BVEVEB',
-    '.BBBB.',
-    'BC'+chest[0]+chest[1]+'CB',
-    '.C'+chest[2]+'CC.',
-    '.L..L.',
-  ];
+  const m = A[id].mark, chest = (m==='spark'||m==='ring') ? 'WCW' : 'CWC';
+  return ['..A...','..S...','.BBBB.','BVVVVB','BVEVEB','.BBBB.','BC'+chest[0]+chest[1]+'CB','.C'+chest[2]+'CC.','.L..L.'];
 }
-const shade = (hex,k) => { const c=rgb(hex).map(v => clamp(Math.round(v*k),0,255)); return `rgb(${c[0]},${c[1]},${c[2]})`; };
-function drawAgent(a, t, alpha){
-  const s = st[a.id], rows = spriteRows(a.id), px = sc;
-  const walking = s.route.length > 0, bob = walking ? (Math.floor(t*8)%2) : Math.round(Math.sin(t*2 + s.i)*.5+.5)*0;
-  const X = WX(s.x) - 3*px, Y = WY(s.y) - 9*px - bob*px*.5;
-  ctx.save(); ctx.globalAlpha = alpha;
-  // Bodenschein
-  ctx.globalCompositeOperation = 'lighter';
-  glow(WX(s.x), WY(s.y), 7*px, a.color, s.status==='work' ? .55 : .25);
-  ctx.globalCompositeOperation = 'source-over';
-  const col = { A:'#ffffff', S:shade(a.color,.55), B:a.color, V:'#132028', E: s.status==='unknown' ? '#51606a' : '#e8fbff', C:shade(a.color,.78), W:'#fff4df', L:shade(a.color,.45) };
-  const legFrame = walking ? Math.floor(t*8)%2 : 0;
-  for (let r=0;r<rows.length;r++){
-    const row = rows[r];
-    for (let c=0;c<6;c++){
-      let ch2 = row[c]; if (ch2==='.') continue;
-      if (r===8 && walking){ if ((c===1 && legFrame) || (c===4 && !legFrame)) continue; }
-      if (ch2==='A'){ ctx.fillStyle = s.status==='work' ? a.color : '#dfe8ea'; }
-      else ctx.fillStyle = col[ch2];
-      const cc = s.face < 0 ? 5-c : c;
-      ctx.fillRect(Math.round(X+cc*px), Math.round(Y+r*px), Math.ceil(px), Math.ceil(px));
-    }
+const VILLAGER_ROWS = ['.HHHH.','HSSSSH','.SESE.','.SSSS.','TTTTTT','STTTTS','.TTTT.','.PPPP.','.P..P.','.F..F.'];
+function blit(rows, colors, x, y, px, face, legFrame){
+  const w = rows[0].length;
+  for (let r=0;r<rows.length;r++) for (let c=0;c<w;c++){
+    const k = rows[r][c]; if (k==='.') continue;
+    if (legFrame !== null && r >= rows.length-2 && ((c<w/2 && legFrame) || (c>=w/2 && !legFrame)) && (k==='P'||k==='F'||k==='L')) continue;
+    ctx.fillStyle = colors[k]; const cc = face < 0 ? w-1-c : c;
+    ctx.fillRect(Math.round(x + cc*px), Math.round(y + r*px), Math.ceil(px), Math.ceil(px));
   }
+}
+const SP = 2.7; // Sprite-Pixel in Bildpixeln
+
+function drawAgent(a, t){
+  const s = st[a.id], px = SP*view.s, walking = s.route.length > 0;
+  const bob = walking ? (Math.floor(t*8)%2) : 0;
+  const X = WX(s.x) - 3*px, Y = WY(s.y) - 9*px - bob*px*.5;
+  ctx.save(); ctx.globalAlpha = s.status==='unknown' ? .55 : 1;
+  ctx.globalCompositeOperation = 'lighter'; glow(WX(s.x), WY(s.y), 9*px, a.color, s.status==='work' ? .5 : .22); ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(WX(s.x), WY(s.y)+px*.3, 3.2*px, 1.1*px, 0, 0, Math.PI*2); ctx.fill();
+  const col = { A: s.status==='work' ? a.color : '#dfe8ea', S:shade(a.color,.55), B:a.color, V:'#132028', E: s.status==='unknown' ? '#51606a' : '#e8fbff', C:shade(a.color,.78), W:'#fff4df', L:shade(a.color,.45) };
+  blit(spriteRows(a.id), col, X, Y, px, s.face, walking ? Math.floor(t*8)%2 : null);
   ctx.restore();
   return { x:WX(s.x), y:Y };
+}
+function drawVillager(v, t){
+  const px = SP*view.s, walking = v.route.length > 0;
+  const X = WX(v.x) - 3*px, Y = WY(v.y) - 10*px - (walking ? (Math.floor(t*7)%2)*px*.4 : 0);
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(WX(v.x), WY(v.y)+px*.3, 3*px, 1*px, 0, 0, Math.PI*2); ctx.fill();
+  blit(VILLAGER_ROWS, { H:v.hair, S:v.skin, E:'#2a1d18', T:v.shirt, P:v.pants, F:'#2b1f18' }, X, Y, px, v.face, walking ? Math.floor(t*7)%2 : null);
+}
+function drawCat(t){
+  const px = 2.2*view.s, moving = Math.hypot(cat.tx-cat.x, cat.ty-cat.y) > 1 && cat.wait <= 0;
+  const rows = cat.sit > 0 ? ['.....K.K','.....KKK','.K..KKKK','..KKKKK.','..KK.KK.'] : ['......KK','K....KKK','.KKKKKK.','.KKKKKK.','.K.K..K.'];
+  const X = WX(cat.x) - 4*px, Y = WY(cat.y) - 5*px;
+  blit(rows, { K:'#e0934a' }, X, Y, px, cat.face, moving ? Math.floor(t*6)%2 : null);
+  ctx.fillStyle = '#1d1410'; const ex = cat.face > 0 ? X + 6*px : X + 1*px; ctx.fillRect(Math.round(ex), Math.round(Y + 1*px), Math.ceil(px*.8), Math.ceil(px*.8));
+}
+function drawDuck(d, t){
+  const px = 2*view.s, face = Math.cos(d.a) >= 0 ? 1 : -1, bob = Math.sin(t*2 + d.a)*px*.3;
+  ctx.strokeStyle = 'rgba(220,240,255,.35)'; ctx.lineWidth = Math.max(1, px*.5);
+  ctx.beginPath(); ctx.ellipse(WX(d.x) - face*4*px, WY(d.y)+px, 5*px, 1.4*px, 0, 0, Math.PI*2); ctx.stroke();
+  blit(['...GG.','...GGO','WWWWW.','WWWWW.'], { G:'#2f6e4a', O:'#f0a23a', W:'#efe9dc' }, WX(d.x) - 3*px, WY(d.y) - 4*px + bob, px, face, null);
 }
 function tag(x, y, text, color, working, t){
   ctx.save();
@@ -896,222 +737,240 @@ function tag(x, y, text, color, working, t){
   ctx.fillStyle = '#e6eef0'; ctx.textBaseline = 'middle'; ctx.fillText(text, tx, by + th/2 + .5*dpr);
   ctx.restore();
 }
+function routePts(bid){ return ROUTES[bid] ? [...ROUTES[bid], BLD[bid] ? BLD[bid].front : ROUTES[bid][ROUTES[bid].length-1]] : null; }
+function pointOnPoly(pts, u){
+  let total = 0; const seg = [];
+  for (let i=1;i<pts.length;i++){ const d = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); seg.push(d); total += d; }
+  let target = u*total;
+  for (let i=0;i<seg.length;i++){ if (target <= seg[i]){ const k = target/seg[i]; return [pts[i][0]+(pts[i+1][0]-pts[i][0])*k, pts[i][1]+(pts[i+1][1]-pts[i][1])*k]; } target -= seg[i]; }
+  return pts[pts.length-1];
+}
 
+let selected = 'sb', hovered = null, hoverAgent = null, filter = '';
 function render(t){
   ctx.setTransform(1,0,0,1,0,0);
-  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
   ctx.fillStyle = '#0b1512'; ctx.fillRect(0,0,cw,ch);
-  ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(world, ox, oy, W*sc, H*sc);
-  const L = lighting(), lit = Math.max(L.dark, L.warm*.6);
+  if (ready && bgCanvas) ctx.drawImage(bgCanvas, 0, 0);
+  if (!ready){ ctx.fillStyle = '#a8b7bc'; ctx.font = `600 ${14*dpr}px "Chakra Petch", system-ui`; ctx.textAlign = 'center'; ctx.fillText('Karte wird geladen …', cw/2, ch/2); ctx.textAlign = 'start'; return; }
+  const s = view.s, L = lighting(), lit = Math.max(L.dark, L.warm*.6), day = 1 - L.dark;
+  ctx.imageSmoothingEnabled = s < 1.4; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(baseImg, view.ox, view.oy, IW*s, IH*s);
+  ctx.save(); ctx.beginPath(); ctx.rect(view.ox, view.oy, IW*s, IH*s); ctx.clip();
 
-  // Wasser-Glitzer
-  if (!reduceMotion){ for (const s of sparkles){ const v = Math.sin(t*s.sp + s.ph); if (v > .82){ ctx.fillStyle = `rgba(214,244,255,${(v-.82)*4})`; ctx.fillRect(WX(s.x), WY(s.y), Math.ceil(sc), Math.ceil(sc)); } } }
-
+  // Wasser: Strömung, Glitzern, Gischt, Kräuseln
+  if (!reduceMotion){
+    for (const f of flow){ const a = Math.sin(Math.PI * clamp(f.life/f.max,0,1)) * .55; ctx.fillStyle = `rgba(225,246,255,${a})`; ctx.fillRect(WX(f.x), WY(f.y), Math.max(1, 1.4*s), Math.max(2, 5*s)); }
+    for (const p of MD.water){ const v = Math.sin(t*1.7 + p[0]*.13 + p[1]*.07); if (v > .86){ ctx.fillStyle = `rgba(235,250,255,${(v-.86)*5})`; ctx.fillRect(WX(p[0]), WY(p[1]), Math.max(1, 2*s), Math.max(1, 2*s)); } }
+    for (const f of foam){ const z = FOAM_ZONES[f.zone], x = z[0] + ((f.t*7919) % 1)*(z[2]-z[0]), y = z[1] + f.t*(z[3]-z[1]); ctx.fillStyle = `rgba(255,255,255,${.75*(1-f.t)})`; ctx.fillRect(WX(x), WY(y), Math.max(1, 2.5*s), Math.max(1, 2.5*s)); }
+    for (const r of lakeRipples){ const v = (Math.sin(t*.9 + r.ph)+1)/2; ctx.strokeStyle = `rgba(215,238,255,${v*.35})`; ctx.lineWidth = Math.max(1, s); ctx.beginPath(); ctx.moveTo(WX(r.x - 7 - v*4), WY(r.y)); ctx.lineTo(WX(r.x + 7 + v*4), WY(r.y)); ctx.stroke(); }
+  }
+  // Wolkenschatten (Tag)
+  if (day > .3){ ctx.globalCompositeOperation = 'multiply'; for (const c of clouds){ const g = ctx.createRadialGradient(WX(c.x), WY(c.y), 0, WX(c.x), WY(c.y), c.r*s); g.addColorStop(0, `rgba(40,55,70,${.16*day})`); g.addColorStop(1, 'rgba(40,55,70,0)'); ctx.fillStyle = g; ctx.fillRect(WX(c.x)-c.r*s, WY(c.y)-c.r*s, c.r*2*s, c.r*2*s); } ctx.globalCompositeOperation = 'source-over'; }
   // Rauch
-  for (const q of smoke){ const a = clamp(q.life,0,1)*.45; ctx.fillStyle = `rgba(210,214,218,${a})`; const sz = Math.ceil(sc*(q.big?2:1)); ctx.fillRect(Math.round(WX(q.x)), Math.round(WY(q.y)), sz, sz); }
-
-  // Auswahl-Ring (unter der Beleuchtung, damit er im Boden liegt)
-  const ringFor = (bid, strong) => {
-    let x, y, rx, ry;
-    if (bid === 'atlas'){ x = WX(CORE.x); y = WY(CORE.y+2); rx = 30*sc; ry = 15*sc; }
-    else { const b = B[bid]; x = WX(b.x); y = WY(b.y+2); rx = (b.w/2+6)*sc; ry = 7*sc; }
-    const col = (P[bid].group==='sb') ? '#f4c86a' : '#6ee7d8';
-    ctx.save(); ctx.lineWidth = Math.max(1.5, sc*.7);
-    ctx.strokeStyle = rgba(col, strong ? .55 + .3*Math.sin(t*3) : .35);
-    ctx.setLineDash(strong ? [] : [4*dpr,4*dpr]);
-    ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI*2); ctx.stroke(); ctx.restore();
-  };
-  if (hovered && hovered !== selected) ringFor(hovered, false);
-  ringFor(selected, true);
+  for (const q of smoke){ const a = clamp(q.life,0,1)*.4; ctx.fillStyle = `rgba(225,228,232,${a})`; const sz = Math.max(2, q.size*s); ctx.fillRect(WX(q.x)-sz/2, WY(q.y)-sz/2, sz, sz); }
+  // Dorfbewohner & Tiere (werden nachts mit abgedunkelt)
+  for (const d of ducks) drawDuck(d, t);
+  const walkers = [...VILLAGERS].sort((a,b) => a.y - b.y);
+  for (const v of walkers) drawVillager(v, t);
+  drawCat(t);
 
   // Beleuchtung
-  if (L.warm > 0){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle = `rgba(255,176,128,${L.warm*.55})`; ctx.fillRect(0,0,cw,ch); }
-  if (L.dark > 0){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle = `rgba(52,66,118,${L.dark*.88})`; ctx.fillRect(0,0,cw,ch); }
+  const rect = [view.ox, view.oy, IW*s, IH*s];
+  if (L.warm > 0){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle = `rgba(255,172,122,${L.warm*.5})`; ctx.fillRect(...rect); }
+  if (L.dark > 0){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle = `rgba(38,52,108,${L.dark*.84})`; ctx.fillRect(...rect); }
   ctx.globalCompositeOperation = 'source-over';
-
-  // Weltrand weich ausblenden
-  const fade = 26*sc, edge = (x0,y0,x1,y1,gx0,gy0,gx1,gy1) => { const g = ctx.createLinearGradient(gx0,gy0,gx1,gy1); g.addColorStop(0,'rgba(9,16,22,1)'); g.addColorStop(1,'rgba(9,16,22,0)'); ctx.fillStyle=g; ctx.fillRect(x0,y0,x1-x0,y1-y0); };
-  const wx0 = ox, wy0 = oy, wx1 = ox+W*sc, wy1 = oy+H*sc;
-  if (wx0 > -fade) edge(wx0, wy0, wx0+fade, wy1, wx0,0,wx0+fade,0);
-  if (wx1 < cw+fade) edge(wx1-fade, wy0, wx1, wy1, wx1,0,wx1-fade,0);
-  if (wy0 > -fade) edge(wx0, wy0, wx1, wy0+fade, 0,wy0,0,wy0+fade);
-  if (wy1 < ch+fade) edge(wx0, wy1-fade, wx1, wy1, 0,wy1,0,wy1-fade);
-
-  // Lichtquellen (additiv)
-  ctx.globalCompositeOperation = 'lighter';
   if (lit > 0){
-    for (const g of glowSpots){
-      const fl = g.kind==='lamp' ? .85 + .15*Math.sin(t*7 + g.x) : .9 + .1*Math.sin(t*3 + g.y);
-      glow(WX(g.x)+sc*.5, WY(g.y)+sc*.5, g.r*sc, g.c, .42*lit*fl);
-    }
-    ctx.globalCompositeOperation = 'source-over';
-    for (const g of glowSpots){ if (g.kind!=='win') continue; ctx.fillStyle = rgba(g.c, .85*lit); ctx.fillRect(WX(g.wx), WY(g.wy), (g.ww||4)*sc, (g.wh||4)*sc); }
-    for (const g of glowSpots){ if (g.kind!=='lamp') continue; ctx.fillStyle = rgba('#ffe2a0', .9*lit); ctx.fillRect(WX(g.x-1), WY(g.y-1), 3*sc, 2*sc); }
+    ctx.globalAlpha = Math.min(1, lit*1.05); ctx.drawImage(lightImg, ...rect); ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'lighter';
-    if (!reduceMotion && L.dark > .3){
-      for (const f of fireflies){ const fx = f.x + Math.sin(t*f.sp + f.ph)*6, fy = f.y + Math.cos(t*f.sp*.8 + f.ph)*4; const a = (Math.sin(t*2.2 + f.ph)*.5+.5)*L.dark; if (a < .15) continue; glow(WX(fx), WY(fy), 3.2*sc, '#d9f77a', .55*a); }
-    }
+    ctx.globalAlpha = lit * (.88 + .08*Math.sin(t*2.3)); ctx.drawImage(glowCanvas, ...rect); ctx.globalAlpha = 1;
+    if (!reduceMotion && L.dark > .3) for (const f of fireflies){ const fx = f.x + Math.sin(t*f.sp + f.ph)*14, fy = f.y + Math.cos(t*f.sp*.8 + f.ph)*10, a = (Math.sin(t*2.2 + f.ph)*.5+.5)*L.dark; if (a > .15) glow(WX(fx), WY(fy), 7*s, '#d9f77a', .6*a); }
+    ctx.globalCompositeOperation = 'source-over';
   }
-
-  // Datenleitungen entlang der Wege
-  ctx.lineCap='round'; ctx.lineJoin='round';
-  for (const b of BLD){
-    const act = workingAt(b.id), col = act.length ? A[act[0]].color : (P[b.id].group==='sb' ? '#f4c86a' : '#6ee7d8');
-    const dimmed = filter && !match(b.id);
-    ctx.beginPath(); b.path.forEach((q,i) => i ? ctx.lineTo(WX(q.x),WY(q.y)) : ctx.moveTo(WX(q.x),WY(q.y)));
-    ctx.strokeStyle = rgba(col, dimmed ? .04 : act.length ? .28 : .1); ctx.lineWidth = sc*(act.length ? 2.2 : 1.3); ctx.stroke();
-    ctx.strokeStyle = rgba(col, dimmed ? .08 : act.length ? .85 : .3); ctx.lineWidth = Math.max(1, sc*.35); ctx.stroke();
-    if (!reduceMotion){
-      const n = act.length ? 3 : 1, sp = act.length ? .32 : .09;
-      for (let k=0;k<n;k++){ const u = ((t*sp + k/n + b.phase) % 1); const q = pointAt(b.path, u); glow(WX(q.x), WY(q.y), sc*(act.length ? 3.2 : 2), col, act.length ? .95 : .5); }
-    }
-  }
-
-  // SternenBücher-Sterne, Funkturm-Licht, Labor-Antenne
-  const sbB = B.sb;
-  for (const s of sbStars){ const a = (Math.sin(t*1.7 + s.ph)*.5+.5); if (a < .25) continue; const x = WX(sbB.x + s.dx), y = WY(sbB.y - 20 + s.dy); ctx.fillStyle = rgba('#ffe6a3', a*.9); ctx.fillRect(x, y - sc, sc, sc*3); ctx.fillRect(x - sc, y, sc*3, sc); glow(x+sc/2, y+sc/2, 5*sc, '#f4c86a', a*.35); }
-  const rl = B.mkt.redLight; if (rl && Math.sin(t*3) > 0) glow(WX(rl.x)+sc/2, WY(rl.y)+sc/2, 6*sc, '#ff5a4a', .9);
-  const an = B.digi.antenna; if (an) glow(WX(an.x)+sc/2, WY(an.y)+sc/2, 4*sc, '#6ee7d8', .5 + .4*Math.sin(t*4));
-
-  // KI-Kern (modern, weich gezeichnet)
+  // Funkmast-Licht
   ctx.globalCompositeOperation = 'lighter';
-  const coreAct = workingAt('atlas').length, totalAct = AGENTS.filter(a => st[a.id].status==='work').length;
-  const cx = WX(CORE.x+.5), baseY = WY(CORE.y-1), fy = baseY - (17 + Math.sin(t*1.6)*2)*sc;
-  glow(cx, fy, (30 + totalAct*4)*sc, '#6ee7d8', .22 + totalAct*.05);
-  glow(cx, baseY, 16*sc, '#6ee7d8', .25);
-  const beam = ctx.createLinearGradient(0, baseY, 0, fy);
-  beam.addColorStop(0, 'rgba(110,231,216,.35)'); beam.addColorStop(1, 'rgba(110,231,216,0)');
-  ctx.fillStyle = beam; ctx.fillRect(cx - 3*sc, fy, 6*sc, baseY - fy);
-  ctx.lineWidth = Math.max(1, sc*.55);
-  ctx.setLineDash([4*sc, 3*sc]); ctx.lineDashOffset = -t*18*sc*(reduceMotion?0:1);
-  ctx.strokeStyle = 'rgba(110,231,216,.7)'; ctx.beginPath(); ctx.ellipse(cx, baseY-2*sc, 17*sc, 6*sc, 0, 0, Math.PI*2); ctx.stroke();
-  ctx.lineDashOffset = t*24*sc*(reduceMotion?0:1); ctx.strokeStyle = 'rgba(191,247,240,.55)'; ctx.beginPath(); ctx.ellipse(cx, baseY-2*sc, 11*sc, 3.8*sc, 0, 0, Math.PI*2); ctx.stroke();
+  if (Math.sin(t*3) > 0) glow(WX(1333), WY(24), 16*s, '#ff5a4a', .5 + .45*lit);
+
+  // Selektion
+  ctx.globalCompositeOperation = 'source-over';
+  const ring = (id, strong) => {
+    let x, y, rx, ry;
+    if (id==='atlas'){ x = PLAZA.x; y = PLAZA.y; rx = PLAZA.rx; ry = PLAZA.ry; }
+    else if (P[id]?.plot){ x = P[id].x; y = P[id].y + 10; rx = 70; ry = 30; }
+    else { const b = BLD[id].box; x = (b[0]+b[2])/2; y = b[3] - 4; rx = (b[2]-b[0])*.42; ry = 18; }
+    const col = P[id].group==='sb' ? '#f4c86a' : '#6ee7d8';
+    ctx.save(); ctx.lineWidth = Math.max(1.5*dpr, 3*s); ctx.strokeStyle = rgba(col, strong ? .5 + .3*Math.sin(t*3) : .4);
+    ctx.setLineDash(strong ? [] : [5*dpr,5*dpr]); ctx.beginPath(); ctx.ellipse(WX(x), WY(y), rx*s, ry*s, 0, 0, Math.PI*2); ctx.stroke(); ctx.restore();
+  };
+  if (hovered && hovered !== selected) ring(hovered, false);
+  ring(selected, true);
+
+  // Datenleitungen der arbeitenden KIs
+  ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (const bid of Object.keys(BLD)){
+    const act = workingAt(bid); if (!act.length) continue;
+    const pts = routePts(bid), col = A[act[0]].color, full = [[CRYSTAL.x, CRYSTAL.y+30], ...pts];
+    ctx.beginPath(); full.forEach((q,i) => i ? ctx.lineTo(WX(q[0]),WY(q[1])) : ctx.moveTo(WX(q[0]),WY(q[1])));
+    ctx.strokeStyle = rgba(col, .18); ctx.lineWidth = 6*s; ctx.stroke();
+    ctx.strokeStyle = rgba(col, .55); ctx.lineWidth = Math.max(1, 1.6*s); ctx.stroke();
+    if (!reduceMotion) for (let k=0;k<3;k++){ const q = pointOnPoly(full, (t*.28 + k/3) % 1); glow(WX(q[0]), WY(q[1]), 9*s, col, .9); }
+  }
+
+  // KI-Kern
+  const coreAct = AGENTS.filter(a => st[a.id].status==='work').length, pulse = .5 + .5*Math.sin(t*1.6);
+  glow(WX(CRYSTAL.x), WY(CRYSTAL.y), (70 + coreAct*10 + pulse*10)*s, '#6ee7d8', (.18 + lit*.25 + coreAct*.04));
+  const beam = ctx.createLinearGradient(0, WY(CRYSTAL.y+10), 0, WY(CRYSTAL.y-120));
+  beam.addColorStop(0, `rgba(110,231,216,${.18 + lit*.25})`); beam.addColorStop(1, 'rgba(110,231,216,0)');
+  ctx.fillStyle = beam; ctx.fillRect(WX(CRYSTAL.x-9), WY(CRYSTAL.y-120), 18*s, 130*s);
+  ctx.lineWidth = Math.max(1, 1.6*s); ctx.setLineDash([10*s, 8*s]); ctx.lineDashOffset = reduceMotion ? 0 : -t*30*s;
+  ctx.strokeStyle = `rgba(110,231,216,${.35 + lit*.35})`; ctx.beginPath(); ctx.ellipse(WX(PLAZA.x), WY(PLAZA.y - 8), 78*s, 30*s, 0, 0, Math.PI*2); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.globalCompositeOperation = 'source-over';
-  const wm = .6 + .4*Math.abs(Math.cos(t*.8)), dw = 7*sc*wm, top = fy - 11*sc, bot = fy + 10*sc, midY = fy - 1*sc;
-  const cg = ctx.createLinearGradient(cx - dw, top, cx + dw, bot);
-  cg.addColorStop(0,'#e8fffb'); cg.addColorStop(.45,'#6ee7d8'); cg.addColorStop(1,'#1b6f75');
-  ctx.fillStyle = cg; ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx+dw, midY); ctx.lineTo(cx, bot); ctx.lineTo(cx-dw, midY); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx - dw*.55, midY); ctx.lineTo(cx, midY + 2*sc); ctx.closePath(); ctx.fill();
-  ctx.strokeStyle = 'rgba(232,255,251,.8)'; ctx.lineWidth = Math.max(1, sc*.3); ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx+dw, midY); ctx.lineTo(cx, bot); ctx.lineTo(cx-dw, midY); ctx.closePath(); ctx.stroke();
-  ctx.globalCompositeOperation = 'lighter';
-  for (let k=0;k<5;k++){ const ang = t*(reduceMotion?0:1.1) + k*1.2566; glow(cx + Math.cos(ang)*14*sc, fy + Math.sin(ang)*5*sc, 2.5*sc, k%2 ? '#f4c86a' : '#6ee7d8', .8); }
-  ctx.globalCompositeOperation = 'source-over';
+  if (!reduceMotion) for (let k=0;k<6;k++){ const ang = t*.9 + k*1.047; glow(WX(CRYSTAL.x + Math.cos(ang)*34), WY(CRYSTAL.y - 6 + Math.sin(ang)*12 - ((t*12 + k*9) % 40)*.4), 5*s, k%2 ? '#f4c86a' : '#bff7f0', .75); }
 
-  // Agenten (tiefensortiert) + Arbeits-Funken
-  const order = [...AGENTS].sort((a,b) => st[a.id].y - st[b.id].y);
-  const heads = {};
-  for (const a of order){
-    const s = st[a.id];
-    const alpha = s.status==='unknown' ? .55 : 1;
-    if (s.status==='work' && !reduceMotion){ ctx.globalCompositeOperation='lighter'; for (let k=0;k<3;k++){ const ph = (t*1.4 + k/3 + s.i*.21) % 1; glow(WX(s.x + Math.sin(k*2.1+t*2)*4), WY(s.y - 10 - ph*10), 2*sc, a.color, (1-ph)*.8); } ctx.globalCompositeOperation='source-over'; }
-    heads[a.id] = drawAgent(a, t, alpha);
+  // Tag: Schmetterlinge und Vögel · Wind: Blätter
+  ctx.globalCompositeOperation = 'source-over';
+  if (!reduceMotion && day > .4){
+    for (const b of butterflies){ const x = b.cx + Math.sin(t*.7 + b.ph)*b.r, y = b.cy + Math.sin(t*1.3 + b.ph*2)*b.r*.5 - 10, flap = Math.abs(Math.sin(t*14 + b.ph)); ctx.fillStyle = b.col; ctx.fillRect(WX(x) - 2.5*s*flap, WY(y), 2.5*s*flap, 2.5*s); ctx.fillRect(WX(x), WY(y), 2.5*s*flap, 2.5*s); }
+    ctx.strokeStyle = 'rgba(30,34,40,.8)'; ctx.lineWidth = Math.max(1, 1.3*s);
+    for (const b of birds){ const flap = Math.sin(t*10 + b.ph)*3; const x = WX(b.x), y = WY(b.y); ctx.beginPath(); ctx.moveTo(x - 6*s, y - flap*s); ctx.lineTo(x, y); ctx.lineTo(x + 6*s, y - flap*s); ctx.stroke(); }
   }
-  // Namensschilder gestapelt, wenn mehrere am selben Ort stehen
+  for (const l of leaves){ ctx.save(); ctx.translate(WX(l.x), WY(l.y)); ctx.rotate(l.rot); ctx.fillStyle = l.col; ctx.fillRect(-2*s, -1*s, 4*s, 2.2*s); ctx.restore(); }
+  ctx.restore(); // Clip
+
+  // KI-Agenten + Namensschilder
+  const order = [...AGENTS].sort((a,b) => st[a.id].y - st[b.id].y), heads = {};
+  for (const a of order){
+    const s2 = st[a.id];
+    if (s2.status==='work' && !reduceMotion){ ctx.globalCompositeOperation='lighter'; for (let k=0;k<3;k++){ const ph = (t*1.4 + k/3 + s2.i*.21) % 1; glow(WX(s2.x + Math.sin(k*2.1+t*2)*8), WY(s2.y - 26 - ph*26), 4*s, a.color, (1-ph)*.8); } ctx.globalCompositeOperation='source-over'; }
+    heads[a.id] = drawAgent(a, t);
+  }
   const groups = {};
-  for (const a of order){ const s = st[a.id]; const key = s.route.length ? a.id : s.target; (groups[key] ||= []).push(a.id); }
+  for (const a of order){ const s2 = st[a.id]; const key = s2.route.length ? a.id : s2.target; (groups[key] ||= []).push(a.id); }
   for (const key in groups){
-    groups[key].forEach((id, k) => {
-      const a = A[id], s = st[id], h = heads[id];
-      const label = s.status==='unknown' ? a.name + ' · keine Meldung' : a.name;
-      const baseY = Math.min(...groups[key].map(g => heads[g].y));
-      tag(h.x, baseY - k*19*dpr, label, a.color, s.status==='work', t);
-    });
+    const baseY = Math.min(...groups[key].map(g => heads[g].y));
+    groups[key].forEach((id, k) => { const a = A[id], s2 = st[id]; tag(heads[id].x, baseY - k*19*dpr, s2.status==='unknown' ? a.name + ' · keine Meldung' : a.name, a.color, s2.status==='work', t); });
   }
 }
 
 /* =========================================================
-   HTML-Beschriftungen, Panel, Interaktion
+   Simulation
+   ========================================================= */
+function simulate(dt, t){
+  for (const a of AGENTS){ const s = st[a.id]; if (s.route.length && walk(s, dt, 55)) arrive(a.id); }
+  if (mode==='demo') demoTick(dt);
+  if (reduceMotion) return;
+  for (const v of VILLAGERS){
+    if (v.route.length){ walk(v, dt, 32); continue; }
+    v.wait -= dt; if (v.wait > 0) continue;
+    let dest; do { dest = pick(DESTS); } while (dest === v.at);
+    v.route = pathBetween(v.at && v.at !== 'plaza' ? v.at : null, dest); v.at = dest; v.wait = 3 + rnd()*6;
+  }
+  if (cat.wait > 0){ cat.wait -= dt; if (cat.sit > 0) cat.sit -= dt; }
+  else { const dx = cat.tx-cat.x, dy = cat.ty-cat.y, d = Math.hypot(dx,dy);
+    if (d < 2){ cat.wait = 2 + rnd()*6; cat.sit = rnd() < .5 ? cat.wait : 0; const a = rnd()*6.28; cat.tx = PLAZA.x + Math.cos(a)*PLAZA.rx*.8; cat.ty = PLAZA.y + 10 + Math.sin(a)*PLAZA.ry*.7; }
+    else { const m = Math.min(d, 18*dt); cat.x += dx/d*m; cat.y += dy/d*m; if (Math.abs(dx) > .5) cat.face = dx > 0 ? 1 : -1; } }
+  for (const d of ducks){ d.a += (Math.sin(t*.3 + d.sp) * .4) * dt; const nx = d.x + Math.cos(d.a)*d.sp*dt, ny = d.y + Math.sin(d.a)*d.sp*.5*dt; if (isWater(nx+Math.cos(d.a)*14, ny) && isWater(nx, ny+6)){ d.x = nx; d.y = ny; } else d.a += Math.PI*(.6 + rnd()*.4); }
+  birdT -= dt; if (birdT <= 0){ birdT = 18 + rnd()*20; const y0 = 80 + rnd()*500, n = 3 + Math.floor(rnd()*3); for (let i=0;i<n;i++) birds.push({ x:-30 - i*22, y:y0 + (i%2)*14 + i*4, vx:70 + rnd()*10, ph:rnd()*6 }); }
+  for (const b of birds){ b.x += b.vx*dt; b.y += Math.sin(t + b.ph)*.2; } birds = birds.filter(b => b.x < IW + 40);
+  for (const c of clouds){ c.x += (7 + gust*18)*dt; if (c.x - c.r > IW) { c.x = -c.r; c.y = 100 + rnd()*(IH-200); } }
+  gustT -= dt; if (gustT <= 0){ gustT = 25 + rnd()*25; gust = 6; const y0 = rnd()*IH*.8; for (let i=0;i<34;i++) leaves.push({ x:-20 - rnd()*300, y:y0 + rnd()*260, vx:110 + rnd()*70, vy:(rnd()-.5)*20, rot:rnd()*6, vr:(rnd()-.5)*8, ph:rnd()*6, col:pick(['#6cae4f','#8cc25a','#d99a3a','#c8672f']) }); }
+  if (gust > 0) gust = Math.max(0, gust - dt);
+  for (const l of leaves){ l.x += l.vx*dt; l.y += (l.vy + Math.sin(t*3 + l.ph)*18)*dt; l.rot += l.vr*dt; } leaves = leaves.filter(l => l.x < IW + 30);
+  for (const f of flow){ f.life += dt; f.y += 26*dt; f.x += Math.sin(f.y*.02)*6*dt; if (f.life > f.max || !isWater(f.x, f.y)) spawnFlow(f); }
+  for (const f of foam){ f.t += dt*(f.zone===2 ? .9 : .55); if (f.t > 1) { f.t = 0; f.zone = Math.floor(rnd()*3); } }
+  smokeT += dt; if (smokeT > .3){ smokeT = 0; for (const [x,y] of SMOKE_SRC) smoke.push({ x:x + (rnd()-.5)*3, y, vx:(rnd()-.2)*6 + gust*4, vy:-10 - rnd()*6, life:1, size:3 + rnd()*3 }); }
+  for (let i=smoke.length-1;i>=0;i--){ const q = smoke[i]; q.x += q.vx*dt; q.y += q.vy*dt; q.size += dt*2.5; q.life -= dt*.3; if (q.life <= 0) smoke.splice(i,1); }
+  if (tween){ tween.t = Math.min(1, tween.t + dt*2.2); const e = 1 - Math.pow(1 - tween.t, 3); centerOn(tween.fx + (tween.tx-tween.fx)*e, tween.fy + (tween.ty-tween.fy)*e, tween.fs + (tween.ts-tween.fs)*e); if (tween.t >= 1) tween = null; }
+}
+let smokeT = 0;
+
+/* =========================================================
+   Beschriftungen, Panel
    ========================================================= */
 const labelsEl = $('#labels');
 function progressOf(pr){
   if (pr.progressFrom === 'tasks'){ const d = pr.tasks.filter(t => t[1]==='done').length; return Math.round(d/pr.tasks.length*100); }
   return typeof pr.progress === 'number' ? pr.progress : null;
 }
-function statusClass(s){ return s==='In Bearbeitung' ? 'st-run' : s==='Planung' ? 'st-plan' : 'st-none'; }
+const statusClass = s => s==='In Bearbeitung' ? 'st-run' : s==='Planung' ? 'st-plan' : 'st-none';
 function match(id){ if (!filter) return true; const pr = P[id]; return (pr.name + ' ' + pr.building).toLowerCase().includes(filter); }
-
+function anchorOf(id){
+  if (id==='atlas') return [PLAZA.x, PLAZA.y + PLAZA.ry + 6, 'below'];
+  if (P[id].plot) return [P[id].x, P[id].y - 34, 'above'];
+  return BLD[id].label;
+}
 function buildLabels(){
   labelsEl.innerHTML = '';
-  for (const pr of PROJECTS){
+  for (const pr of [...PROJECTS, ...PLOTS.map(p => P[p.id])]){
     const el = document.createElement('button');
-    el.type = 'button'; el.className = 'lbl ' + (pr.id==='atlas' ? 'core' : pr.group==='sb' ? 'sb' : 'other') + (BELOW[pr.id] ? ' below' : '');
+    const pos = anchorOf(pr.id)[2];
+    el.type = 'button';
+    el.className = 'lbl ' + (pr.id==='atlas' ? 'core' : pr.plot ? 'plot' : pr.group==='sb' ? 'sb' : 'other') + (pos==='below' ? ' below' : pos==='center' ? ' mid' : '');
     el.dataset.id = pr.id;
-    const pg = progressOf(pr);
+    const pg = pr.plot ? null : progressOf(pr);
     el.innerHTML = `<span class="lbl-name">${esc(pr.name)}</span>` +
-      (pg !== null ? `<span class="lbl-row"><span class="bar"><i style="width:${pg}%"></i></span>${pg}%</span>` : `<span class="lbl-state">${esc(pr.status)}</span>`) +
+      (pr.plot ? '' : pg !== null ? `<span class="lbl-row"><span class="bar"><i style="width:${pg}%"></i></span>${pg}%</span>` : `<span class="lbl-state">${esc(pr.status)}</span>`) +
       `<span class="lbl-ai"></span>`;
-    el.setAttribute('aria-label', `${pr.name}, ${pr.status}${pg!==null ? ', ' + pg + ' Prozent' : ''}`);
+    el.setAttribute('aria-label', pr.plot ? 'Freier Bauplatz für ein neues Projekt' : `${pr.name}, ${pr.status}${pg!==null ? ', ' + pg + ' Prozent' : ''}`);
     el.addEventListener('click', () => select(pr.id));
     el.addEventListener('mouseenter', () => { hovered = pr.id; });
     el.addEventListener('mouseleave', () => { if (hovered===pr.id) hovered = null; });
     labelsEl.appendChild(el);
   }
 }
-const BELOW = { atlas:true, sbweb:true, sbshop:true };
-function anchorOf(id){ if (id==='atlas') return { x:CORE.x, y:CORE.y + 30 }; const b = B[id]; if (BELOW[id]) return { x:b.x, y:b.y + 9 }; return { x:b.x + (b.kind==='radio' ? 4 : 0), y:(b.top ?? b.y-30) - 2 }; }
 function placeLabels(){
   for (const el of labelsEl.children){
-    const a = anchorOf(el.dataset.id);
-    el.style.left = (WX(a.x)/dpr) + 'px'; el.style.top = (WY(a.y)/dpr) + 'px';
+    const [x,y] = anchorOf(el.dataset.id), X = WX(x)/dpr, Y = WY(y)/dpr;
+    el.style.left = X + 'px'; el.style.top = Y + 'px';
+    el.hidden = X < -40 || Y < -40 || X > cw/dpr + 40 || Y > ch/dpr + 60;
   }
 }
 function refreshLabels(){
   for (const el of labelsEl.children){
     const id = el.dataset.id;
-    el.classList.toggle('sel', id===selected);
-    el.classList.toggle('dim', !match(id));
-    const box = el.querySelector('.lbl-ai');
+    el.classList.toggle('sel', id===selected); el.classList.toggle('dim', !match(id));
     const ids = headingTo(id);
-    box.innerHTML = ids.map(a => `<i style="background:${A[a].color};color:${A[a].color}" title="${esc(A[a].name)}"></i>`).join('');
+    el.querySelector('.lbl-ai').innerHTML = ids.map(a => `<i style="background:${A[a].color};color:${A[a].color}" title="${esc(A[a].name)}"></i>`).join('');
   }
 }
-
 function pixelAvatar(id){
   const rows = spriteRows(id), a = A[id];
-  const col = { A:'#ffffff', S:shade(a.color,.55), B:a.color, V:'#132028', E:'#e8fbff', C:shade(a.color,.78), W:'#fff4df', L:shade(a.color,.45) };
-  let r = '';
-  rows.forEach((row,y) => [...row].forEach((c,x) => { if (c!=='.') r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${c==='A'?a.color:col[c]}"/>`; }));
+  const col = { A:a.color, S:shade(a.color,.55), B:a.color, V:'#132028', E:'#e8fbff', C:shade(a.color,.78), W:'#fff4df', L:shade(a.color,.45) };
+  let r = ''; rows.forEach((row,y) => [...row].forEach((c,x) => { if (c!=='.') r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${col[c]}"/>`; }));
   return `<svg viewBox="0 0 6 9" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
 }
 const STATUS_TXT = { work:'Arbeitet', walk:'Unterwegs', ready:'Bereit', unknown:'Keine Meldung' };
-
 function renderAgents(){
   $('#agentList').innerHTML = AGENTS.map(a => {
-    const s = st[a.id];
-    const where = s.target==='home' ? 'am KI-Kern' : P[s.target] ? P[s.target].name : '';
-    const line = s.status==='unknown' ? `${esc(a.role)} · ${esc(a.source)}` :
-                 s.status==='ready' ? `Bereit am KI-Kern · ${esc(a.role)}` :
-                 `${esc(where)}: ${esc(s.task)}`;
+    const s = st[a.id], where = s.target==='home' ? 'am KI-Kern' : P[s.target] ? P[s.target].name : '';
+    const line = s.status==='unknown' ? `${esc(a.role)} · ${esc(a.source)}` : s.status==='ready' ? `Bereit am KI-Kern · ${esc(a.role)}` : `${esc(where)}: ${esc(s.task)}`;
     return `<button type="button" class="agent" data-agent="${a.id}">${pixelAvatar(a.id)}<span style="min-width:0"><span class="n" style="color:${a.color}">${esc(a.name)}</span><span class="a">${line}</span></span><span class="s ${s.status}"><i></i>${STATUS_TXT[s.status]}</span></button>`;
   }).join('');
   $('#agentNote').textContent = mode==='demo'
     ? 'Demo-Modus: Wer wo arbeitet, ist simuliert, damit du die Bewegung siehst. Die Aufgaben stammen aus deinem Notion.'
-    : 'Echter Stand: Nur Claude Code ist belegt (baut gerade dieses Dashboard). Für Claude, ChatGPT und Gemini gibt es noch keine Anbindung – deshalb „keine Meldung“.';
+    : 'Echter Stand: Claude Code baut gerade diese Welt. Gemini und ChatGPT melden sich, sobald sie als Team angebunden sind.';
 }
 function renderSummary(){
-  const all = PROJECTS.flatMap(p => p.tasks || []);
-  const done = all.filter(t => t[1]==='done').length;
-  const running = PROJECTS.filter(p => p.status!=='Nicht begonnen').length;
-  const act = AGENTS.filter(a => st[a.id].status==='work').length;
-  $('#sum').innerHTML = [
-    [PROJECTS.length, 'Projekte gesamt'], [running, 'laufen (inkl. Atlas)'],
-    [`${done}/${all.length}`, 'Aufgaben erledigt'], ['2/2', 'Meilensteine SternenBücher'],
-  ].map(([v,l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
-  $('#hAct').textContent = act; $('#hProj').textContent = PROJECTS.length;
-  $('#hOpen').textContent = all.length - done; $('#hDone').textContent = done;
+  const all = PROJECTS.flatMap(p => p.tasks || []), done = all.filter(t => t[1]==='done').length;
+  const running = PROJECTS.filter(p => p.status!=='Nicht begonnen').length, act = AGENTS.filter(a => st[a.id].status==='work').length;
+  $('#sum').innerHTML = [[PROJECTS.length,'Projekte gesamt'],[running,'laufen (inkl. Atlas)'],[`${done}/${all.length}`,'Aufgaben erledigt'],[PLOTS.length,'freie Bauplätze']]
+    .map(([v,l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
+  $('#hAct').textContent = act; $('#hProj').textContent = PROJECTS.length; $('#hOpen').textContent = all.length - done; $('#hDone').textContent = done;
 }
 function renderProject(){
-  const pr = P[selected], pg = progressOf(pr);
-  const grp = pr.id==='atlas' ? '<span class="chip grp-other">Dashboard · Kern</span>' : pr.group==='sb' ? '<span class="chip grp-sb">SternenBücher-Bereich</span>' : '<span class="chip grp-other">Weiteres Projekt</span>';
-  let h = `<div class="eyebrow">Ausgewählt · ${esc(pr.building)}</div><h2>${esc(pr.name)}</h2>
-    <div class="chips"><span class="chip ${statusClass(pr.status)}">${esc(pr.status)}</span>${grp}</div>`;
-  if (pr.desc) h += `<p class="desc">${esc(pr.desc)}</p>`;
-  if (pg !== null){
-    h += `<div class="meter"><div class="meter-top"><span>Fortschritt</span><b>${pg} %</b></div><div class="bar ${pr.group==='sb'?'sb':''}"><i style="width:${pg}%"></i></div>
-      <small>${pr.progressFrom==='tasks' ? 'berechnet aus erledigten Aufgaben' : 'laut Notion-Feld „Fortschritt Prozent“'}</small></div>`;
+  const pr = P[selected];
+  if (pr.plot){
+    $('#projCard').innerHTML = `<div class="eyebrow">Ausgewählt · Bauplatz</div><h2>Freier Bauplatz</h2>
+      <div class="chips"><span class="chip st-none">frei</span></div>
+      <p class="desc">Hier kann dein nächstes Projekt einziehen. Lege es in Notion unter „Projekte“ an – dann bekommt es hier ein eigenes Gebäude.</p>
+      <a class="btn" href="${NOTION}3ec50ed7a8c4402ca44637ea943ac758" target="_blank" rel="noopener">Projekte in Notion öffnen <span aria-hidden="true">↗</span></a>`;
+    return;
   }
+  const pg = progressOf(pr);
+  const grp = pr.id==='atlas' ? '<span class="chip grp-other">Dashboard · Kern</span>' : pr.group==='sb' ? '<span class="chip grp-sb">SternenBücher-Bereich</span>' : '<span class="chip grp-other">Weiteres Projekt</span>';
+  let h = `<div class="eyebrow">Ausgewählt · ${esc(pr.building)}</div><h2>${esc(pr.name)}</h2><div class="chips"><span class="chip ${statusClass(pr.status)}">${esc(pr.status)}</span>${grp}</div>`;
+  if (pr.desc) h += `<p class="desc">${esc(pr.desc)}</p>`;
+  if (pg !== null) h += `<div class="meter"><div class="meter-top"><span>Fortschritt</span><b>${pg} %</b></div><div class="bar ${pr.group==='sb'?'sb':''}"><i style="width:${pg}%"></i></div><small>${pr.progressFrom==='tasks' ? 'berechnet aus erledigten Aufgaben' : 'laut Notion-Feld „Fortschritt Prozent“'}</small></div>`;
   if (pr.tasks){
     const d = pr.tasks.filter(t => t[1]==='done').length;
     h += `<div class="kpis"><div class="kpi"><b>${d}/${pr.tasks.length}</b><span>Aufgaben erledigt</span></div>` +
@@ -1119,91 +978,87 @@ function renderProject(){
       `<div class="kpi"><b>${pr.tasks.filter(t=>t[2]==='Hoch' && t[1]!=='done').length}</b><span>offen, Prio hoch</span></div></div>`;
   }
   if (pr.zodiac){
-    h += `<h3 style="margin-top:18px">Sternzeichen-Produktion</h3><div class="zodiac">` + pr.zodiac.map(([n,g,st2]) => {
-      const s = st2 || [0,0,0,0];
-      const on = s.some(v => v>0);
-      return `<div class="zs ${on?'on':''}" title="${esc(n)}: Story ${['offen','in Arbeit','fertig'][s[0]]}, Charakter ${['offen','in Arbeit','fertig'][s[1]]}, Illustration ${['offen','in Arbeit','fertig'][s[2]]}, Layout ${['offen','in Arbeit','fertig'][s[3]]}"><span class="g">${g}︎</span><span class="d">${s.map(v => `<i class="${v===2?'done':v===1?'wip':''}"></i>`).join('')}</span></div>`;
-    }).join('') + `</div><div class="legend"><span>Punkte: Story · Charakter · Illustration · Layout</span><span><i style="background:var(--ok)"></i>fertig</span><span><i style="background:var(--star)"></i>in Arbeit</span></div>`;
+    const lv = ['offen','in Arbeit','fertig'];
+    h += `<h3 style="margin-top:18px">Sternzeichen-Produktion</h3><div class="zodiac">` + pr.zodiac.map(([n,g,z]) => { const s = z || [0,0,0,0];
+      return `<div class="zs ${s.some(v => v>0)?'on':''}" title="${esc(n)}: Story ${lv[s[0]]}, Charakter ${lv[s[1]]}, Illustration ${lv[s[2]]}, Layout ${lv[s[3]]}"><span class="g">${g}︎</span><span class="d">${s.map(v => `<i class="${v===2?'done':v===1?'wip':''}"></i>`).join('')}</span></div>`; }).join('') +
+      `</div><div class="legend"><span>Punkte: Story · Charakter · Illustration · Layout</span><span><i style="background:var(--ok)"></i>fertig</span><span><i style="background:var(--star)"></i>in Arbeit</span></div>`;
   }
   if (pr.tasks){
     const order = { wait:0, todo:1, done:2 }, prio = { Hoch:0, Mittel:1, Niedrig:2 };
-    const list = [...pr.tasks].sort((a,b) => order[a[1]]-order[b[1]] || prio[a[2]]-prio[b[2]]);
-    h += `<h3>Aufgaben</h3><ul class="tasks">` + list.map(([t,s,pp,who]) => {
+    h += `<h3>Aufgaben</h3><ul class="tasks">` + [...pr.tasks].sort((a,b) => order[a[1]]-order[b[1]] || prio[a[2]]-prio[b[2]]).map(([t,s,pp,who]) => {
       const meta = s==='wait' ? `<span class="tm wt">wartet auf Flo</span>` : s==='done' ? `<span class="tm">erledigt</span>` : `<span class="tm ${pp==='Hoch'?'hi':''}">${esc(pp)}</span>`;
       const dot = who ? `<span class="who" style="background:${A[who].color}" title="${esc(A[who].name)}"></span>` : '';
-      return `<li class="${s}"><span class="ic"></span><span class="tt">${dot}${esc(t)}</span>${meta}</li>`;
-    }).join('') + `</ul>`;
-  } else {
-    h += `<h3>Aufgaben</h3><div class="empty">Noch keine Aufgaben in Notion. Sobald du dort welche anlegst, erscheinen sie hier und das Gebäude bekommt einen Fortschrittsbalken.</div>`;
-  }
-  if (pr.milestones){
-    h += `<h3>Meilensteine</h3><ul class="tasks">` + pr.milestones.map(([t,d]) => `<li class="done"><span class="ic"></span><span class="tt">${esc(t)}</span><span class="tm">${esc(d)}</span></li>`).join('') + `</ul>`;
-  }
+      return `<li class="${s}"><span class="ic"></span><span class="tt">${dot}${esc(t)}</span>${meta}</li>`; }).join('') + `</ul>`;
+  } else h += `<h3>Aufgaben</h3><div class="empty">Noch keine Aufgaben in Notion. Sobald du dort welche anlegst, erscheinen sie hier und das Gebäude bekommt einen Fortschrittsbalken.</div>`;
+  if (pr.milestones) h += `<h3>Meilensteine</h3><ul class="tasks">` + pr.milestones.map(([t,d]) => `<li class="done"><span class="ic"></span><span class="tt">${esc(t)}</span><span class="tm">${esc(d)}</span></li>`).join('') + `</ul>`;
   const here = headingTo(pr.id);
   h += `<h3>KIs an diesem Projekt</h3>` + (here.length ? `<div class="here">${here.map(id => `<span><i style="background:${A[id].color}"></i>${esc(A[id].name)} · ${esc(st[id].status==='walk' ? 'unterwegs' : st[id].task)}</span>`).join('')}</div>` : `<div class="empty">Gerade arbeitet keine KI hier.</div>`);
   h += `<a class="btn" href="${NOTION + pr.notion}" target="_blank" rel="noopener">In Notion öffnen <span aria-hidden="true">↗</span></a>`;
   $('#projCard').innerHTML = h;
 }
-function select(id){ selected = id; renderProject(); refreshLabels(); }
-
+function select(id, focus){ selected = id; renderProject(); refreshLabels(); if (focus) focusOn(id); }
 let dirty = true;
 function changed(){ dirty = true; }
 function flush(){ if (!dirty) return; dirty = false; renderAgents(); renderSummary(); refreshLabels(); renderProject(); }
 
-// Zeiger auf der Welt
+/* =========================================================
+   Interaktion
+   ========================================================= */
 const tip = $('#tip');
-function worldPos(e){ const r = cv.getBoundingClientRect(); return { x:((e.clientX - r.left)*dpr - ox)/sc, y:((e.clientY - r.top)*dpr - oy)/sc, cx:e.clientX - r.left, cy:e.clientY - r.top }; }
-function hitAgent(q){ let best=null, bd=7; for (const a of AGENTS){ const s = st[a.id]; const d = Math.hypot(q.x - s.x, (q.y - (s.y-5))*.8); if (d < bd){ bd=d; best=a.id; } } return best; }
+function toImage(e){ const r = cv.getBoundingClientRect(); const px = (e.clientX - r.left)*dpr, py = (e.clientY - r.top)*dpr; return { x:(px - view.ox)/view.s, y:(py - view.oy)/view.s, px, py, cx:e.clientX - r.left, cy:e.clientY - r.top }; }
+function hitAgent(q){ let best=null, bd=22; for (const a of AGENTS){ const s = st[a.id]; const d = Math.hypot(q.x - s.x, (q.y - (s.y-12))*.8); if (d < bd){ bd=d; best=a.id; } } return best; }
 function hitBuilding(q){
-  if (Math.hypot(q.x-CORE.x, (q.y-CORE.y)*1.4) < 26) return 'atlas';
-  for (const b of BLD){ const bb = bounds[b.id]; if (q.x > b.x+bb.x0 && q.x < b.x+bb.x1 && q.y > b.y+bb.y0 && q.y < b.y+6) return b.id; }
+  if (((q.x-PLAZA.x)/PLAZA.rx)**2 + ((q.y-PLAZA.y)/PLAZA.ry)**2 < 1) return 'atlas';
+  for (const id of Object.keys(BLD)){ const b = BLD[id].box; if (q.x > b[0] && q.x < b[2] && q.y > b[1] && q.y < b[3]) return id; }
+  for (const p of PLOTS) if (Math.hypot(q.x-p.x, (q.y-p.y)*1.4) < 70) return p.id;
   return null;
 }
+const pointers = new Map(); let drag = null, pinch = null;
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  if (pointers.size === 1) drag = { x:e.clientX, y:e.clientY, ox:view.ox, oy:view.oy, moved:false };
+  else if (pointers.size === 2){ const [a,b] = [...pointers.values()]; pinch = { d:Math.hypot(a.x-b.x, a.y-b.y), s:view.s }; drag = null; } });
 cv.addEventListener('pointermove', e => {
-  const q = worldPos(e);
-  hoverAgent = hitAgent(q);
-  hovered = hoverAgent ? null : hitBuilding(q);
+  if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  if (pinch && pointers.size === 2){ const [a,b] = [...pointers.values()], r = cv.getBoundingClientRect(); const d = Math.hypot(a.x-b.x, a.y-b.y); zoomAt((pinch.s * d/pinch.d)/view.s, ((a.x+b.x)/2 - r.left)*dpr, ((a.y+b.y)/2 - r.top)*dpr); tween = null; return; }
+  if (drag && pointers.size === 1){ const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.hypot(dx,dy) > 5) drag.moved = true;
+    if (drag.moved){ view.ox = drag.ox + dx*dpr; view.oy = drag.oy + dy*dpr; clampView(); placeLabels(); tween = null; cv.classList.add('dragging'); tip.hidden = true; return; } }
+  const q = toImage(e); hoverAgent = hitAgent(q); hovered = hoverAgent ? null : hitBuilding(q);
   cv.classList.toggle('hot', !!(hoverAgent || hovered));
-  if (hoverAgent){
-    const a = A[hoverAgent], s = st[hoverAgent];
-    const where = s.target==='home' ? 'am KI-Kern' : P[s.target]?.name || '';
+  if (hoverAgent){ const a = A[hoverAgent], s = st[hoverAgent], where = s.target==='home' ? 'am KI-Kern' : P[s.target]?.name || '';
     tip.innerHTML = `<b style="color:${a.color}">${esc(a.name)}</b> · ${STATUS_TXT[s.status]}<small>${s.task ? esc(where) + ': ' + esc(s.task) : esc(a.role)}</small>`;
-    tip.style.left = q.cx + 'px'; tip.style.top = q.cy + 'px'; tip.hidden = false;
-  } else tip.hidden = true;
+    tip.style.left = q.cx + 'px'; tip.style.top = q.cy + 'px'; tip.hidden = false; } else tip.hidden = true;
 });
-cv.addEventListener('pointerleave', () => { hovered = null; hoverAgent = null; tip.hidden = true; });
-cv.addEventListener('click', e => {
-  const q = worldPos(e);
-  const ag = hitAgent(q);
-  if (ag){ const t = st[ag].target; select(t==='home' ? 'atlas' : t); return; }
-  const b = hitBuilding(q); if (b) select(b);
-});
-$('#agentList').addEventListener('click', e => {
-  const btn = e.target.closest('[data-agent]'); if (!btn) return;
-  const t = st[btn.dataset.agent].target; select(t==='home' ? 'atlas' : t);
-});
+function endPointer(e){
+  const wasDrag = drag && drag.moved, single = pointers.size === 1;
+  pointers.delete(e.pointerId); cv.classList.remove('dragging');
+  if (pointers.size < 2) pinch = null;
+  if (single && drag && !wasDrag && e.type === 'pointerup'){ const q = toImage(e); const ag = hitAgent(q);
+    if (ag){ const t = st[ag].target; select(t==='home' ? 'atlas' : t); } else { const b = hitBuilding(q); if (b) select(b); } }
+  if (!pointers.size) drag = null;
+}
+cv.addEventListener('pointerup', endPointer); cv.addEventListener('pointercancel', endPointer);
+cv.addEventListener('pointerleave', () => { if (!pointers.size){ hovered = null; hoverAgent = null; tip.hidden = true; } });
+cv.addEventListener('wheel', e => { e.preventDefault(); const r = cv.getBoundingClientRect(); zoomAt(Math.exp(-e.deltaY*.0015), (e.clientX-r.left)*dpr, (e.clientY-r.top)*dpr); tween = null; }, { passive:false });
+$('#zIn').addEventListener('click', () => { zoomAt(1.3, cw/2, ch/2); tween = null; });
+$('#zOut').addEventListener('click', () => { zoomAt(1/1.3, cw/2, ch/2); tween = null; });
+$('#zFit').addEventListener('click', () => { tween = null; fit(); });
+$('#agentList').addEventListener('click', e => { const btn = e.target.closest('[data-agent]'); if (!btn) return; const t = st[btn.dataset.agent].target; select(t==='home' ? 'atlas' : t, true); });
 $('#q').addEventListener('input', e => { filter = e.target.value.trim().toLowerCase(); refreshLabels(); });
-$('#q').addEventListener('keydown', e => { if (e.key==='Enter'){ const hit = PROJECTS.find(p => match(p.id)); if (hit) select(hit.id); } });
+$('#q').addEventListener('keydown', e => { if (e.key==='Enter'){ const hit = PROJECTS.find(p => match(p.id)); if (hit) select(hit.id, true); } });
 $('#mDemo').addEventListener('click', () => mode!=='demo' && setMode('demo'));
 $('#mReal').addEventListener('click', () => mode!=='real' && setMode('real'));
-document.querySelectorAll('[data-tod]').forEach(b => b.addEventListener('click', () => {
-  todMode = b.dataset.tod;
-  document.querySelectorAll('[data-tod]').forEach(x => x.setAttribute('aria-pressed', x===b));
-  updateClock();
-}));
+document.querySelectorAll('[data-tod]').forEach(b => b.addEventListener('click', () => { todMode = b.dataset.tod; document.querySelectorAll('[data-tod]').forEach(x => x.setAttribute('aria-pressed', x===b)); updateClock(); }));
 const toast = $('#toast'); let toastT;
 document.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', () => {
   if (b.dataset.nav === 'home') return;
   toast.textContent = `„${b.dataset.nav}“ kommt mit dem MVP (Phase 1). Im Prototyp ist nur die Übersicht aktiv.`;
   toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 2600);
 }));
-
 function updateClock(){
-  const now = new Date();
-  const t = tz => new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit',timeZone:tz}).format(now);
+  const now = new Date(), t = tz => new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit',timeZone:tz}).format(now);
   const date = new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Asia/Nicosia'}).format(now);
   $('#tCy').textContent = t('Asia/Nicosia') + ' Uhr';
-  const L = lighting(); const tod = L.dark > .6 ? 'Nacht' : L.dark > 0 || L.warm > 0 ? 'Dämmerung' : 'Tag';
+  const L = lighting(), tod = L.dark > .6 ? 'Nacht' : L.dark > 0 || L.warm > 0 ? 'Dämmerung' : 'Tag';
   $('#tDe').textContent = `Zypern · ${date} · Deutschland ${t('Europe/Berlin')} · ${tod}`;
   const h = cyprusHour();
   $('#greet').textContent = h < 5 ? 'Gute Nacht, Flo' : h < 11 ? 'Guten Morgen, Flo' : h < 17 ? 'Hallo Flo' : h < 22 ? 'Guten Abend, Flo' : 'Gute Nacht, Flo';
@@ -1217,25 +1072,18 @@ new ResizeObserver(resize).observe(stage);
 resize();
 updateClock(); setInterval(updateClock, 15000);
 setMode('demo');
-renderProject();
-flush();
-
+renderProject(); flush();
+Promise.all([loadImg(baseImg, 'assets/dorf.webp'), loadImg(lightImg, 'assets/lichter.png')])
+  .then(() => { buildGlow(); ready = true; fit(); buildBackdrop(); })
+  .catch(err => { console.error('Karte konnte nicht geladen werden:', err.message); });
 let last = performance.now()/1000;
 function loop(){
   const t = performance.now()/1000, dt = Math.min(.05, t - last); last = t;
-  step(dt);
-  if (mode==='demo') demoTick(dt);
-  if (!reduceMotion){
-    smokeT += dt;
-    if (smokeT > .35){ smokeT = 0; for (const s of smokeSrc) smoke.push({ x:s.x + (rnd()-.5), y:s.y, vx:(rnd()-.3)*1.5, vy:-3-rnd()*2, life:1, big:rnd()<.35 }); }
-    for (let i=smoke.length-1;i>=0;i--){ const q = smoke[i]; q.x += q.vx*dt; q.y += q.vy*dt; q.life -= dt*.35; if (q.life <= 0) smoke.splice(i,1); }
-  }
-  render(t);
-  flush();
+  simulate(dt, t); render(t); flush();
   requestAnimationFrame(loop);
 }
-if (reduceMotion){ render(performance.now()/1000); setInterval(() => { const t = performance.now()/1000; step(1); if (mode==='demo') demoTick(1); render(t); flush(); }, 1000); }
+if (reduceMotion) setInterval(() => { const t = performance.now()/1000; simulate(1, t); render(t); flush(); }, 1000);
 else requestAnimationFrame(loop);
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { placeLabels(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeLabels);
 })();
 </script>

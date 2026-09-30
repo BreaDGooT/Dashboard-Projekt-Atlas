@@ -5,7 +5,8 @@ Interaktives, animiertes Projekt-Dashboard für Flos eigene Projekte – eine Pi
 ## Stand
 
 - **Phase 0 – Stil:** Hybrid entschieden (Pixelwelt + moderne Glas-Panels).
-- **Prototyp v0.1:** [`prototype/index.html`](prototype/index.html) – eine einzelne HTML-Datei ohne Build-Schritt.
+- **Prototyp v0.2:** [`prototype/index.html`](prototype/index.html) – ohne Build-Schritt; die Welt basiert auf einer von ChatGPT gemalten Dorf-Karte (`prototype/assets/dorf.webp`), darüber liegt die Animationsebene (Wasser, Licht, Figuren, Tiere, Wind, Tag/Nacht, Zoom).
+  - Neue Karte? In `prototype/` ausführen: `python3 tools/build_mapdata.py` (erzeugt Lichter-Ebene und Wasser-Daten).
   - Projekte, Aufgaben und Meilensteine sind ein Snapshot aus Notion („Flo Dashboard“, Stand 30.09.2026).
   - KI-Aktivität: Umschalter zwischen **Demo** (simuliert) und **Echter Stand**.
   - Tageszeit der Welt folgt der Uhrzeit in Zypern (umschaltbar: Auto / Tag / Nacht).
